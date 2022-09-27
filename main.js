@@ -53,10 +53,12 @@ dcClient.on("messageCreate", async (msg) => {
     ) {
       console.log("new discord message");
       console.log(msg.channelId, msg.author.username);
-      wtsClient.sendMessage(
-        process.env.WTS_GROUP_ID,
-        `${msg.author.username} (discord): ${msg.content}`
-      );
+      wtsClient
+        .sendMessage(
+          process.env.WTS_GROUP_ID,
+          `${msg.author.username} (discord): ${msg.content}`
+        )
+        .catch(() => {});
     }
   } catch (e) {
     console.error(e);
@@ -72,9 +74,12 @@ wtsClient.on("message", async (msg) => {
       const channel = dcClient.channels.cache.get(
         process.env.DISCORD_FORWARD_CHANNEL_ID
       );
-      channel.send(
-        `${msg.author.split("@")[0]} (whatsapp): ${msg.body || msg.type}`
-      );
+      if (channel)
+        channel
+          .send(
+            `${msg.author.split("@")[0]} (whatsapp): ${msg.body || msg.type}`
+          )
+          .catch(() => {});
     }
   } catch (e) {
     console.error(e);
@@ -204,6 +209,6 @@ app.listen(process.env.PORT || 8080, async () => {
     }),
   ]);
   setInterval(() => {
-    if (process.env.PING_URL) fetch(process.env.PING_URL);
+    if (process.env.PING_URL) fetch(process.env.PING_URL).catch(() => {});
   }, 15 * 60 * 1000);
 });
