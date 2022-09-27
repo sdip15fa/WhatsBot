@@ -1,19 +1,28 @@
 //jshint esversion:8
 const express = require("express");
 const app = express();
-const { Client, LocalAuth } = require("whatsapp-web.js");
+const { Client: WTSClient, LocalAuth } = require("whatsapp-web.js");
 const pmpermit = require("./helpers/pmpermit");
 const config = require("./config");
 const fs = require("fs");
 const logger = require("./logger");
 const { afkStatus } = require("./helpers/afkWrapper");
+const { Client: DCClient, GatewayIntentBits } = require("discord.js");
 
-const client = new Client({
+const dcClient = new DCClient({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ],
+});
+
+const wtsClient = new WTSClient({
   puppeteer: { headless: true, args: ["--no-sandbox"] },
   authStrategy: new LocalAuth({ clientId: "whatsbot" }),
 });
 
-client.commands = new Map();
+wtsClient.commands = new Map();
 
 fs.readdir("./commands", (err, files) => {
   if (err) return console.error(e);
@@ -21,24 +30,50 @@ fs.readdir("./commands", (err, files) => {
     if (commandFile.endsWith(".js")) {
       let commandName = commandFile.replace(".js", "");
       const command = require(`./commands/${commandName}`);
-      client.commands.set(commandName, command);
+      wtsClient.commands.set(commandName, command);
     }
   });
 });
 
-client.initialize();
-
-client.on("auth_failure", () => {
+wtsClient.on("auth_failure", () => {
   console.error(
     "There is a problem in authentication, Kindly set the env var again and restart the app"
   );
 });
 
-client.on("ready", () => {
-  console.log("Bot has been started");
+wtsClient.on("ready", () => {
+  console.log("Whatsapp logged in");
 });
 
-client.on("message", async (msg) => {
+dcClient.on("messageCreate", async (msg) => {
+    try {
+      if (msg.channelId === process.env.DISCORD_READ_CHANNEL_ID && !msg.author.bot) {
+        console.log("new discord message");
+        console.log(msg.channelId, msg.author.username);
+        wtsClient.sendMessage(
+          process.env.WTS_GROUP_ID,
+          `${msg.author.username} (discord): ${msg.content}`
+        );
+      }
+    } catch (e) {
+      console.error(e);
+    }
+});
+
+wtsClient.on("message", async (msg) => {
+    try {
+      console.log("new whatsapp message");
+      console.log(msg.author, msg.from);
+      if (msg.author && msg.from === process.env.WTS_GROUP_ID) {
+        console.log(msg.from);
+        const channel = dcClient.channels.cache.get(
+          process.env.DISCORD_FORWARD_CHANNEL_ID
+        );
+        channel.send(`${msg.author.split("@")[0]} (whatsapp): ${msg.body || msg.type}`);
+      }
+    } catch (e) {
+      console.error(e);
+    }
   if (!msg.author && config.pmpermit_enabled === "true") {
     // Pm check for pmpermit module
     var checkIfAllowed = await pmpermit.handler(msg.from.split("@")[0]); // get status
@@ -70,7 +105,7 @@ client.on("message", async (msg) => {
         }
       } catch (e) {
         await logger(
-          client,
+          wtsClient,
           `Incoming afk message error from ${msg.from.split("@")[0]}.\n\n${
             e?.message
           }`
@@ -80,7 +115,7 @@ client.on("message", async (msg) => {
   }
 });
 
-client.on("message_create", async (msg) => {
+wtsClient.on("message_create", async (msg) => {
   // auto pmpermit
   try {
     if (config.pmpermit_enabled == "true") {
@@ -108,14 +143,14 @@ client.on("message_create", async (msg) => {
 
     console.log({ command, args });
 
-    if (client.commands.has(command)) {
+    if (wtsClient.commands.has(command)) {
       try {
-        await client.commands.get(command).execute(client, msg, args);
+        await wtsClient.commands.get(command).execute(wtsClient, msg, args);
       } catch (error) {
         console.log(error);
       }
     } else {
-      await client.sendMessage(
+      await wtsClient.sendMessage(
         msg.to,
         "No such command found. Type !help to get the list of available commands"
       );
@@ -123,7 +158,7 @@ client.on("message_create", async (msg) => {
   }
 });
 
-client.on("message_revoke_everyone", async (after, before) => {
+wtsClient.on("message_revoke_everyone", async (after, before) => {
   if (before) {
     if (
       before.fromMe !== true &&
@@ -131,7 +166,7 @@ client.on("message_revoke_everyone", async (after, before) => {
       before.author == undefined &&
       config.enable_delete_alert == "true"
     ) {
-      client.sendMessage(
+      wtsClient.sendMessage(
         before.from,
         "_You deleted this message_ 👇👇\n\n" + before.body
       );
@@ -139,7 +174,7 @@ client.on("message_revoke_everyone", async (after, before) => {
   }
 });
 
-client.on("disconnected", (reason) => {
+wtsClient.on("disconnected", (reason) => {
   console.log("Client was logged out", reason);
 });
 
@@ -155,6 +190,12 @@ app.use(
   require("serve-index")("public", { icons: true })
 ); // public directory will be publicly available
 
-app.listen(process.env.PORT || 8080, () => {
+app.listen(process.env.PORT || 8080, async () => {
   console.log(`Server listening at Port: ${process.env.PORT || 8080}`);
+  await Promise.all([
+    wtsClient.initialize(),
+    dcClient.login(process.env.DISCORD_TOKEN).then(() => {
+      console.log("Discord logged in");
+    }),
+  ]);
 });

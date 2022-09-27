@@ -17,7 +17,7 @@ const execute = async (client,msg,args) => {
             }
                 
         });
-        let help = `${adminHelp}\n${infoHelp}\n${pluginHelp}\n${commands.get('help').help}`;
+        let help = `Welcome to KK park!\n\n${adminHelp}\n${infoHelp}\n${pluginHelp}\n${commands.get('help').help}`;
         await client.sendMessage(msg.to, help);
     }
 
