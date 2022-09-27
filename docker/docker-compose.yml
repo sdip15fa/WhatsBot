@@ -10,7 +10,7 @@ services:
     environment:
       SESSION_KEY: ${SESSION_KEY}
       PMPERMIT_ENABLED: ${PMPERMIT_ENABLED}
-      MONGODB_URL: ${MONGODB_URL}
+      MONGODB_URL: "mongodb://${MONGO_USER}:${MONGO_PASSWORD}@wtstodis-mongo:${MONGO_PORT}"
       DEFAULT_TR_LANG: ${DEFAULT_TR_LANG}
       ENABLE_DELETE_ALERT: ${ENABLE_DELETE_ALERT}
       OCR_SPACE_API_KEY: ${OCR_SPACE_API_KEY}
@@ -19,3 +19,24 @@ services:
       DISCORD_READ_CHANNEL_ID: ${DISCORD_READ_CHANNEL_ID}
       DISCORD_FORWARD_CHANNEL_ID: ${DISCORD_FORWARD_CHANNEL_ID}
       PING_URL: ${PING_URL}
+    networks:
+      - whatsbot-network
+  wtstodis-mongo:
+    container_name: wtstodis-mongo
+    image: mongo
+    tty: true
+    command: mongod --auth --port=${MONGO_PORT} --bind_ip_all
+    restart: always
+    ports:
+      - ${MONGO_PORT}:${MONGO_PORT}
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: whatsbot
+    networks:
+      - whatsbot-network
+    volumes:
+      - ./data:/data/db
+networks:
+  whatsbot-network:
+    driver: bridge
