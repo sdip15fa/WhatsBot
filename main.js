@@ -46,44 +46,46 @@ wtsClient.on("ready", () => {
 });
 
 dcClient.on("messageCreate", async (msg) => {
-  try {
-    if (
-      msg.channelId === process.env.DISCORD_READ_CHANNEL_ID &&
-      !msg.author.bot
-    ) {
-      console.log("new discord message");
-      console.log(msg.channelId, msg.author.username);
-      wtsClient
-        .sendMessage(
-          process.env.WTS_GROUP_ID,
-          `${msg.author.username} (discord): ${msg.content}`
-        )
-        .catch(() => {});
+  if (JSON.parse(process.env.DISCORD_TO_WHATSAPP))
+    try {
+      if (
+        msg.channelId === process.env.DISCORD_READ_CHANNEL_ID &&
+        !msg.author.bot
+      ) {
+        console.log("new discord message");
+        console.log(msg.channelId, msg.author.username);
+        wtsClient
+          .sendMessage(
+            process.env.WTS_GROUP_ID,
+            `${msg.author.username} (discord): ${msg.content}`
+          )
+          .catch(() => {});
+      }
+    } catch (e) {
+      console.error(e);
     }
-  } catch (e) {
-    console.error(e);
-  }
 });
 
 wtsClient.on("message", async (msg) => {
-  try {
-    console.log("new whatsapp message");
-    console.log(msg.author, msg.from);
-    if (msg.author && msg.from === process.env.WTS_GROUP_ID) {
-      console.log(msg.from);
-      const channel = dcClient.channels.cache.get(
-        process.env.DISCORD_FORWARD_CHANNEL_ID
-      );
-      if (channel)
-        channel
-          .send(
-            `${msg.author.split("@")[0]} (whatsapp): ${msg.body || msg.type}`
-          )
-          .catch(() => {});
+  if (JSON.parse(process.env.WHATSAPP_TO_DISCORD))
+    try {
+      console.log("new whatsapp message");
+      console.log(msg.author, msg.from);
+      if (msg.author && msg.from === process.env.WTS_GROUP_ID) {
+        console.log(msg.from);
+        const channel = dcClient.channels.cache.get(
+          process.env.DISCORD_FORWARD_CHANNEL_ID
+        );
+        if (channel)
+          channel
+            .send(
+              `${msg.author.split("@")[0]} (whatsapp): ${msg.body || msg.type}`
+            )
+            .catch(() => {});
+      }
+    } catch (e) {
+      console.error(e);
     }
-  } catch (e) {
-    console.error(e);
-  }
   if (!msg.author && config.pmpermit_enabled === "true") {
     // Pm check for pmpermit module
     var checkIfAllowed = await pmpermit.handler(msg.from.split("@")[0]); // get status
