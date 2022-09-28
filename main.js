@@ -72,13 +72,13 @@ dcClient.on("messageCreate", async (msg) => {
   }
 });
 
-wtsClient.on("message", async (msg) => {
+wtsClient.on("message_create", async (msg) => {
   if (JSON.parse(process.env.WHATSAPP_TO_DISCORD))
     try {
+      const groupId = (await msg.getChat())?.id._serialized;
       console.log("new whatsapp message");
-      console.log(msg.author, msg.from);
-      if (msg.author && msg.from === process.env.WTS_GROUP_ID) {
-        console.log(msg.from);
+      console.log(msg.author, groupId);
+      if (groupId === process.env.WTS_GROUP_ID) {
         const channel = dcClient.channels.cache.get(
           process.env.DISCORD_FORWARD_CHANNEL_ID
         );
@@ -86,30 +86,33 @@ wtsClient.on("message", async (msg) => {
         if (channel) {
           const contact = await msg.getContact();
 
+          (await msg.getMentions()).forEach((contact) => {
+            if (contact.name)
+              msg.body = msg.body.replaceAll(`@${contact.number}`, `@${contact.name}`);
+          });
+
           let embed = new EmbedBuilder()
             .setColor(0x0099ff)
             .setAuthor({
-              name: contact.name || msg.author?.split("@")[0],
+              name: contact.name || msg.author?.split("@")[0] || "",
               iconURL: await contact.getProfilePicUrl(),
             })
             .setTitle("Whatsapp Message")
             .setDescription(msg.body || msg.type || "")
-            .setTimestamp(new Date())
-            .setFooter({
-              text: "Powered by https://gitlab.com/wcyat/whatsapp-to-discord",
-              iconURL: "https://wcyat.me/favicon.ico"
-            });
+            .setTimestamp(new Date());
           let file;
 
           if (msg.hasQuotedMsg) {
             const quoted = await msg.getQuotedMessage();
             const contact = await quoted.getContact();
-            embed = embed.addFields({
-              name: "Quoted Message",
-              value: `${contact?.name || quoted.author}: ${
-                quoted.body || quoted.type || ""
-              }`,
-            });
+            embed = embed.setFields([
+              {
+                name: "Quoted Message",
+                value: `${contact?.name || quoted.author}: ${
+                  quoted.body || quoted.type || ""
+                }`,
+              },
+            ]);
           }
 
           if (msg.hasMedia) {
@@ -118,9 +121,7 @@ wtsClient.on("message", async (msg) => {
               name: media?.filename || "image.png",
             });
             const fileUrl = `attachment://${media.filename || "image.png"}`;
-            embed = embed
-              .setImage(fileUrl)
-              .setThumbnail(fileUrl)
+            embed = embed.setImage(fileUrl).setThumbnail(fileUrl);
           }
 
           channel
@@ -131,6 +132,9 @@ wtsClient.on("message", async (msg) => {
     } catch (e) {
       console.log(e);
     }
+});
+
+wtsClient.on("message", async (msg) => {
   if (!msg.author && config.pmpermit_enabled === "true") {
     // Pm check for pmpermit module
     var checkIfAllowed = await pmpermit.handler(msg.from.split("@")[0]); // get status
