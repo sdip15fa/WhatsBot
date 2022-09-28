@@ -83,7 +83,7 @@ wtsClient.on("message", async (msg) => {
         if (channel) {
           channel
             .send(
-              `msgId: ${msg.id}
+              `msgId: ${msg.id.id}
 author: ${msg.author.split("@")[0]} (whatsapp)
 
 ${msg.body || msg.type}`
