@@ -46,24 +46,28 @@ wtsClient.on("ready", () => {
 });
 
 dcClient.on("messageCreate", async (msg) => {
-  if (JSON.parse(process.env.DISCORD_TO_WHATSAPP))
+  if (JSON.parse(process.env.DISCORD_TO_WHATSAPP)) {
     try {
       if (
         msg.channelId === process.env.DISCORD_READ_CHANNEL_ID &&
         !msg.author.bot
       ) {
         console.log("new discord message");
-        console.log(msg.channelId, msg.author.username);
+        console.log(msg.channelId, msg.author.tag);
         wtsClient
           .sendMessage(
             process.env.WTS_GROUP_ID,
-            `${msg.author.username} (discord): ${msg.content}`
+            `msgId: ${msg.id}
+author: ${msg.author.tag} (discord)
+
+${msg.content}`
           )
           .catch(() => {});
       }
     } catch (e) {
       console.error(e);
     }
+  }
 });
 
 wtsClient.on("message", async (msg) => {
@@ -76,12 +80,17 @@ wtsClient.on("message", async (msg) => {
         const channel = dcClient.channels.cache.get(
           process.env.DISCORD_FORWARD_CHANNEL_ID
         );
-        if (channel)
+        if (channel) {
           channel
             .send(
-              `${msg.author.split("@")[0]} (whatsapp): ${msg.body || msg.type}`
+              `msgId: ${msg.id}
+author: ${msg.author.split("@")[0]} (whatsapp)
+
+${msg.body || msg.type}`
             )
             .catch(() => {});
+          if (msg.hasMedia) channel.send(await msg.downloadMedia());
+        }
       }
     } catch (e) {
       console.error(e);

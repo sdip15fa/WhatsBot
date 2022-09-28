@@ -5,6 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "node startProcess.js",
+    "dev": "nodemon startProcess.js",
     "gentoken": "node session/genToken.js",
     "gentokenwithdownload": "node session/genTokenWithDownload.js"
   },
@@ -42,5 +43,8 @@
     "urban-dictionary": "^3.0.2",
     "weather-js": "^2.0.0",
     "whatsapp-web.js": "^1.16.5"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
   }
 }
