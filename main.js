@@ -62,7 +62,7 @@ dcClient.on("messageCreate", async (msg) => {
           .catch(() => {});
       }
     } catch (e) {
-      console.error(e);
+      console.log(e);
     }
   }
 });
@@ -83,11 +83,14 @@ wtsClient.on("message", async (msg) => {
               `${msg.author.split("@")[0]} (whatsapp): ${msg.body || msg.type}`
             )
             .catch(() => {});
-          if (msg.hasMedia) channel.send(await msg.downloadMedia());
+          if (msg.hasMedia) {
+            const media = await msg.downloadMedia();
+            if (media) channel.send(media);
+          }
         }
       }
     } catch (e) {
-      console.error(e);
+      console.log(e);
     }
   if (!msg.author && config.pmpermit_enabled === "true") {
     // Pm check for pmpermit module
