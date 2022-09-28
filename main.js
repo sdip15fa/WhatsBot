@@ -85,7 +85,15 @@ wtsClient.on("message", async (msg) => {
             .catch(() => {});
           if (msg.hasMedia) {
             const media = await msg.downloadMedia();
-            if (media) channel.send(media);
+            if (media?.data)
+              channel.send({
+                files: [
+                  {
+                    attachment: Buffer.from(media.data, 'base64'),
+                    ...(media.filename && { name: media.filename }),
+                  },
+                ],
+              });
           }
         }
       }
