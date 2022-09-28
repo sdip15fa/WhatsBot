@@ -1,7 +1,7 @@
-const { Client, LocalAuth } = require("whatsapp-web.js");
-const qrcode = require("qrcode-terminal");
-const { write, clean } = require("./manage");
-const readline = require("readline");
+import { Client, LocalAuth } from "whatsapp-web.js";
+import qrcode from "qrcode-terminal";
+import { write, clean } from "./manage";
+import readline from "readline";
 
 clean();
 

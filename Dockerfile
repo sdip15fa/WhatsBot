@@ -23,6 +23,8 @@ RUN yarn build
 FROM puppeteer
 
 COPY --from=build /app/dist ./
-COPY --from=build /app/node_modules ./node_modules
+COPY ./yarn.lock ./yarn.lock
+
+RUN yarn install --production
 
 CMD ["node", "startProcess.js"]
