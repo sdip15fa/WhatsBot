@@ -57,10 +57,7 @@ dcClient.on("messageCreate", async (msg) => {
         wtsClient
           .sendMessage(
             process.env.WTS_GROUP_ID,
-            `msgId: ${msg.id}
-author: ${msg.author.tag} (discord)
-
-${msg.content}`
+            `${msg.author.tag} (discord): ${msg.content}`
           )
           .catch(() => {});
       }
@@ -83,10 +80,7 @@ wtsClient.on("message", async (msg) => {
         if (channel) {
           channel
             .send(
-              `msgId: ${msg.id.id}
-author: ${msg.author.split("@")[0]} (whatsapp)
-
-${msg.body || msg.type}`
+              `${msg.author.split("@")[0]} (whatsapp): ${msg.body || msg.type}`
             )
             .catch(() => {});
           if (msg.hasMedia) channel.send(await msg.downloadMedia());
