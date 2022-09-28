@@ -106,7 +106,6 @@ export default function main() {
                 name: contact.name || msg.author?.split("@")[0] || "",
                 iconURL: await contact.getProfilePicUrl(),
               })
-              .setTitle("Whatsapp Message")
               .setDescription(msg.body || msg.type || "")
               .setTimestamp(new Date());
             let file: AttachmentBuilder | undefined = undefined;
