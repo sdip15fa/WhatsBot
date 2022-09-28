@@ -7,7 +7,12 @@ const config = require("./config");
 const fs = require("fs");
 const logger = require("./logger");
 const { afkStatus } = require("./helpers/afkWrapper");
-const { Client: DCClient, GatewayIntentBits } = require("discord.js");
+const {
+  Client: DCClient,
+  GatewayIntentBits,
+  EmbedBuilder,
+  AttachmentBuilder,
+} = require("discord.js");
 
 const dcClient = new DCClient({
   intents: [
@@ -77,24 +82,50 @@ wtsClient.on("message", async (msg) => {
         const channel = dcClient.channels.cache.get(
           process.env.DISCORD_FORWARD_CHANNEL_ID
         );
+
         if (channel) {
-          channel
-            .send(
-              `${msg.author.split("@")[0]} (whatsapp): ${msg.body || msg.type}`
-            )
-            .catch(() => {});
+          const contact = await msg.getContact();
+
+          let embed = new EmbedBuilder()
+            .setColor(0x0099ff)
+            .setAuthor({
+              name: contact.name || msg.author?.split("@")[0],
+              iconURL: await contact.getProfilePicUrl(),
+            })
+            .setTitle("Whatsapp Message")
+            .setDescription(msg.body || msg.type || "")
+            .setTimestamp(new Date())
+            .setFooter({
+              text: "Powered by https://gitlab.com/wcyat/whatsapp-to-discord",
+              iconURL: "https://wcyat.me/favicon.ico"
+            });
+          let file;
+
+          if (msg.hasQuotedMsg) {
+            const quoted = await msg.getQuotedMessage();
+            const contact = await quoted.getContact();
+            embed = embed.addFields({
+              name: "Quoted Message",
+              value: `${contact?.name || quoted.author}: ${
+                quoted.body || quoted.type || ""
+              }`,
+            });
+          }
+
           if (msg.hasMedia) {
             const media = await msg.downloadMedia();
-            if (media?.data)
-              channel.send({
-                files: [
-                  {
-                    attachment: Buffer.from(media.data, 'base64'),
-                    ...(media.filename && { name: media.filename }),
-                  },
-                ],
-              });
+            file = new AttachmentBuilder(Buffer.from(media?.data, "base64"), {
+              name: media?.filename || "image.png",
+            });
+            const fileUrl = `attachment://${media.filename || "image.png"}`;
+            embed = embed
+              .setImage(fileUrl)
+              .setThumbnail(fileUrl)
           }
+
+          channel
+            .send({ embeds: [embed], ...(file && { files: [file] }) })
+            .catch(() => {});
         }
       }
     } catch (e) {
