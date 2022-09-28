@@ -1,0 +1,9 @@
+/node_modules/
+/dist/
+/.lh/
+/.wwebjs_auth/
+/session.secure
+/.env
+/Dockerfile
+/docker
+/.dockerignore

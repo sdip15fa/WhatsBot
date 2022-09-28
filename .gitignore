@@ -23,3 +23,8 @@ session-output/*
 session-output
 session.secure
 /.lh/
+**/*.js
+**/*.d.ts
+**/*.js.map
+/dist/
+/docker/data

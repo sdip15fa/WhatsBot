@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   wtstodis:
-    image: registry.gitlab.com/wcyat/whatsapp-to-discord
+    image: wtstodis
     container_name: wtstodis
     restart: unless-stopped
     volumes:
