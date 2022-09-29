@@ -170,8 +170,8 @@ export default function main() {
   wtsClient.on("message", async (msg) => {
     if (!msg.author && config.pmpermit_enabled === "true") {
       // Pm check for pmpermit module
-      var checkIfAllowed = await pmpermit.handler(msg.from.split("@")[0]); // get status
-      if (!checkIfAllowed.permit) {
+      const checkIfAllowed = await pmpermit.handler(msg.from.split("@")[0]); // get status
+      if (!(checkIfAllowed.permit || (await msg.getContact())?.name)) {
         // if not permitted
         if (checkIfAllowed.block) {
           await msg.reply(checkIfAllowed.msg);
