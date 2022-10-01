@@ -1,7 +1,8 @@
 //jshint esversion:8
 import express from "express";
+import download from "download";
 const app = express();
-import { Client as WTSClient, LocalAuth } from "whatsapp-web.js";
+import { Client as WTSClient, LocalAuth, MessageMedia } from "whatsapp-web.js";
 import pmpermit from "./helpers/pmpermit";
 import config from "./config";
 import fs from "fs";
@@ -57,6 +58,65 @@ export default function main() {
   });
 
   dcClient.on("messageCreate", async (msg) => {
+    try {
+      if (msg.author.bot) return;
+      if (msg.channelId !== process.env.DISCORD_FORWARD_CHANNEL_ID) return;
+      const disId = msg.reference?.messageId;
+      if (disId) {
+        const wtsId = (await (await db("messages")).coll.findOne({ disId }))
+          ?.wtsId;
+        console.log(msg.author.id, wtsId, process.env.WTS_GROUP_ID);
+        let replyMsg = msg.content;
+        if (msg.author.id !== process.env.DISCORD_OWNER_ID) {
+          replyMsg = `${msg.author.tag} (discord): ${msg.content}`;
+        }
+
+        const media = await Promise.all(
+          msg.attachments
+            ?.map(async (attachment) => {
+              try {
+                if (typeof attachment.attachment === "string") {
+                  attachment.attachment = await download(
+                    attachment.attachment
+                  ).catch(() => {});
+                }
+                return new MessageMedia(
+                  attachment.contentType,
+                  attachment.attachment.toString("base64"),
+                  attachment.name
+                );
+              } catch {
+                return null;
+              }
+            })
+            .filter((a) => a)
+        );
+
+        console.log(media?.length, media[0]?.filename);
+
+        while (media?.length > 1) {
+          const i = media.shift();
+          wtsClient
+            .sendMessage(process.env.WTS_GROUP_ID, "", {
+              quotedMessageId: wtsId,
+              media: i,
+            })
+            .catch(console.log);
+        }
+
+        wtsClient
+          .sendMessage(process.env.WTS_GROUP_ID, replyMsg, {
+            quotedMessageId: wtsId,
+            ...(media[0] && { media: media[0] }),
+          })
+          .catch(console.log);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  });
+
+  dcClient.on("messageCreate", async (msg) => {
     if (JSON.parse(process.env.DISCORD_TO_WHATSAPP)) {
       try {
         if (
@@ -84,6 +144,7 @@ export default function main() {
         const groupId = (await msg.getChat())?.id._serialized;
         console.log("new whatsapp message");
         console.log(msg.author, groupId);
+        console.log(msg.id._serialized);
         if (groupId === process.env.WTS_GROUP_ID) {
           const channel = dcClient.channels.cache.get(
             process.env.DISCORD_FORWARD_CHANNEL_ID
@@ -114,7 +175,9 @@ export default function main() {
             if (msg.hasQuotedMsg) {
               const quoted = await msg.getQuotedMessage();
               disId = (
-                await (await db("messages")).coll.findOne({ wtsId: quoted.id.id })
+                await (
+                  await db("messages")
+                ).coll.findOne({ wtsId: quoted.id._serialized })
               )?.disId;
 
               if (!disId) {
@@ -142,7 +205,7 @@ export default function main() {
             const newMsg = { embeds: [embed], ...(file && { files: [file] }) };
             const onSuccess = async (message: Message<true>) => {
               (await db("messages")).coll.insertOne({
-                wtsId: msg.id.id,
+                wtsId: msg.id._serialized,
                 disId: message.id,
               });
             };
