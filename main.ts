@@ -296,7 +296,7 @@ export default function main() {
     // auto pmpermit
     try {
       if (config.pmpermit_enabled == "true") {
-        var otherChat = await (await msg.getChat()).getContact();
+        const otherChat = await (await msg.getChat()).getContact();
         if (
           msg.fromMe &&
           msg.type !== "notification_template" &&
@@ -307,9 +307,9 @@ export default function main() {
           !msg.body.endsWith("_Powered by WhatsBot_")
         ) {
           await pmpermit.permit(otherChat.number);
-          await msg.reply(
+          /*await msg.reply(
             `You are automatically permitted for message !\n\n_Powered by WhatsBot_`
-          );
+          );*/
         }
       }
     } catch (ignore) {}
