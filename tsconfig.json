@@ -10,6 +10,7 @@
     "experimentalDecorators": true,
     "allowJs": true,
     "moduleResolution": "node",
+    "skipLibCheck": true,
     "resolveJsonModule": true,
     "sourceMap": true,
     "declaration": true,
@@ -19,6 +20,6 @@
     }
   },
   "include": ["**/*.ts", "*.ts"],
-  "exclude": ["node_modules", "*.js"],
+  "exclude": ["node_modules", "*.js", "dist"],
   "compileOnSave": true,
 }
