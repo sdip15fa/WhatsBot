@@ -65,10 +65,11 @@ export default function main() {
       if (disId) {
         const wtsId = (await (await db("messages")).coll.findOne({ disId }))
           ?.wtsId;
+        if (!wtsId) return;
         console.log(msg.author.id, wtsId, process.env.WTS_GROUP_ID);
         let replyMsg = msg.content;
         if (msg.author.id !== process.env.DISCORD_OWNER_ID) {
-          replyMsg = `${msg.author.tag} (discord): ${msg.content}`;
+          replyMsg = `${msg.author.tag}: ${msg.content}`;
         }
 
         const media = await Promise.all(
@@ -92,8 +93,6 @@ export default function main() {
             .filter((a) => a)
         );
 
-        console.log(media?.length, media[0]?.filename);
-
         while (media?.length > 1) {
           const i = media.shift();
           wtsClient
@@ -109,6 +108,9 @@ export default function main() {
             quotedMessageId: wtsId,
             ...(media[0] && { media: media[0] }),
           })
+          .then(() => {
+            msg.delete().catch(() => {});
+          })
           .catch(console.log);
       }
     } catch (e) {
@@ -119,6 +121,13 @@ export default function main() {
   dcClient.on("messageCreate", async (msg) => {
     if (JSON.parse(process.env.DISCORD_TO_WHATSAPP)) {
       try {
+        const quoteDisId = msg.reference?.messageId;
+        if (
+          quoteDisId &&
+          (await (await db("messages")).coll.findOne({ disId: quoteDisId }))
+        ) {
+          return;
+        }
         if (
           msg.channelId === process.env.DISCORD_READ_CHANNEL_ID &&
           !msg.author.bot
@@ -128,8 +137,19 @@ export default function main() {
           wtsClient
             .sendMessage(
               process.env.WTS_GROUP_ID,
-              `${msg.author.tag} (discord): ${msg.content}`
+              `${
+                process.env.DISCORD_OWNER_ID === msg.author.id
+                  ? ""
+                  : `${msg.author.tag}: `
+              }${msg.content}`
             )
+            .then(() => {
+              if (
+                process.env.DISCORD_READ_CHANNEL_ID ===
+                process.env.DISCORD_FORWARD_CHANNEL_ID
+              )
+                msg.delete().catch(() => {});
+            })
             .catch(() => {});
         }
       } catch (e) {
@@ -357,8 +377,5 @@ export default function main() {
         console.log("Discord logged in");
       }),
     ]);
-    setInterval(() => {
-      if (process.env.PING_URL) fetch(process.env.PING_URL).catch(() => {});
-    }, 15 * 60 * 1000);
   });
 }
