@@ -1,4 +1,3 @@
-import { Dex } from "pokemon-showdown";
 import { Client, Message } from "whatsapp-web.js";
 import { weakness } from "../helpers/weakness";
 

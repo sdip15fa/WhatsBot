@@ -28,6 +28,7 @@
   "homepage": "https://github.com/tuhinpal/WhatsBot#readme",
   "dependencies": {
     "@iamtraction/google-translate": "^1.1.2",
+    "@wcyat/pokemon-showdown": "^0.11.7-2",
     "adm-zip": "^0.5.9",
     "aes-encrypt-stream": "^0.2.0",
     "axios": "^0.21.0",
@@ -41,7 +42,6 @@
     "mongodb": "^4.10.0",
     "node-cron": "^3.0.0",
     "ocr-space-api-wrapper": "^1.0.6",
-    "pokemon-showdown": "^0.11.7",
     "qr-image": "^3.2.0",
     "qrcode-svg": "^1.1.0",
     "qrcode-terminal": "^0.12.0",
