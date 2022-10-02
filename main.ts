@@ -58,15 +58,22 @@ export default function main() {
   });
 
   dcClient.on("messageCreate", async (msg) => {
-    try {
-      if (msg.author.bot) return;
-      if (msg.channelId !== process.env.DISCORD_FORWARD_CHANNEL_ID) return;
-      const disId = msg.reference?.messageId;
-      if (disId) {
+    if (JSON.parse(process.env.DISCORD_TO_WHATSAPP))
+      try {
+        if (msg.author.bot) return;
+        const disId = msg.reference?.messageId;
+
         const wtsId = (await (await db("messages")).coll.findOne({ disId }))
           ?.wtsId;
-        if (!wtsId) return;
         console.log(msg.author.id, wtsId, process.env.WTS_GROUP_ID);
+
+        if (
+          (!JSON.parse(process.env.DISCORD_TO_WHATSAPP) ||
+            msg.channelId !== process.env.DISCORD_READ_CHANNEL_ID) &&
+          !wtsId
+        )
+          return;
+
         let replyMsg = msg.content;
         if (msg.author.id !== process.env.DISCORD_OWNER_ID) {
           replyMsg = `${msg.author.tag}: ${msg.content}`;
@@ -97,7 +104,7 @@ export default function main() {
           const i = media.shift();
           wtsClient
             .sendMessage(process.env.WTS_GROUP_ID, "", {
-              quotedMessageId: wtsId,
+              ...(wtsId && { quotedMessageId: wtsId }),
               media: i,
             })
             .catch(console.log);
@@ -105,57 +112,16 @@ export default function main() {
 
         wtsClient
           .sendMessage(process.env.WTS_GROUP_ID, replyMsg, {
-            quotedMessageId: wtsId,
-            ...(media[0] && { media: media[0] }),
+            ...(wtsId && { quotedMessageId: wtsId }),
+            ...(media?.[0] && { media: media[0] }),
           })
           .then(() => {
             msg.delete().catch(() => {});
           })
           .catch(console.log);
-      }
-    } catch (e) {
-      console.log(e);
-    }
-  });
-
-  dcClient.on("messageCreate", async (msg) => {
-    if (JSON.parse(process.env.DISCORD_TO_WHATSAPP)) {
-      try {
-        const quoteDisId = msg.reference?.messageId;
-        if (
-          quoteDisId &&
-          (await (await db("messages")).coll.findOne({ disId: quoteDisId }))
-        ) {
-          return;
-        }
-        if (
-          msg.channelId === process.env.DISCORD_READ_CHANNEL_ID &&
-          !msg.author.bot
-        ) {
-          console.log("new discord message");
-          console.log(msg.channelId, msg.author.tag);
-          wtsClient
-            .sendMessage(
-              process.env.WTS_GROUP_ID,
-              `${
-                process.env.DISCORD_OWNER_ID === msg.author.id
-                  ? ""
-                  : `${msg.author.tag}: `
-              }${msg.content}`
-            )
-            .then(() => {
-              if (
-                process.env.DISCORD_READ_CHANNEL_ID ===
-                process.env.DISCORD_FORWARD_CHANNEL_ID
-              )
-                msg.delete().catch(() => {});
-            })
-            .catch(() => {});
-        }
       } catch (e) {
         console.log(e);
       }
-    }
   });
 
   wtsClient.on("message_create", async (msg) => {
