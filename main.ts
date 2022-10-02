@@ -116,7 +116,12 @@ export default function main() {
             ...(media?.[0] && { media: media[0] }),
           })
           .then(() => {
-            msg.delete().catch(() => {});
+            if (
+              wtsId ||
+              process.env.DISCORD_READ_CHANNEL_ID ===
+                process.env.DISCORD_FORWARD_CHANNEL_ID
+            )
+              msg.delete().catch(() => {});
           })
           .catch(console.log);
       } catch (e) {
