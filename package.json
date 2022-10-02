@@ -41,6 +41,7 @@
     "mongodb": "^4.10.0",
     "node-cron": "^3.0.0",
     "ocr-space-api-wrapper": "^1.0.6",
+    "pokemon-showdown": "^0.11.7",
     "qr-image": "^3.2.0",
     "qrcode-svg": "^1.1.0",
     "qrcode-terminal": "^0.12.0",

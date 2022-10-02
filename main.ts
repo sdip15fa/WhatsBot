@@ -285,25 +285,27 @@ export default function main() {
       }
     } catch (ignore) {}
 
-    if (msg.fromMe && msg.body.startsWith("!")) {
+    if (msg.body.startsWith("!")) {
       let args = msg.body.slice(1).trim().split(/ +/g);
       let command = args.shift().toLowerCase();
 
-      console.log({ command, args });
+      if (msg.fromMe || ["sticker", "tr"].includes(command)) {
+        console.log({ command, args });
 
-      // @ts-ignore
-      if (wtsClient.commands.has(command)) {
-        try {
-          // @ts-ignore
-          await wtsClient.commands.get(command).execute(wtsClient, msg, args);
-        } catch (error) {
-          console.log(error);
+        // @ts-ignore
+        if (wtsClient.commands.has(command)) {
+          try {
+            // @ts-ignore
+            await wtsClient.commands.get(command).execute(wtsClient, msg, args);
+          } catch (error) {
+            console.log(error);
+          }
+        } else {
+          await wtsClient.sendMessage(
+            msg.to,
+            "No such command found. Type !help to get the list of available commands"
+          );
         }
-      } else {
-        await wtsClient.sendMessage(
-          msg.to,
-          "No such command found. Type !help to get the list of available commands"
-        );
       }
     }
   });
