@@ -73,5 +73,3 @@ Immunities:
 ${immunities.join("\n")}
   `;
 }
-
-console.log(weakness("pikachu"))
