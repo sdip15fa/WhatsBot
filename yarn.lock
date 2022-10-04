@@ -394,10 +394,10 @@
   dependencies:
     "@types/node" "*"
 
-"@wcyat/pokemon-showdown@^0.11.7-3":
-  version "0.11.7-3"
-  resolved "https://registry.yarnpkg.com/@wcyat/pokemon-showdown/-/pokemon-showdown-0.11.7-3.tgz#1dcdcef3f4d9eb2c06367271a3df48922098dbf1"
-  integrity sha512-Up3Z3GDTyecCTh0rOpkPCEFXx5ZGBhMAfxbHR7nnKo9aRNQUuztSbFccV+hNcEORGRZcIpIqz3lyUSmRw4sNJg==
+"@wcyat/pokemon-showdown@^0.11.7-4":
+  version "0.11.7-4"
+  resolved "https://registry.yarnpkg.com/@wcyat/pokemon-showdown/-/pokemon-showdown-0.11.7-4.tgz#40ab2e67cf3f6001897b9fd51b76702419a75c97"
+  integrity sha512-t3qN5PbZmQaZ9msdSXVJtbmoMZPqpqkz8kZCV54y2fxPU+AtD8b127oO64vcoV+nvSpe8mnICba7Oewt1tcFaw==
   dependencies:
     "@swc/core" "1.2.205"
     "@types/pg" "^8.6.1"
