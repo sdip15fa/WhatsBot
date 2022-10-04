@@ -3,9 +3,19 @@ import { weakness } from "../helpers/weakness";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   if (!args[0]) {
-    return await client.sendMessage(msg.to, "Please provide an argument.");
+    return await client.sendMessage(
+      (
+        await msg.getChat()
+      ).id._serialized,
+      "Please provide an argument."
+    );
   }
-  await client.sendMessage(msg.to, weakness(args[0]));
+  await client.sendMessage(
+    (
+      await msg.getChat()
+    ).id._serialized,
+    weakness(args[0])
+  );
 };
 
 module.exports = {

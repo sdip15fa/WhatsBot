@@ -8,7 +8,12 @@ import { search } from "../helpers/song";
 const execute = async (client: Client, msg: Message, args: string[]) => {
   msg.delete(true);
   let getdata = await search(args.join(" "));
-  let sendmessage = await client.sendMessage(msg.to, getdata.content); // have to grab the message ID
+  let sendmessage = await client.sendMessage(
+    (
+      await msg.getChat()
+    ).id._serialized,
+    getdata.content
+  ); // have to grab the message ID
   if (getdata.status) {
     fs.writeFileSync(
       path.join(__dirname, `../cache/song~${sendmessage.id.id}.json`),

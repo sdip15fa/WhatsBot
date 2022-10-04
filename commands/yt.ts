@@ -46,13 +46,17 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
 
   if (data == "error") {
     await client.sendMessage(
-      msg.to,
+      (
+        await msg.getChat()
+      ).id._serialized,
       `🙇‍♂️ *Error*\n\n` +
         "```Something Unexpected Happened to fetch the YouTube video```"
     );
   } else if (typeof data !== "string") {
     await client.sendMessage(
-      msg.to,
+      (
+        await msg.getChat()
+      ).id._serialized,
       new MessageMedia(
         data.image.mimetype,
         data.image.data,

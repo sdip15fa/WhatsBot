@@ -45,7 +45,9 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     );
   } else if (typeof data !== "string") {
     await client.sendMessage(
-      msg.to,
+      (
+        await msg.getChat()
+      ).id._serialized,
       `*Original (${data.ori_lang}) :* ` +
         "```" +
         data.original +

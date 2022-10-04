@@ -4,7 +4,8 @@ import axios from "axios";
 import { Client, Message } from "whatsapp-web.js";
 
 export async function getShortURL(input: string) {
-  return axios.get(`https://da.gd/s?url=${input}`)
+  return axios
+    .get(`https://da.gd/s?url=${input}`)
     .then(async function (response) {
       let shortened = response.data;
       let out = {
@@ -29,13 +30,17 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
 
   if (data == "error") {
     await client.sendMessage(
-      msg.to,
+      (
+        await msg.getChat()
+      ).id._serialized,
       `🙇‍♂️ *Error*\n\n` +
         "```Please make sure the entered URL is in correct format.```"
     );
   } else if (typeof data !== "string") {
     await client.sendMessage(
-      msg.to,
+      (
+        await msg.getChat()
+      ).id._serialized,
       `Short URL for ${data.input} is 👇\n${data.short}`
     );
   }

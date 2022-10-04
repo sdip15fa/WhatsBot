@@ -24,7 +24,9 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   }
 
   await client.sendMessage(
-    msg.to,
+    (
+      await msg.getChat()
+    ).id._serialized,
     new MessageMedia(data.mimetype, data.data, data.filename),
     { caption: `QR code for 👇\n` + "```" + msg.body + "```" }
   );

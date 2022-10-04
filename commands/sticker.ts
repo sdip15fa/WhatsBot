@@ -7,7 +7,9 @@ const execute = async (client: Client, msg: Message) => {
   if (quotedMsg.hasMedia) {
     let attachmentData = await quotedMsg.downloadMedia();
     await client.sendMessage(
-      msg.to,
+      (
+        await msg.getChat()
+      ).id._serialized,
       new MessageMedia(
         attachmentData.mimetype,
         attachmentData.data,

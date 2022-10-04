@@ -60,6 +60,8 @@ export function weakness(target: string) {
     }
   }
 
+  console.log(weaknesses, resistances, immunities, species, species.types);
+
   return `
 Weaknesses:
 ${weaknesses.join("\n")}
@@ -69,5 +71,7 @@ ${resistances.join("\n")}
 
 Immunities:
 ${immunities.join("\n")}
-  `
+  `;
 }
+
+console.log(weakness("pikachu"))

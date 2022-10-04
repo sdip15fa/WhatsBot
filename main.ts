@@ -289,7 +289,22 @@ export default function main() {
       let args = msg.body.slice(1).trim().split(/ +/g);
       let command = args.shift().toLowerCase();
 
-      if (msg.fromMe || ["sticker", "tr", "weakness"].includes(command)) {
+      if (
+        msg.fromMe ||
+        [
+          "directlink",
+          "didsong",
+          "qr",
+          "shorten",
+          "song",
+          "sticker",
+          "tr",
+          "weakness",
+          "weather",
+          "yt",
+          "ytmusic",
+        ].includes(command)
+      ) {
         console.log({ command, args });
 
         // @ts-ignore

@@ -9,7 +9,9 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     let getdata = await download(args[0], quotedMsg.id.id);
     if (getdata.status && typeof getdata.content !== "string") {
       await client.sendMessage(
-        msg.to,
+        (
+          await msg.getChat()
+        ).id._serialized,
         new MessageMedia(
           getdata.content.image.mimetype,
           getdata.content.image.data,
@@ -18,11 +20,18 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         { caption: getdata.content.text }
       );
     } else if (typeof getdata.content === "string") {
-      await client.sendMessage(msg.to, getdata.content);
+      await client.sendMessage(
+        (
+          await msg.getChat()
+        ).id._serialized,
+        getdata.content
+      );
     }
   } else {
     await client.sendMessage(
-      msg.to,
+      (
+        await msg.getChat()
+      ).id._serialized,
       "```Search for the song with !song and then reply to the query result with this command```"
     );
   }

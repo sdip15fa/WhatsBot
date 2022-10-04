@@ -34,7 +34,12 @@ const execute = async (client: Client, msg: Message) => {
       quotedMsg.reply(`🔗 *Direct Link 👇*\n\n` + "```" + data + "```");
     }
   } else {
-    await client.sendMessage(msg.to, "Please reply to a media file");
+    await client.sendMessage(
+      (
+        await msg.getChat()
+      ).id._serialized,
+      "Please reply to a media file"
+    );
   }
 };
 

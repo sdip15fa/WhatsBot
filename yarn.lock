@@ -394,10 +394,33 @@
   dependencies:
     "@types/node" "*"
 
-"@wcyat/pokemon-showdown@^0.11.7-2":
-  version "0.11.7-2"
-  resolved "https://registry.yarnpkg.com/@wcyat/pokemon-showdown/-/pokemon-showdown-0.11.7-2.tgz#bebf5d7ea80034d7e8cd8d57e9db7b93325d91a6"
-  integrity sha512-rsk0bXIJnaEIy/t/k8fR3HxBMcR8DYcCNkrjeFVTOopr1xZ3ChmzCHvjCpEQP3V3Wcgz5RxgDlTPUoGSK1/aig==
+"@wcyat/pokemon-showdown@/home/wcyat/dev/pokemon-showdown/sim/sim.tar.gz":
+  version "0.11.7-3"
+  uid c836f8490d066e15fb84e6a1cc04ea3cf2c5241c
+  resolved "/home/wcyat/dev/pokemon-showdown/sim/sim.tar.gz#c836f8490d066e15fb84e6a1cc04ea3cf2c5241c"
+  dependencies:
+    "@swc/core" "1.2.205"
+    "@types/pg" "^8.6.1"
+    preact "^10.5.15"
+    preact-render-to-string "^5.1.19"
+    probe-image-size "^5.0.0"
+    sockjs "^0.3.21"
+    ts-node "^10.0.0"
+  optionalDependencies:
+    better-sqlite3 "^7.1.0"
+    cloud-env "^0.2.3"
+    githubhook "^1.9.3"
+    node-static "^0.7.11"
+    nodemailer "^6.4.6"
+    permessage-deflate "^0.1.7"
+    pg "^8.7.1"
+    sql-template-strings "^2.2.2"
+    sqlite "^3.0.6"
+    sucrase "^3.15.0"
+
+"@wcyat/pokemon-showdown@file:../../pokemon-showdown/sim/sim.tar.gz":
+  version "0.11.7-3"
+  resolved "file:../../pokemon-showdown/sim/sim.tar.gz#c836f8490d066e15fb84e6a1cc04ea3cf2c5241c"
   dependencies:
     "@swc/core" "1.2.205"
     "@types/pg" "^8.6.1"
