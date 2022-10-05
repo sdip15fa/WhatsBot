@@ -5,15 +5,15 @@ const execute = async (client: Client, msg: Message) => {
   let quotedMsg = await msg.getQuotedMessage();
   if (quotedMsg.hasMedia) {
     let attachmentData = await quotedMsg.downloadMedia();
-    await msg.reply(
+    await client.sendMessage(
+      (
+        await msg.getChat()
+      ).id._serialized,
       new MessageMedia(
         attachmentData.mimetype,
         attachmentData.data,
         attachmentData.filename
       ),
-      (
-        await msg.getChat()
-      ).id._serialized,
       { sendMediaAsSticker: true }
     );
   } else {
