@@ -2,7 +2,6 @@
 import { Client, Message, MessageMedia } from "whatsapp-web.js";
 
 const execute = async (client: Client, msg: Message) => {
-  msg.delete(true);
   let quotedMsg = await msg.getQuotedMessage();
   if (quotedMsg.hasMedia) {
     let attachmentData = await quotedMsg.downloadMedia();
