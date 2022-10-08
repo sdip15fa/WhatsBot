@@ -369,15 +369,15 @@ export default async function main() {
 
   wtsClient.on("message_revoke_everyone", async (after, before) => {
     if (before) {
-      if (
-        before.fromMe !== true &&
-        before.hasMedia !== true &&
-        before.author == undefined &&
-        config.enable_delete_alert == "true"
-      ) {
+      if (config.enable_delete_alert == "true") {
+        const media: false | MessageMedia =
+          before.hasMedia && (await before.downloadMedia().catch(() => false));
         wtsClient.sendMessage(
-          before.from,
-          "_You deleted this message_ 👇👇\n\n" + before.body
+          before.fromMe ? before.from : before.to,
+          `_${
+            (await before.getContact()).name
+          } deleted this message_ 👇👇\n\n ${before.body}`,
+          { ...(media && { media }) }
         );
       }
     }
