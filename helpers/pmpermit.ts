@@ -6,36 +6,28 @@ import database from "../db";
 
 export async function insert(id: string) {
   try {
-    var { conn, coll } = await database("pmpermit");
+    const { coll } = database("pmpermit");
     await coll.insertOne({ number: id, times: 1, permit: false });
     return true;
   } catch (error) {
     return false;
-  } finally {
-    if (conn) {
-      await conn.close();
-    }
   }
 }
 
 export async function updateviolant(id: string, timesvio: number) {
   try {
-    var { conn, coll } = await database("pmpermit");
+    const { coll } = database("pmpermit");
     await coll.updateOne({ number: id }, { $set: { times: timesvio } });
     return true;
   } catch (error) {
     return false;
-  } finally {
-    if (conn) {
-      await conn.close();
-    }
   }
 }
 
 export async function read(id: string) {
   try {
-    var { conn, coll } = await database("pmpermit");
-    var data = await coll.findOne({ number: id });
+    const { coll } = database("pmpermit");
+    const data = await coll.findOne({ number: id });
     if (data && data.permit) {
       // save the cache for later usage
       fs.writeFileSync(
@@ -46,16 +38,12 @@ export async function read(id: string) {
     return data ? { ...data, found: true } : { found: false };
   } catch (error) {
     return { found: false };
-  } finally {
-    if (conn) {
-      await conn.close();
-    }
   }
 }
 
 export async function permit(id: string) {
   try {
-    var { conn, coll } = await database("pmpermit");
+    const { coll } = database("pmpermit");
     await coll.updateOne({ number: id }, { $set: { times: 1, permit: true } });
     fs.writeFileSync(
       path.join(__dirname, `../cache/${id}.json`),
@@ -64,16 +52,12 @@ export async function permit(id: string) {
     return true;
   } catch (error) {
     return false;
-  } finally {
-    if (conn) {
-      await conn.close();
-    }
   }
 }
 
 export async function nopermit(id: string) {
   try {
-    var { conn, coll } = await database("pmpermit");
+    const { coll } = database("pmpermit");
     await coll.updateOne({ number: id }, { $set: { times: 1, permit: false } });
 
     try {
@@ -84,10 +68,6 @@ export async function nopermit(id: string) {
     return true;
   } catch (error) {
     return false;
-  } finally {
-    if (conn) {
-      await conn.close();
-    }
   }
 }
 
@@ -138,7 +118,7 @@ export async function handler(id: string) {
 
 export async function isPermitted(id: string) {
   try {
-    let checkPermit: {[key: string]: any}
+    let checkPermit: { [key: string]: any };
     try {
       checkPermit = JSON.parse(
         fs.readFileSync(path.join(__dirname, `../cache/${id}.json`), "utf8")
@@ -159,6 +139,5 @@ export default {
   permit,
   nopermit,
   handler,
-  isPermitted
-}
-
+  isPermitted,
+};

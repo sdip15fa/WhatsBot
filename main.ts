@@ -16,21 +16,41 @@ import {
   TextChannel,
   Message,
 } from "discord.js";
-import db from "./db";
+import db, { client } from "./db";
+import { agenda } from "./helpers/agenda";
+import { getDate } from "./helpers/date";
+export const dcClient = new DCClient({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ],
+});
 
-export default function main() {
-  const dcClient = new DCClient({
-    intents: [
-      GatewayIntentBits.Guilds,
-      GatewayIntentBits.GuildMessages,
-      GatewayIntentBits.MessageContent,
-    ],
-  });
+export const wtsClient = new WTSClient({
+  puppeteer: { headless: false, args: ["--no-sandbox"] },
+  authStrategy: new LocalAuth({ clientId: "whatsbot" }),
+});
 
-  const wtsClient = new WTSClient({
-    puppeteer: { headless: true, args: ["--no-sandbox"] },
-    authStrategy: new LocalAuth({ clientId: "whatsbot" }),
-  });
+export default async function main() {
+  await client.connect();
+  await agenda.start();
+
+  if (
+    !(await agenda.jobs({
+      name: "send count",
+      data: { groupId: process.env.WTS_GROUP_ID },
+    }))
+  ) {
+    await agenda.every(
+      "1 day",
+      "send count",
+      { groupId: process.env.WTS_GROUP_ID },
+      {
+        startDate: new Date(`${getDate()}T23:59:00.000+08:00`),
+      }
+    );
+  }
 
   // @ts-ignore
   wtsClient.commands = new Map();
@@ -63,8 +83,7 @@ export default function main() {
         if (msg.author.bot) return;
         const disId = msg.reference?.messageId;
 
-        const wtsId = (await (await db("messages")).coll.findOne({ disId }))
-          ?.wtsId;
+        const wtsId = (await db("messages").coll.findOne({ disId }))?.wtsId;
         console.log(msg.author.id, wtsId, process.env.WTS_GROUP_ID);
 
         if (
@@ -166,9 +185,9 @@ export default function main() {
             if (msg.hasQuotedMsg) {
               const quoted = await msg.getQuotedMessage();
               disId = (
-                await (
-                  await db("messages")
-                ).coll.findOne({ wtsId: quoted.id._serialized })
+                await db("messages").coll.findOne({
+                  wtsId: quoted.id._serialized,
+                })
               )?.disId;
 
               if (!disId) {
@@ -195,7 +214,7 @@ export default function main() {
 
             const newMsg = { embeds: [embed], ...(file && { files: [file] }) };
             const onSuccess = async (message: Message<true>) => {
-              (await db("messages")).coll.insertOne({
+              await db("messages").coll.insertOne({
                 wtsId: msg.id._serialized,
                 disId: message.id,
               });
@@ -219,6 +238,28 @@ export default function main() {
       } catch (e) {
         console.log(e);
       }
+  });
+
+  wtsClient.on("message_create", async (msg) => {
+    const groupId = (await msg.getChat()).id._serialized;
+    if (
+      groupId === process.env.WTS_GROUP_ID &&
+      (msg.body || msg.hasMedia) &&
+      !msg.body.startsWith("Messages")
+    ) {
+      const date = getDate();
+
+      if (
+        !(
+          await db("count").coll.updateOne(
+            { groupId, date },
+            { $inc: { count: 1 } }
+          )
+        ).modifiedCount
+      ) {
+        await db("count").coll.insertOne({ groupId, date, count: 1 });
+      }
+    }
   });
 
   wtsClient.on("message", async (msg) => {
@@ -294,6 +335,7 @@ export default function main() {
         [
           "directlink",
           "didsong",
+          "ping",
           "qr",
           "shorten",
           "song",

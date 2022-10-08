@@ -4,14 +4,14 @@
   "description": "Plugable UserBot for WhatsApp",
   "main": "main.js",
   "scripts": {
-    "start": "node dist/startProcess.js",
+    "start": "cd dist && node startProcess.js",
     "start:ts": "ts-node startProcess.ts",
     "build": "tsc",
     "dev": "nodemon startProcess.ts",
     "lint": "prettier --write **/*.ts",
     "docker": "docker build . -t wtstodis",
-    "gentoken": "node session/genToken.js",
-    "gentokenwithdownload": "node session/genTokenWithDownload.js"
+    "gentoken": "ts-node session/genToken.ts",
+    "gentokenwithdownload": "ts-node session/genTokenWithDownload.ts"
   },
   "repository": {
     "type": "git",
@@ -31,6 +31,7 @@
     "@wcyat/pokemon-showdown": "^0.11.7-4",
     "adm-zip": "^0.5.9",
     "aes-encrypt-stream": "^0.2.0",
+    "agenda": "^4.3.0",
     "axios": "^0.21.0",
     "child_process": "^1.0.2",
     "discord.js": "^14.5.0",

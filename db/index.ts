@@ -1,10 +1,11 @@
 import { MongoClient } from "mongodb";
 import config from "../config";
 
-export default async (collection: string) => {
-  const conn = await MongoClient.connect(config.mongodb_url);
+export const client = new MongoClient(config.mongodb_url);
+
+export default (collection: string) => {
   return {
-    conn,
-    coll: conn.db("whatsbot").collection(collection),
+    conn: client,
+    coll: client.db("whatsbot").collection(collection),
   };
 };
