@@ -7,6 +7,7 @@ services:
     restart: unless-stopped
     volumes:
      - ./session.secure:/app/session.secure
+     - ./.wwebjs_auth:/app/.wwebjs_auth
     environment:
       SESSION_KEY: ${SESSION_KEY}
       PMPERMIT_ENABLED: ${PMPERMIT_ENABLED}
