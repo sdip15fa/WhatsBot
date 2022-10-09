@@ -352,6 +352,7 @@ export default async function main() {
           "tr",
           "weakness",
           "weather",
+          "ud",
           "yt",
           "ytmusic",
         ].includes(command)
