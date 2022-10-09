@@ -40,7 +40,7 @@ export default async function main() {
     !(await agenda.jobs({
       name: "send count",
       data: { groupId: process.env.WTS_GROUP_ID },
-    }))
+    })).length
   ) {
     await agenda.every(
       "1 day",
