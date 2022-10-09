@@ -14,7 +14,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   let data = await ud(args.join(" "));
   if (data == "error") {
     await client.sendMessage(
-      msg.to,
+      (await msg.getChat()).id._serialized,
       `🙇‍♂️ *Error*\n\n` +
         "```Something Unexpected Happened while Lookup on Urban Dictionary```"
     );
