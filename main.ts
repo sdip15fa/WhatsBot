@@ -37,10 +37,12 @@ export default async function main() {
   await agenda.start();
 
   if (
-    !(await agenda.jobs({
-      name: "send count",
-      data: { groupId: process.env.WTS_GROUP_ID },
-    })).length
+    !(
+      await agenda.jobs({
+        name: "send count",
+        data: { groupId: process.env.WTS_GROUP_ID },
+      })
+    ).length
   ) {
     await agenda.every(
       "1 day",
@@ -260,6 +262,11 @@ export default async function main() {
         await db("count").coll.insertOne({ groupId, date, count: 1 });
       }
     }
+  });
+
+  wtsClient.on("message", async (msg) => {
+    if (JSON.parse(process.env.MARK_AS_SEEN || ""))
+      await wtsClient.sendSeen((await msg.getChat())?.id._serialized);
   });
 
   wtsClient.on("message", async (msg) => {
