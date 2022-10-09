@@ -266,7 +266,9 @@ export default async function main() {
 
   wtsClient.on("message", async (msg) => {
     if (JSON.parse(process.env.MARK_AS_SEEN || ""))
-      await wtsClient.sendSeen((await msg.getChat())?.id._serialized);
+      await wtsClient
+        .sendSeen((await msg.getChat())?.id._serialized)
+        .catch(() => {});
   });
 
   wtsClient.on("message", async (msg) => {
