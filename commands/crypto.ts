@@ -26,7 +26,6 @@ async function getPrice(cryptoCode: string) {
     });
 }
 const execute = async (client: Client, msg: Message, args: string[]) => {
-  msg.delete(true);
   let data = await getPrice(args[0]);
   if (data == "error") {
     await client.sendMessage(

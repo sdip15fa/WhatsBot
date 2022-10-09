@@ -2,7 +2,6 @@ import { Client, Message } from "whatsapp-web.js";
 
 //jshint esversion:8
 const execute = async (client: Client, msg: Message, args: string[]) => {
-  msg.delete(true);
   // @ts-ignore
   let commands = client.commands;
   if (!args.length) {

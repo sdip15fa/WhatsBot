@@ -13,7 +13,6 @@ async function qrgen(text: string) {
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   let data;
-  msg.delete(true);
 
   if (msg.hasQuotedMsg) {
     let quotedMsg = await msg.getQuotedMessage();

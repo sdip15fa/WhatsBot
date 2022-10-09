@@ -6,7 +6,6 @@ import path from "path";
 import { search } from "../helpers/song";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
-  msg.delete(true);
   let getdata = await search(args.join(" "));
   let sendmessage = await client.sendMessage(
     (

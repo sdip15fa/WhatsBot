@@ -4,7 +4,6 @@ import { Client, Message } from "whatsapp-web.js";
 import { exec } from "child_process";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
-  msg.delete(true);
   exec("cd public && " + args.join(" "), async (error, stdout, stderr) => {
     if (error) {
       await client.sendMessage(msg.to, "*whatsbot~:* ```" + error + "```");

@@ -2,8 +2,6 @@
 import { Client, Message, MessageMedia } from "whatsapp-web.js";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
-  msg.delete(true);
-
   let count = Number(args.shift());
   if (isNaN(count)) {
     await client.sendMessage(msg.to, `🙇‍♂️ *Error*\n\n` + "```Invalid count```");

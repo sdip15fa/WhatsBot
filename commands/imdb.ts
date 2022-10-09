@@ -6,7 +6,6 @@ const imdb_host = `https://imdb-api.tprojects.workers.dev`; // no slash at the e
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   try {
-    msg.delete(true);
     let query = args.join(" ");
     let res = await axios.get(`${imdb_host}/search?query=${query}`);
     const data = res.data;

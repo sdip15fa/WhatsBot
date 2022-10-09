@@ -45,7 +45,6 @@ async function getTrackingDetails(
     });
 }
 const execute = async (client: Client, msg: Message, args: string[]) => {
-  msg.delete(true);
   let data = await getTrackingDetails(args[0], args[1]);
   if (data.status === "error") {
     await client.sendMessage(

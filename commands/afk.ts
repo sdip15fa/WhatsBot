@@ -2,7 +2,6 @@ import { Client, Message } from "whatsapp-web.js";
 import { startAfk, afkStatus, stopAfk } from "../helpers/afkWrapper";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
-  msg.delete(true);
   try {
     let commandType = args.shift();
 

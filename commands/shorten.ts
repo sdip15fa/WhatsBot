@@ -19,7 +19,6 @@ export async function getShortURL(input: string) {
     });
 }
 const execute = async (client: Client, msg: Message, args: string[]) => {
-  msg.delete(true);
   let data;
   if (msg.hasQuotedMsg) {
     let quotedMsg = await msg.getQuotedMessage();

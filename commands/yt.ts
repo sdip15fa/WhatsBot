@@ -35,8 +35,6 @@ async function youtube(url: string) {
 const execute = async (client: Client, msg: Message, args: string[]) => {
   let data;
 
-  msg.delete(true);
-
   if (msg.hasQuotedMsg) {
     let quotedMsg = await msg.getQuotedMessage();
     data = await youtube(quotedMsg.body);

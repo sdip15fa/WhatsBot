@@ -42,7 +42,6 @@ async function emailVerifier(email: string) {
 }
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
-  msg.delete(true);
   let getdata;
   if (msg.hasQuotedMsg) {
     let quotedMsg = await msg.getQuotedMessage();

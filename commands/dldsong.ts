@@ -4,7 +4,6 @@ import { download } from "../helpers/song";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   if (msg.hasQuotedMsg) {
-    msg.delete(true);
     let quotedMsg = await msg.getQuotedMessage();
     let getdata = await download(args[0], quotedMsg.id.id);
     if (getdata.status && typeof getdata.content !== "string") {

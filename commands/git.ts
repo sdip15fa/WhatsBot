@@ -63,7 +63,6 @@ async function gitinfo(url: string) {
 }
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
-  msg.delete(true);
   let data = await gitinfo(args[0]);
   if (data.status) {
     if (data.data.status) {

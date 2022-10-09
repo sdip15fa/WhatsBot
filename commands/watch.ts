@@ -57,7 +57,6 @@ async function getDetails(title: string) {
     });
 }
 const execute = async (client: Client, msg: Message, args: string[]) => {
-  msg.delete(true);
   let data = await getDetails(args.join(" "));
   if (data == "error") {
     await client.sendMessage(

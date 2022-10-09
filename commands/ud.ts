@@ -11,7 +11,6 @@ async function ud(term: string) {
 }
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
-  msg.delete(true);
   let data = await ud(args.join(" "));
   if (data == "error") {
     await client.sendMessage(

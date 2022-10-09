@@ -1,7 +1,13 @@
 //jshint esversion:8
 import config from "../config";
 import axios from "axios";
-import { BatteryInfo, Client, ClientInfoPhone, Message, MessageMedia } from "whatsapp-web.js";
+import {
+  BatteryInfo,
+  Client,
+  ClientInfoPhone,
+  Message,
+  MessageMedia,
+} from "whatsapp-web.js";
 import packageJson from "../package.json";
 
 async function get(battery: BatteryInfo, phn_info: ClientInfoPhone) {
@@ -30,7 +36,6 @@ async function get(battery: BatteryInfo, phn_info: ClientInfoPhone) {
 }
 
 const execute = async (client: Client, msg: Message) => {
-  msg.delete(true);
   let startdata = await get(
     await client.info.getBatteryStatus(),
     client.info.phone

@@ -23,7 +23,6 @@ async function telegraph(attachmentData: MessageMedia) {
     });
 }
 const execute = async (client: Client, msg: Message) => {
-  msg.delete(true);
   if (msg.hasQuotedMsg) {
     let quotedMsg = await msg.getQuotedMessage();
     let attachmentData = await quotedMsg.downloadMedia();

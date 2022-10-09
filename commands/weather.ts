@@ -20,7 +20,6 @@ async function fetchweather(query: string) {
 }
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
-  msg.delete(true);
   const data = await fetchweather(args.join(" "));
   if (data == "error") {
     await client.sendMessage(
