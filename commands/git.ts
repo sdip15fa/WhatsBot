@@ -88,4 +88,5 @@ module.exports = {
   isDependent: false,
   help: `*Github*\n\nGet a github repository in zip format with it's details.\n\nSend a message with *!git [Github-Url]* to execute.`,
   execute,
+  public: false
 };

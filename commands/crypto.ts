@@ -29,21 +29,21 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   let data = await getPrice(args[0]);
   if (data == "error") {
     await client.sendMessage(
-      msg.to,
+      (await msg.getChat()).id._serialized,
       `🙇‍♂️ *Error*\n\n` +
         "```Something unexpected happened while fetching Cryptocurrency Price```"
     );
   }
   if (data == "unsupported") {
     await client.sendMessage(
-      msg.to,
+      (await msg.getChat()).id._serialized,
       `🙇‍♂️ *Error*\n\n` +
         "```Support for this CryptoCurrency is not yet added```"
     );
   } else if (data instanceof Object) {
     let date = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
     await client.sendMessage(
-      msg.to,
+      (await msg.getChat()).id._serialized,
       `Price of *${data.name}* as of ${date} is *₹ ${data.price}*`
     );
   }
@@ -57,4 +57,5 @@ module.exports = {
   isDependent: false,
   help: `*Crypto Currency*\n\nGet current price of cryptocurrency. \n\n*!crypto [crypto-code]*\n`,
   execute,
+  public: true
 };

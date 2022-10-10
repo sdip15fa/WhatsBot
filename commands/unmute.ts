@@ -17,4 +17,5 @@ module.exports = {
   isDependent: true, //whether this command is related/dependent to some other command
   help: "This command is related to !mute. Type !help mute to learn about this", // a string descring how to use this command Ex = help : 'To use this command type !test arguments'
   execute,
+  public: false
 };

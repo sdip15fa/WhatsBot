@@ -11,22 +11,37 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     commands.forEach((command: any) => {
       if (!command.isDependent) {
         if (command.commandType === "admin")
-          adminHelp += `⭐ *${command.name} (${command.command})*  - ${command.description}\n`;
+          adminHelp += `⭐ *${command.name} (${command.command})*  - ${
+            command.description
+          } (public: ${command.public ? "yes" : "no"})\n`;
         if (command.commandType === "info")
-          infoHelp += `⭐ *${command.name} (${command.command})*  - ${command.description}\n`;
+          infoHelp += `⭐ *${command.name} (${command.command})*  - ${
+            command.description
+          } (public: ${command.public ? "yes" : "no"})\n`;
         if (command.commandType === "plugin")
-          pluginHelp += `⭐ *${command.name} (${command.command})*  - ${command.description}\n`;
+          pluginHelp += `⭐ *${command.name} (${command.command})*  - ${
+            command.description
+          } (public: ${command.public ? "yes" : "no"})\n`;
       }
     });
     let help = `Welcome to KK park!\n\n${adminHelp}\n${infoHelp}\n${pluginHelp}\n${
       commands.get("help").help
     }`;
-    await client.sendMessage(msg.to, help);
+    await client.sendMessage((await msg.getChat()).id._serialized, help);
   } else if (commands.has(args[0])) {
-    await client.sendMessage(msg.to, commands.get(args[0]).help);
+    await client.sendMessage(
+      (
+        await msg.getChat()
+      ).id._serialized,
+      `${commands.get(args[0]).help}\npublic: ${
+        commands.get(args[0]).public ? "yes" : "no"
+      }`
+    );
   } else {
     await client.sendMessage(
-      msg.to,
+      (
+        await msg.getChat()
+      ).id._serialized,
       `No command with the name *${args[0]}*...`
     );
   }
@@ -40,4 +55,5 @@ module.exports = {
   isDependent: false,
   help: "To get more info use ```!help [command]```. Ex: ```!help ping```",
   execute,
+  public: true,
 };

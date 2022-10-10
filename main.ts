@@ -341,21 +341,10 @@ export default async function main() {
 
       if (
         msg.fromMe ||
-        [
-          "directlink",
-          "didsong",
-          "ping",
-          "qr",
-          "shorten",
-          "song",
-          "sticker",
-          "tr",
-          "weakness",
-          "weather",
-          "ud",
-          "yt",
-          "ytmusic",
-        ].includes(command)
+        // @ts-ignore
+        (wtsClient.commands.has(command) &&
+          // @ts-ignore
+          wtsClient.commands.get(command).public)
       ) {
         console.log({ command, args });
 

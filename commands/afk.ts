@@ -52,5 +52,6 @@ module.exports = {
   commandType: "admin", // admin|info|plugin
   isDependent: false, //whether this command is related/dependent to some other command
   help: "*Afk*\n\n1. *!afk on Message* to turn on afk.\n2. *!afk off* to turn off afk.\n3. *!afk status* to check current status of afk.", // a string descring how to use this command Ex = help : 'To use this command type !test arguments'
+  public: false,
   execute,
 };

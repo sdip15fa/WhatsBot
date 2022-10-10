@@ -13,5 +13,6 @@ module.exports = {
   commandType: "plugin",
   isDependent: false,
   help: undefined,
+  public: false,
   execute,
 };

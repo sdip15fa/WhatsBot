@@ -12,4 +12,5 @@ module.exports = {
   isDependent: false,
   help: undefined,
   execute,
+  public: true
 };

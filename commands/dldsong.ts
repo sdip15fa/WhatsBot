@@ -44,4 +44,5 @@ module.exports = {
   isDependent: true,
   help: "use !help song to learn about this command",
   execute,
+  public: true
 };

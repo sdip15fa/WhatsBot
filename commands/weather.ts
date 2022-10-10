@@ -58,4 +58,5 @@ module.exports = {
   isDependent: false,
   help: `*Weather*\n\nLookup a city's weather with this command.\n\n*!weather [Place-Name]*\nTo check a weather`,
   execute,
+  public: true
 };

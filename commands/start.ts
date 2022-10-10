@@ -55,4 +55,5 @@ module.exports = {
   isDependent: false,
   help: "Get information about your WhatsBot",
   execute,
+  public: false
 };

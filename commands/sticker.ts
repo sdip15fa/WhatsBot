@@ -18,7 +18,7 @@ const execute = async (client: Client, msg: Message) => {
     );
   } else {
     await client.sendMessage(
-      msg.to,
+      (await msg.getChat()).id._serialized,
       `🙇‍♂️ *Error*\n\n` + "```No image found to make a Sticker```"
     );
   }
@@ -32,4 +32,5 @@ module.exports = {
   isDependent: false,
   help: `*Sticker Maker*\n\nCreate sticker from Image.\n\nReply an image with *!sticker* to get a sticker of that image.`,
   execute,
+  public: true
 };

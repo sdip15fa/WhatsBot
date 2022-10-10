@@ -26,4 +26,5 @@ module.exports = {
   isDependent: false,
   help: `*Weakness*\n\nLookup a pokemon's weaknesses with this command.\n\n*!weakness [pokemon]*\nTo check a pokemon`,
   execute,
+  public: true
 };

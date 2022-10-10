@@ -35,7 +35,9 @@ const execute = async (client: Client, msg: Message) => {
     }
   } else {
     await client.sendMessage(
-      msg.to,
+      (
+        await msg.getChat()
+      ).id._serialized,
       "```Please reply to an image with text in it```"
     );
   }
@@ -49,4 +51,5 @@ module.exports = {
   isDependent: false,
   help: `*OCR*\n\nReads text from any readable image. \n\n*Reply a photo with !ocr to read text from that image.*\n`,
   execute,
+  public: true,
 };

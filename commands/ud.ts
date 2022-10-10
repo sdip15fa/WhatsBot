@@ -42,4 +42,5 @@ module.exports = {
   isDependent: false,
   help: `*Urban Dictionary*\n\nUrban Dictionary is a crowdsourced online dictionary for slang words and phrases.\n\n*!ud [Word]*\nto search a word using Urban Dictionary`,
   execute,
+  public: true
 };

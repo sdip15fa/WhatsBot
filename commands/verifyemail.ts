@@ -61,4 +61,5 @@ module.exports = {
   isDependent: false,
   help: `*Email Verifier*\n\nTest an Email's validity before it bounce. \n\n*Reply an email with !verifyemail*\nor,\n*!verifyemail [Email Address]*`,
   execute,
+  public: false
 };

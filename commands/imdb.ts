@@ -31,13 +31,13 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       .join("\n")}\n\n*IMDB Link:* ${result.imdb}`;
 
     await client.sendMessage(
-      msg.to,
+      (await msg.getChat()).id._serialized,
       new MessageMedia(image.mimetype, image.data, `${result.title}.jpg`),
       { caption: text }
     );
   } catch (error) {
     let messagetosend = `Something went wrong to get this content\n\n${error?.message}`;
-    await client.sendMessage(msg.to, messagetosend);
+    await client.sendMessage((await msg.getChat()).id._serialized, messagetosend);
   }
 };
 
@@ -49,4 +49,5 @@ module.exports = {
   isDependent: false, //whether this command is related/dependent to some other command
   help: "Type *!imdb {query}* to get detail of a content.\n\n*Ex.* !imdb rrr", // a string descring how to use this command Ex = help : 'To use this command type !test arguments'
   execute,
+  public: true
 };

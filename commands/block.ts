@@ -2,6 +2,7 @@ import { Client, Message } from "whatsapp-web.js";
 
 //jshint esversion:8
 const execute = async (client: Client, msg: Message, args: string[]) => {
+  msg.delete(true);
   if (!msg.to.includes("-")) {
     await msg.reply(
       `*❌ Blocked* \n\n You have been blocked\n\n _Powered by WhatsBot_`
@@ -19,5 +20,6 @@ module.exports = {
   commandType: "admin", //
   isDependent: false, //whether this command is related/dependent to some other command
   help: "Type !block in the chat to block the user", // a string descring how to use this command Ex = help : 'To use this command type !test arguments'
+  public: false,
   execute,
 };

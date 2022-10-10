@@ -48,13 +48,13 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   let data = await getTrackingDetails(args[0], args[1]);
   if (data.status === "error") {
     await client.sendMessage(
-      msg.to,
+      (await msg.getChat()).id._serialized,
       `🙇‍♂️ *Error*\n\n` +
         "```Something unexpected happened while fetching the courier details.```"
     );
   } else {
     await client.sendMessage(
-      msg.to,
+      (await msg.getChat()).id._serialized,
       `🙇‍♂️ *Courier/Shipment Details*\n\n` + "```" + data.status + "```"
     );
   }
@@ -69,4 +69,5 @@ module.exports = {
   isDependent: false,
   help: `*courier*\n\nGet information about your couriers and shipments. \n\n*!courier [courier-name] [tracking-id]*\n\nSupported: Ekart, Gati`,
   execute,
+  public: true,
 };
