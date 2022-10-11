@@ -11,16 +11,17 @@ async function ud(term: string) {
 }
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
+  const chatId = (await msg.getChat()).id._serialized;
   let data = await ud(args.join(" "));
   if (data == "error") {
     await client.sendMessage(
-      (await msg.getChat()).id._serialized,
+      chatId,
       `🙇‍♂️ *Error*\n\n` +
         "```Something Unexpected Happened while Lookup on Urban Dictionary```"
     );
   } else if (typeof data !== "string") {
     await client.sendMessage(
-      (await msg.getChat()).id._serialized,
+      chatId,
       "*Term:* ```" +
         args.join(" ") +
         "```\n\n" +

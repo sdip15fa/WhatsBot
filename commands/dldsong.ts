@@ -3,14 +3,13 @@ import { Client, Message, MessageMedia } from "whatsapp-web.js";
 import { download } from "../helpers/song";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
+  const chatId = (await msg.getChat()).id._serialized;
   if (msg.hasQuotedMsg) {
     let quotedMsg = await msg.getQuotedMessage();
     let getdata = await download(args[0], quotedMsg.id.id);
     if (getdata.status && typeof getdata.content !== "string") {
       await client.sendMessage(
-        (
-          await msg.getChat()
-        ).id._serialized,
+        chatId,
         new MessageMedia(
           getdata.content.image.mimetype,
           getdata.content.image.data,
@@ -20,17 +19,13 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       );
     } else if (typeof getdata.content === "string") {
       await client.sendMessage(
-        (
-          await msg.getChat()
-        ).id._serialized,
+        chatId,
         getdata.content
       );
     }
   } else {
     await client.sendMessage(
-      (
-        await msg.getChat()
-      ).id._serialized,
+      chatId,
       "```Search for the song with !song and then reply to the query result with this command```"
     );
   }

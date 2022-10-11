@@ -5,6 +5,7 @@ import processImage from "../helpers/processImage";
 const imdb_host = `https://imdb-api.tprojects.workers.dev`; // no slash at the end
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
+  const chatId = (await msg.getChat()).id._serialized;
   try {
     let query = args.join(" ");
     let res = await axios.get(`${imdb_host}/search?query=${query}`);
@@ -31,13 +32,13 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       .join("\n")}\n\n*IMDB Link:* ${result.imdb}`;
 
     await client.sendMessage(
-      (await msg.getChat()).id._serialized,
+      chatId,
       new MessageMedia(image.mimetype, image.data, `${result.title}.jpg`),
       { caption: text }
     );
   } catch (error) {
     let messagetosend = `Something went wrong to get this content\n\n${error?.message}`;
-    await client.sendMessage((await msg.getChat()).id._serialized, messagetosend);
+    await client.sendMessage(chatId, messagetosend);
   }
 };
 

@@ -45,16 +45,17 @@ async function getTrackingDetails(
     });
 }
 const execute = async (client: Client, msg: Message, args: string[]) => {
+  const chatId = (await msg.getChat()).id._serialized;
   let data = await getTrackingDetails(args[0], args[1]);
   if (data.status === "error") {
     await client.sendMessage(
-      (await msg.getChat()).id._serialized,
+      chatId,
       `🙇‍♂️ *Error*\n\n` +
         "```Something unexpected happened while fetching the courier details.```"
     );
   } else {
     await client.sendMessage(
-      (await msg.getChat()).id._serialized,
+      chatId,
       `🙇‍♂️ *Courier/Shipment Details*\n\n` + "```" + data.status + "```"
     );
   }

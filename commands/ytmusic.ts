@@ -32,6 +32,7 @@ async function youtube(url: string) {
 }
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
+  const chatId = (await msg.getChat()).id._serialized;
   let data;
 
   if (msg.hasQuotedMsg) {
@@ -43,17 +44,13 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
 
   if (data == "error") {
     await client.sendMessage(
-      (
-        await msg.getChat()
-      ).id._serialized,
+      chatId,
       `🙇‍♂️ *Error*\n\n` +
         "```Something Unexpected Happened to fetch the YouTube video```"
     );
   } else if (typeof data !== "string") {
     await client.sendMessage(
-      (
-        await msg.getChat()
-      ).id._serialized,
+      chatId,
       new MessageMedia(
         data.image.mimetype,
         data.image.data,

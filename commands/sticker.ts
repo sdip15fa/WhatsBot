@@ -2,13 +2,12 @@
 import { Client, Message, MessageMedia } from "whatsapp-web.js";
 
 const execute = async (client: Client, msg: Message) => {
+  const chatId = (await msg.getChat()).id._serialized;
   let quotedMsg = await msg.getQuotedMessage();
   if (quotedMsg.hasMedia) {
     let attachmentData = await quotedMsg.downloadMedia();
     await client.sendMessage(
-      (
-        await msg.getChat()
-      ).id._serialized,
+      chatId,
       new MessageMedia(
         attachmentData.mimetype,
         attachmentData.data,
@@ -18,7 +17,7 @@ const execute = async (client: Client, msg: Message) => {
     );
   } else {
     await client.sendMessage(
-      (await msg.getChat()).id._serialized,
+      chatId,
       `🙇‍♂️ *Error*\n\n` + "```No image found to make a Sticker```"
     );
   }

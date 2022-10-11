@@ -32,6 +32,8 @@ export const wtsClient = new WTSClient({
   authStrategy: new LocalAuth({ clientId: "whatsbot" }),
 });
 
+export const commands = new Map();
+
 export default async function main() {
   await client.connect();
   await agenda.start();
@@ -45,7 +47,7 @@ export default async function main() {
     ).length
   ) {
     await agenda.every(
-      "1 day",
+      "24 hours",
       "send count",
       { groupId: process.env.WTS_GROUP_ID },
       {
@@ -54,17 +56,13 @@ export default async function main() {
     );
   }
 
-  // @ts-ignore
-  wtsClient.commands = new Map();
-
   fs.readdir("./commands", (err, files) => {
     if (err) return console.error(err);
     files.forEach((commandFile) => {
       if (commandFile.endsWith(".js")) {
         let commandName = commandFile.replace(".js", "");
         const command = require(`./commands/${commandName}`);
-        // @ts-ignore
-        wtsClient.commands.set(commandName, command);
+        commands.set(commandName, command);
       }
     });
   });
@@ -341,18 +339,13 @@ export default async function main() {
 
       if (
         msg.fromMe ||
-        // @ts-ignore
-        (wtsClient.commands.has(command) &&
-          // @ts-ignore
-          wtsClient.commands.get(command).public)
+        (commands.has(command) && commands.get(command).public)
       ) {
         console.log({ command, args });
 
-        // @ts-ignore
-        if (wtsClient.commands.has(command)) {
+        if (commands.has(command)) {
           try {
-            // @ts-ignore
-            await wtsClient.commands.get(command).execute(wtsClient, msg, args);
+            await commands.get(command).execute(wtsClient, msg, args);
           } catch (error) {
             console.log(error);
           }

@@ -20,6 +20,7 @@ export async function getShortURL(input: string) {
 }
 const execute = async (client: Client, msg: Message, args: string[]) => {
   let data;
+  const chatId = (await msg.getChat()).id._serialized;
   if (msg.hasQuotedMsg) {
     let quotedMsg = await msg.getQuotedMessage();
     data = await getShortURL(quotedMsg.body);
@@ -29,17 +30,13 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
 
   if (data == "error") {
     await client.sendMessage(
-      (
-        await msg.getChat()
-      ).id._serialized,
+      chatId,
       `🙇‍♂️ *Error*\n\n` +
         "```Please make sure the entered URL is in correct format.```"
     );
   } else if (typeof data !== "string") {
     await client.sendMessage(
-      (
-        await msg.getChat()
-      ).id._serialized,
+      chatId,
       `Short URL for ${data.input} is 👇\n${data.short}`
     );
   }

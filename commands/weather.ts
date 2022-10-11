@@ -20,20 +20,17 @@ async function fetchweather(query: string) {
 }
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
+  const chatId = (await msg.getChat()).id._serialized;
   const data = await fetchweather(args.join(" "));
   if (data == "error") {
     await client.sendMessage(
-      (
-        await msg.getChat()
-      ).id._serialized,
+      chatId,
       `🙇‍♂️ *Error*\n\n` + "```Something Unexpected Happened to fetch Weather```"
     );
   } else if (data instanceof Array) {
     const weather = data[0];
     await client.sendMessage(
-      (
-        await msg.getChat()
-      ).id._serialized,
+      chatId,
       `*Today's Weather at ${weather.location.name}*\n` +
         "```" +
         weather.current.skytext +

@@ -27,23 +27,24 @@ async function getPrice(cryptoCode: string) {
 }
 const execute = async (client: Client, msg: Message, args: string[]) => {
   let data = await getPrice(args[0]);
+  const chatId = (await msg.getChat()).id._serialized;
   if (data == "error") {
     await client.sendMessage(
-      (await msg.getChat()).id._serialized,
+      chatId,
       `🙇‍♂️ *Error*\n\n` +
         "```Something unexpected happened while fetching Cryptocurrency Price```"
     );
   }
   if (data == "unsupported") {
     await client.sendMessage(
-      (await msg.getChat()).id._serialized,
+      chatId,
       `🙇‍♂️ *Error*\n\n` +
         "```Support for this CryptoCurrency is not yet added```"
     );
   } else if (data instanceof Object) {
     let date = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
     await client.sendMessage(
-      (await msg.getChat()).id._serialized,
+      chatId,
       `Price of *${data.name}* as of ${date} is *₹ ${data.price}*`
     );
   }

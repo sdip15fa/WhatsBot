@@ -2,18 +2,15 @@ import { Client, Message } from "whatsapp-web.js";
 import { weakness } from "../helpers/weakness";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
+  const chatId = (await msg.getChat()).id._serialized;
   if (!args[0]) {
     return await client.sendMessage(
-      (
-        await msg.getChat()
-      ).id._serialized,
+      chatId,
       "Please provide an argument."
     );
   }
   await client.sendMessage(
-    (
-      await msg.getChat()
-    ).id._serialized,
+    chatId,
     weakness(args[0])
   );
 };
