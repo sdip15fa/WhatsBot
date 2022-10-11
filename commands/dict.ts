@@ -44,17 +44,17 @@ ${meaning.definitions
     (def, index) =>
       `${index + 1}. ${def.definition}${
         def.example
-          ? `\n\n_Example_:
+          ? `\n_Example_:
 ${def.example}`
           : ""
       }${
         def.synonyms.length
-          ? `\n\n_Synonyms_
+          ? `\n_Synonyms_
 ${def.synonyms.map((synonym) => `- ${synonym}`).join("\n")}`
           : ""
       }${
         def.antonyms.length
-          ? `\n\n_Antonyms_
+          ? `\n_Antonyms_
 ${def.antonyms.map((antonym) => `- ${antonym}`).join("\n")}`
           : ""
       }`
