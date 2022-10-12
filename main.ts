@@ -52,6 +52,7 @@ export default async function main() {
       { groupId: process.env.WTS_GROUP_ID },
       {
         startDate: new Date(`${getDate()}T23:59:00.000+08:00`),
+        skipImmediate: true,
       }
     );
   }
