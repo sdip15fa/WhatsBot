@@ -372,7 +372,7 @@ export default async function main() {
             (await before.getContact()).name || before.author?.split("@")[0]
           } was deleted in ${
             chat.name || chat.id
-          }_ 👇👇\n\n ${before.body || before.type}`,
+          }_ 👇👇\n\n${before.body || before.type}`,
           { ...(media && { media }) }
         );
       }
