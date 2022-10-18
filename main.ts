@@ -367,10 +367,10 @@ export default async function main() {
           before.hasMedia && (await before.downloadMedia().catch(() => false));
         const chat = await before.getChat();
         wtsClient.sendMessage(
-          before.fromMe ? before.from : before.to,
-          `_${
+          before.fromMe ? before.author : before.to,
+          `_${before.isStatus ? "Status" : "Message"} from ${
             (await before.getContact()).name || before.author?.split("@")[0]
-          }deleted this ${before.isStatus ? "status" : "message"} in ${
+          } was deleted in ${
             chat.name || chat.id
           }_ 👇👇\n\n ${before.body || before.type}`,
           { ...(media && { media }) }
