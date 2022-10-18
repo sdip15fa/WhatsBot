@@ -47,11 +47,11 @@ export default async function main() {
     ).length
   ) {
     await agenda.every(
-      "24 hours",
+      "59 23 * * *",
       "send count",
       { groupId: process.env.WTS_GROUP_ID },
       {
-        startDate: new Date(`${getDate()}T23:59:00.000+08:00`),
+        timezone: "Asia/Hong_Kong",
         skipImmediate: true,
       }
     );
@@ -360,16 +360,19 @@ export default async function main() {
     }
   });
 
-  wtsClient.on("message_revoke_everyone", async (after, before) => {
+  wtsClient.on("message_revoke_everyone", async (_after, before) => {
     if (before) {
       if (config.enable_delete_alert == "true") {
         const media: false | MessageMedia =
           before.hasMedia && (await before.downloadMedia().catch(() => false));
+        const chat = await before.getChat();
         wtsClient.sendMessage(
           before.fromMe ? before.from : before.to,
           `_${
-            (await before.getContact()).name
-          } deleted this message_ 👇👇\n\n ${before.body}`,
+            (await before.getContact()).name || before.author?.split("@")[0]
+          }deleted this ${before.isStatus ? "status" : "message"} in ${
+            chat.name || chat.id
+          }_ 👇👇\n\n ${before.body || before.type}`,
           { ...(media && { media }) }
         );
       }
@@ -380,7 +383,7 @@ export default async function main() {
     console.log("Client was logged out", reason);
   });
 
-  app.get("/", (req, res) => {
+  app.get("/", (_req, res) => {
     res.send(
       '<h1>This server is powered by Whatsbot<br><a href="https://github.com/tuhinpal/WhatsBot">https://github.com/tuhinpal/WhatsBot</a></h1>'
     );
