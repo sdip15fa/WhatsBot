@@ -370,9 +370,9 @@ export default async function main() {
           const chat = await before.getChat();
           wtsClient
             .sendMessage(
-              before.fromMe ? before.author : before.to,
+              before.fromMe ? before.from : before.to,
               `_${before.isStatus ? "Status" : "Message"} from ${
-                (await before.getContact()).name || before.author?.split("@")[0]
+                (await before.getContact())?.name || before.author?.split("@")[0]
               } was deleted in ${chat.name || chat.id}_ 👇👇\n\n${
                 before.body || before.type
               }`,
