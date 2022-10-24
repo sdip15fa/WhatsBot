@@ -28,7 +28,7 @@ export const dcClient = new DCClient({
 });
 
 export const wtsClient = new WTSClient({
-  puppeteer: { headless: true, args: ["--no-sandbox"] },
+  puppeteer: { headless: false, args: ["--no-sandbox"] },
   authStrategy: new LocalAuth({ clientId: "whatsbot" }),
 });
 
@@ -104,9 +104,7 @@ export default async function main() {
             ?.map(async (attachment) => {
               try {
                 if (typeof attachment.attachment === "string") {
-                  attachment.attachment = await download(
-                    attachment.attachment
-                  ).catch(() => {});
+                  attachment.attachment = await download(attachment.attachment);
                 }
                 return new MessageMedia(
                   attachment.contentType,
@@ -372,7 +370,8 @@ export default async function main() {
             .sendMessage(
               before.fromMe ? before.from : before.to,
               `_${before.isStatus ? "Status" : "Message"} from ${
-                (await before.getContact())?.name || before.author?.split("@")[0]
+                (await before.getContact())?.name ||
+                before.author?.split("@")[0]
               } was deleted in ${chat.name || chat.id}_ 👇👇\n\n${
                 before.body || before.type
               }`,
