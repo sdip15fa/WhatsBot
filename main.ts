@@ -28,7 +28,7 @@ export const dcClient = new DCClient({
 });
 
 export const wtsClient = new WTSClient({
-  puppeteer: { headless: false, args: ["--no-sandbox"] },
+  puppeteer: { headless: true, args: ["--no-sandbox"] },
   authStrategy: new LocalAuth({ clientId: "whatsbot" }),
 });
 
