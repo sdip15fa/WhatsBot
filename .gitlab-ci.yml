@@ -50,7 +50,7 @@ update-dependencies:
   script:
     - yarn
     - yarn upgrade --latest
-    - git commit -a -m "Update Dependencies"
+    - git commit -a -m "Update Dependencies" || (echo "nothing to commit" && exit 0)
     - git push origin main
   rules:
     - if: $UPDATE
