@@ -44,6 +44,8 @@ update-dependencies:
   image: node:18-alpine
   before_script:
     - apk add git
+    - git config --global user.email "bot@wcyat.me"
+    - git config --global user.name "wcyat bot"
     - git remote set-url origin https://root:$gitlab_token@$CI_SERVER_HOST/$CI_PROJECT_PATH
   script:
     - yarn
