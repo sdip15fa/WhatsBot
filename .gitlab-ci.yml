@@ -34,6 +34,20 @@ docker-build:
     - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
   # Run this job in a branch where a Dockerfile exists
   rules:
+    - if: $UPDATE
+      when: never
     - if: $CI_COMMIT_BRANCH
       exists:
         - Dockerfile
+
+update-dependencies:
+  image: node:18-alpine
+  before_script:
+    - git remote set-url origin https://root:$gitlab_token@$CI_SERVER_HOST/$CI_PROJECT_PATH
+  script:
+    - yarn
+    - yarn upgrade --latest
+    - git commit -a -m "Update Dependencies"
+    - git push origin main
+  rules:
+    - if: $UPDATE
