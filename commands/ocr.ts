@@ -1,6 +1,5 @@
 //jshint esversion:8
-// @ts-ignore
-import ocrSpace from "ocr-space-api-wrapper";
+import { ocrSpace } from "ocr-space-api-wrapper";
 import { Client, Message, MessageMedia } from "whatsapp-web.js";
 import config from "../config";
 
