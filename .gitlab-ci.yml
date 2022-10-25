@@ -52,6 +52,6 @@ update-dependencies:
     - yarn
     - yarn upgrade --latest
     - git commit -a -m "Update Dependencies" || exit 0
-    - git push origin main || exit 0
+    - git push origin main
   rules:
     - if: $UPDATE
