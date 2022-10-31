@@ -52,6 +52,7 @@ update-dependencies:
   script:
     - yarn
     - yarn upgrade --latest
+    - yarn add whatsapp-web.js@latest
     - git commit -a -m "Update Dependencies" || exit 0
     - git push origin main
   rules:
