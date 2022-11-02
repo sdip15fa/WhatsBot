@@ -6,7 +6,7 @@ declare module "metar" {
     auto: boolean;
     wind: {
       speed: number;
-      gust?: any;
+      gust?: number;
       direction: number;
       variation: {
         min: number;
