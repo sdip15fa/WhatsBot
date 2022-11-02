@@ -42,7 +42,7 @@ ${date.toLocaleDateString("en-UK", {
 Wind ${data.wind.direction}° ${data.wind.speed}${data.wind.unit}${
         data.wind.gust ? ` Gusting ${data.wind.gust}${data.wind.unit}` : ""
       }
-Visibility ${data.visibility === 9999 ? "over 9999" : data.visibility}m
+Visibility ${data.visibility === 9999 ? "over 9999m" : `${data.visibility}km`}
 ${data.weather
   ?.sort((a, b) => a.abbreviation.length - b.abbreviation.length)
   .map((v) => {
