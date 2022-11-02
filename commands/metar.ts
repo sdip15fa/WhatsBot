@@ -40,7 +40,7 @@ ${date.toLocaleDateString("en-UK", {
   timeZone: "UTC",
 })} ${date.toLocaleTimeString("en-UK", { timeZone: "UTC" })} UTC
 Wind ${data.wind.direction}° ${data.wind.speed}${data.wind.unit}${
-        data.wind.gust ? ` ${data.wind.gust}${data.wind.unit}` : ""
+        data.wind.gust ? ` Gusting ${data.wind.gust}${data.wind.unit}` : ""
       }
 Visibility ${data.visibility === 9999 ? "over 9999" : data.visibility}m
 ${data.weather
