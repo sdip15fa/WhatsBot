@@ -14,6 +14,7 @@ async function fetchmetar() {
     const metar = parsed.querySelector("p").innerText;
     return {
       ...parseMETAR(metar),
+      original: metar,
       special_weather_conditions: metar.split(" ").pop(),
     };
   } catch {
@@ -31,6 +32,7 @@ const execute = async (client: Client, msg: Message) => {
     );
   } else {
     const date = new Date(data.time);
+    await client.sendMessage(chatId, data.original);
     await client.sendMessage(
       chatId,
       `METAR ${data.station}
