@@ -18,10 +18,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         { caption: getdata.content.text }
       );
     } else if (typeof getdata.content === "string") {
-      await client.sendMessage(
-        chatId,
-        getdata.content
-      );
+      await client.sendMessage(chatId, getdata.content);
     }
   } else {
     await client.sendMessage(
@@ -39,5 +36,5 @@ module.exports = {
   isDependent: true,
   help: "use !help song to learn about this command",
   execute,
-  public: true
+  public: true,
 };

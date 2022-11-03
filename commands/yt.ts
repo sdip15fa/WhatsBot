@@ -85,5 +85,5 @@ module.exports = {
   isDependent: false,
   help: `*Youtube*\n\nDownload a Youtube video with this command.\n\n*!yt [Youtube-Link]*\nor,\nReply a message with *!yt* to Download`,
   execute,
-  public: true
+  public: true,
 };

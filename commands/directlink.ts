@@ -51,5 +51,5 @@ module.exports = {
   isDependent: false,
   help: `*Directlink*\n\nIt will generate photo's directlink for you.\n\nReply a photo with *!directlink* to Create`,
   execute,
-  public: true
+  public: true,
 };

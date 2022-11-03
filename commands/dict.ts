@@ -24,12 +24,14 @@ ${
   definition.phonetics.length
     ? `\n*Phonetics*
 
-${definition.phonetics.map(
-  (phonetic, index) =>
-    `${index + 1}.${phonetic.text ? `\nText: ${phonetic.text}` : ""}${
-      phonetic.audio ? `\nAudio: ${phonetic.audio}` : ""
-    }`
-).join("\n\n")}\n`
+${definition.phonetics
+  .map(
+    (phonetic, index) =>
+      `${index + 1}.${phonetic.text ? `\nText: ${phonetic.text}` : ""}${
+        phonetic.audio ? `\nAudio: ${phonetic.audio}` : ""
+      }`
+  )
+  .join("\n\n")}\n`
     : ""
 }
 *Meanings*
@@ -62,11 +64,11 @@ ${def.antonyms.map((antonym) => `- ${antonym}`).join("\n")}`
   .join("\n\n")}`
   )
   .join("\n\n")}${
-  definition.origin
-    ? `\n\n*Origin*:
+        definition.origin
+          ? `\n\n*Origin*:
 ${definition.origin}`
-    : ""
-}`
+          : ""
+      }`
     );
   }
 };

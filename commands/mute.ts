@@ -22,5 +22,5 @@ module.exports = {
   isDependent: false, //whether this command is related/dependent to some other command
   help: `Type !mute in chat to mute the chat for 1 hour. use !unmute to unmute the chat.`, // a string descring how to use this command Ex = help : 'To use this command type !test arguments'
   execute,
-  public: false
+  public: false,
 };

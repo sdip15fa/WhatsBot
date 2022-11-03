@@ -58,5 +58,5 @@ module.exports = {
   isDependent: false,
   help: `*Crypto Currency*\n\nGet current price of cryptocurrency. \n\n*!crypto [crypto-code]*\n`,
   execute,
-  public: true
+  public: true,
 };

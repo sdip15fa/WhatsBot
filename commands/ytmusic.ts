@@ -84,5 +84,5 @@ module.exports = {
   isDependent: false,
   help: `*Youtube Music*\n\nDownload mp3 from a Youtube Link with this command.\n\n*!ytmusic [Youtube-Link]*\nor,\nReply a youtube link with *!ytmusic*`,
   execute,
-  public: true
+  public: true,
 };

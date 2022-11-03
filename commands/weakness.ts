@@ -4,15 +4,9 @@ import { weakness } from "../helpers/weakness";
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
   if (!args[0]) {
-    return await client.sendMessage(
-      chatId,
-      "Please provide an argument."
-    );
+    return await client.sendMessage(chatId, "Please provide an argument.");
   }
-  await client.sendMessage(
-    chatId,
-    weakness(args[0])
-  );
+  await client.sendMessage(chatId, weakness(args[0]));
 };
 
 module.exports = {
@@ -23,5 +17,5 @@ module.exports = {
   isDependent: false,
   help: `*Weakness*\n\nLookup a pokemon's weaknesses with this command.\n\n*!weakness [pokemon]*\nTo check a pokemon`,
   execute,
-  public: true
+  public: true,
 };

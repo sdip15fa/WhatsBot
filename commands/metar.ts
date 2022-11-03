@@ -15,7 +15,7 @@ async function fetchmetar(airport: string = "VHHH") {
       .filter((v) => v.innerText.startsWith("METAR"))[0]
       .innerText.split(" ")
       .filter((v, i) => i !== 0)
-      .join(" ")}`;
+      .join(" ")}`.trim();
 
     return {
       ...parseMETAR(metar),
@@ -49,15 +49,17 @@ Wind ${data.wind.direction}° ${data.wind.speed}${data.wind.unit}${
         data.wind.gust ? ` Gusting ${data.wind.gust}${data.wind.unit}` : ""
       }
 Visibility ${data.visibility === 9999 ? "over 9999m" : `${data.visibility}km`}
-Weather ${data.weather
-  ?.sort((a, b) => a.abbreviation.length - b.abbreviation.length)
-  .map((v) => {
-    if (v.abbreviation.length === 1) {
-      return v.abbreviation;
-    }
-    return v.meaning;
-  })
-  .join(" ") || "no data"}
+Weather ${
+        data.weather
+          ?.sort((a, b) => a.abbreviation.length - b.abbreviation.length)
+          .map((v) => {
+            if (v.abbreviation.length === 1) {
+              return v.abbreviation;
+            }
+            return v.meaning;
+          })
+          .join(" ") || "no data"
+      }
 Clouds ${
         data.clouds?.map((v) => `${v.meaning} ${v.altitude}m`).join(", ") ||
         "none"

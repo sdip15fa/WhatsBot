@@ -99,5 +99,5 @@ module.exports = {
   isDependent: false,
   help: `*Translator*\n\nIt will translate text in different languages.\n\n_Usage:_\n1. *!tr [Text]*\n2. Reply with *!tr*\n3. *!tr [Output-Language] [Text]*\n4.Reply with \n*!tr [Output-Language]*`,
   execute,
-  public: true
+  public: true,
 };

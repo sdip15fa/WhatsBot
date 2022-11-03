@@ -31,5 +31,5 @@ module.exports = {
   isDependent: false,
   help: `*Sticker Maker*\n\nCreate sticker from Image.\n\nReply an image with *!sticker* to get a sticker of that image.`,
   execute,
-  public: true
+  public: true,
 };

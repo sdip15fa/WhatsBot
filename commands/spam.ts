@@ -54,5 +54,5 @@ module.exports = {
   isDependent: false,
   help: `*Spam*\n\nSpam Messages. \n\n*!spam [count text]*\nOR\nreply *!spam [count]* to any message`,
   execute,
-  public: false
+  public: false,
 };

@@ -51,5 +51,5 @@ module.exports = {
   help: `*Shorten Link*\n\nCreates short URL for any valid URL. \n\n*!shorten [valid-url]*\n`,
   getShortURL,
   execute,
-  public: true
+  public: true,
 };

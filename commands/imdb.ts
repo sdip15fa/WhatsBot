@@ -50,5 +50,5 @@ module.exports = {
   isDependent: false, //whether this command is related/dependent to some other command
   help: "Type *!imdb {query}* to get detail of a content.\n\n*Ex.* !imdb rrr", // a string descring how to use this command Ex = help : 'To use this command type !test arguments'
   execute,
-  public: true
+  public: true,
 };
