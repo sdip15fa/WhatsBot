@@ -20,7 +20,7 @@ declare module "metar" {
       abbreviation: string;
       meaning: string;
     }[];
-    clouds: {
+    clouds?: {
       abbreviation: string;
       meaning: string;
       altitude: number;

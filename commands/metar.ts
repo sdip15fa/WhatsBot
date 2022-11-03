@@ -5,13 +5,18 @@ import { Client, Message } from "whatsapp-web.js";
 import { parse } from "node-html-parser";
 import parseMETAR from "metar";
 
-async function fetchmetar() {
+async function fetchmetar(airport: string = "VHHH") {
   try {
     const { data } = await axios.get(
-      "https://www.hko.gov.hk/aviat/metar_eng_revamp.json"
+      `https://en.allmetsat.com/metar-taf/asia.php?icao=${airport}`
     );
-    const parsed = parse(data.metar_decode_eng_json.content.table.content);
-    const metar = parsed.querySelector("p").innerText;
+    const parsed = parse(data);
+    const metar = `METAR ${Array.from(parsed.querySelectorAll("p"))
+      .filter((v) => v.innerText.startsWith("METAR"))[0]
+      .innerText.split(" ")
+      .filter((v, i) => i !== 0)
+      .join(" ")}`;
+
     return {
       ...parseMETAR(metar),
       original: metar,
@@ -22,9 +27,10 @@ async function fetchmetar() {
   }
 }
 
-const execute = async (client: Client, msg: Message) => {
+const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
-  const data = await fetchmetar();
+  const airport = args[0];
+  const data = await fetchmetar(airport || "VHHH");
   if (!data) {
     await client.sendMessage(
       chatId,
@@ -43,7 +49,7 @@ Wind ${data.wind.direction}° ${data.wind.speed}${data.wind.unit}${
         data.wind.gust ? ` Gusting ${data.wind.gust}${data.wind.unit}` : ""
       }
 Visibility ${data.visibility === 9999 ? "over 9999m" : `${data.visibility}km`}
-${data.weather
+Weather ${data.weather
   ?.sort((a, b) => a.abbreviation.length - b.abbreviation.length)
   .map((v) => {
     if (v.abbreviation.length === 1) {
@@ -51,8 +57,11 @@ ${data.weather
     }
     return v.meaning;
   })
-  .join(" ")}
-Clouds ${data.clouds?.map((v) => `${v.meaning} ${v.altitude}m`).join(", ")}
+  .join(" ") || "no data"}
+Clouds ${
+        data.clouds?.map((v) => `${v.meaning} ${v.altitude}m`).join(", ") ||
+        "none"
+      }
 Temperature ${data.temperature}.${data.dewpoint}°C
 QNH ${data.altimeterInHpa} hPa
 ${data.special_weather_conditions}`
