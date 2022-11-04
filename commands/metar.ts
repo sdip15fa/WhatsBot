@@ -61,7 +61,7 @@ Weather ${
           .join(" ") || "no data"
       }
 Clouds ${
-        data.clouds?.map((v) => `${v.meaning} ${v.altitude}m`).join(", ") ||
+        data.clouds?.map((v) => `${v.meaning} ${v.altitude}ft`).join(", ") ||
         "none"
       }
 Temperature ${data.temperature}.${data.dewpoint}°C
