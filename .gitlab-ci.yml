@@ -48,6 +48,7 @@ update-dependencies:
     - git config --global user.name "wcyat bot"
     - git remote set-url origin https://root:$gitlab_token@$CI_SERVER_HOST/$CI_PROJECT_PATH
     - git fetch origin
+    - git merge -X theirs -m "merge" origin/main
     - git checkout main
   script:
     - yarn
