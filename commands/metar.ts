@@ -77,7 +77,7 @@ module.exports = {
   command: "!metar",
   commandType: "plugin",
   isDependent: false,
-  help: `*METAR*\n\nMETAR broadcast.\n\n*!metar*\nTo get METAR info.`,
+  help: `*METAR*\n\nMETAR broadcast.\n\n*!metar [airport code]*\nTo get METAR info. Airport defaults to VHHH.`,
   execute,
   public: true,
 };

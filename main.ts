@@ -242,7 +242,7 @@ export default async function main() {
   wtsClient.on("message_create", async (msg) => {
     const groupId = (await msg.getChat()).id._serialized;
     if (
-      groupId === process.env.WTS_GROUP_ID &&
+      // groupId === process.env.WTS_GROUP_ID &&
       (msg.body || msg.hasMedia) &&
       !msg.body.startsWith("Messages")
     ) {
