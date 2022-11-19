@@ -12,7 +12,7 @@ const execute = async (_client: Client, msg: Message, args: string[]) => {
     return await msg.reply("Job not found!");
   }
 
-  await agenda.cancel({ "data.id": id });
+  await agenda.cancel({ name: "send message", "data.id": id });
 
   await msg.reply(`Unscheduled job id \`\`\`${id}\`\`\`.`);
 };
