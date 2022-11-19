@@ -44,9 +44,9 @@ export default async function main() {
     !(
       await agenda.jobs({
         name: "send count",
-        data: { groupId: process.env.WTS_GROUP_ID },
+        "data.groupId": process.env.WTS_GROUP_ID,
       })
-    ).length
+    )?.length
   ) {
     await agenda.every(
       "59 23 * * *",
@@ -166,7 +166,7 @@ export default async function main() {
 
             (await msg.getMentions()).forEach((contact) => {
               if (contact.name)
-                msg.body = msg.body?.replaceAll(
+                msg.body = msg.body?.replaceAll?.(
                   `@${contact.number}`,
                   `@${contact.name}`
                 );
@@ -393,8 +393,8 @@ ${msg.body || msg.type}`,
           otherChat.isUser &&
           !(await pmpermit.isPermitted(otherChat.number)) &&
           !otherChat.isMe &&
-          !msg.body?.startsWith("!") &&
-          !msg.body?.endsWith("_Powered by WhatsBot_")
+          !msg.body?.startsWith?.("!") &&
+          !msg.body?.endsWith?.("_Powered by WhatsBot_")
         ) {
           await pmpermit.permit(otherChat.number);
           /*await msg.reply(
@@ -404,8 +404,8 @@ ${msg.body || msg.type}`,
       }
     } catch (ignore) {}
 
-    if (msg.body?.startsWith("!")) {
-      let args = msg.body.slice(1).trim().split(/ +/g);
+    if (msg.body?.startsWith?.("!")) {
+      let args = msg.body?.slice?.(1)?.trim?.()?.split?.(/ +/g);
       let command = args.shift().toLowerCase();
 
       if (

@@ -1,5 +1,4 @@
 //jshint esversion:8
-// Coded by Sumanjay (https://github.com/cyberboysumanjay)
 import { Client, Message } from "whatsapp-web.js";
 import { agenda } from "../helpers/agenda";
 import { countMessage } from "../helpers/count";
@@ -14,9 +13,9 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       !(
         await agenda.jobs({
           name: "send count",
-          data: { groupId: chatId },
+          "data.groupId": chatId,
         })
-      ).length
+      )?.length
     ) {
       await agenda.every(
         "59 23 * * *",
@@ -27,7 +26,10 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
           skipImmediate: true,
         }
       );
-      return await client.sendMessage(chatId, "Subscribed! Message counts will be sent at 23:59 every day.")
+      return await client.sendMessage(
+        chatId,
+        "Subscribed! Message counts will be sent at 23:59 every day."
+      );
     } else {
       return await client.sendMessage(chatId, "Already subscribed!");
     }
@@ -38,9 +40,9 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       (
         await agenda.jobs({
           name: "send count",
-          data: { groupId: chatId },
+          "data.groupId": chatId,
         })
-      ).length
+      )?.length
     ) {
       await agenda.cancel({
         name: "send count",
