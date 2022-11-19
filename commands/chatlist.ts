@@ -24,7 +24,7 @@ module.exports = {
   command: "!chatlist",
   commandType: "plugin",
   isDependent: false,
-  help: `**\n\nGet a list of chats. \n\n*!chatlist [page]\n\nTwenty chats are shown in a page.`,
+  help: `*Get a list of chats.* \n\n*!chatlist [page]*\n\nTwenty chats are shown in a page.`,
   execute,
   public: false,
 };

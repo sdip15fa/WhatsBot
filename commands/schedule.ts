@@ -36,7 +36,7 @@ module.exports = {
   command: "!schedule",
   commandType: "plugin",
   isDependent: false,
-  help: `**\n\nSchedule a message to be sent at a specific time.\n\nReply to the message you want to schedule.\n\n*!schedule [chat id] [time]\n\nTime example: \`in 1 minute\`\n\nFor list of chats and chat ids, use !chatlist.`,
+  help: `*Schedule a message to be sent at a specific time.*\n\nReply to the message you want to schedule.\n\n*!schedule [chat id] [time]*\n\nTime example: \`\`\`in 1 minute\`\`\`\n\nFor list of chats and chat ids, use !chatlist.`,
   execute,
   public: false,
 };

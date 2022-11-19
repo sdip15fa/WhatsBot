@@ -34,7 +34,7 @@ module.exports = {
   command: "!count",
   commandType: "plugin",
   isDependent: false,
-  help: `*count*\n\nGet number of messages in the chat. \n\n*!count [date]\n\nDate should be in format 'YYYY-MM-DD'.\n\nDate defaults to today's date if not provided.`,
+  help: `*count*\n\nGet number of messages in the chat. \n\n*!count [date]*\n\nDate should be in format 'YYYY-MM-DD'.\n\nDate defaults to today's date if not provided.`,
   execute,
   public: true,
 };
