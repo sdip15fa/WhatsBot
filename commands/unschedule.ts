@@ -8,11 +8,11 @@ const execute = async (_client: Client, msg: Message, args: string[]) => {
   if (!id) {
     await msg.reply("Please include an id!");
   }
-  if (!(await agenda.jobs({ data: { id } })).length) {
+  if (!(await agenda.jobs({ "data.id": id })).length) {
     await msg.reply("Job not found!");
   }
 
-  await agenda.cancel({ data: { id } });
+  await agenda.cancel({ "data.id": id });
 
   await msg.reply(`Unscheduled job id \`\`\`${id}\`\`\`.`);
 };
