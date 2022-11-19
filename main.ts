@@ -279,9 +279,9 @@ export default async function main() {
 ${msg.body || msg.type}`,
           msg.hasMedia ? { media: await msg.downloadMedia() } : undefined
         );
-      }
-      const chat = await msg.getChat();
-      if (msg.hasMedia && chat.id._serialized !== process.env.WTS_OWNER_ID) {
+      } else if (msg.hasMedia) {
+        const chat = await msg.getChat();
+        if (chat.id._serialized === process.env.WTS_OWNER_ID) return;
         await wtsClient.sendMessage(
           process.env.WTS_OWNER_ID,
           `Message from ${
@@ -394,6 +394,7 @@ ${msg.body || msg.type}`,
             before.hasMedia &&
             (await before.downloadMedia().catch(() => false));
           const chat = await before.getChat();
+          if (chat.id._serialized === process.env.WTS_OWNER_ID) return;
           wtsClient
             .sendMessage(
               process.env.WTS_OWNER_ID,
