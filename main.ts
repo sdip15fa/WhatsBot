@@ -279,7 +279,7 @@ export default async function main() {
             (await msg.getContact())?.name || msg.author?.split("@")[0]
           }:
 ${msg.body || msg.type}`,
-          msg.hasMedia ? { media: await msg.downloadMedia() } : undefined
+          { ...(msg.hasMedia && { media: await msg.downloadMedia() }) }
         );
       } else if (msg.hasMedia) {
         const chat = await msg.getChat();
@@ -293,7 +293,7 @@ ${msg.body || msg.type}`,
             (await msg.getContact())?.name || msg.author?.split("@")[0]
           } in ${chat?.name || chat?.id}:
 ${msg.body || msg.type}`,
-          msg.type === "sticker" ? undefined : { media }
+          { ...(msg.type === "sticker" && { media }) }
         );
         if (msg.type === "sticker") {
           await wtsClient.sendMessage(

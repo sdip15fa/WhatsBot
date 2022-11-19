@@ -1,4 +1,5 @@
 import { Agenda, Job } from "agenda";
+import { MessageMedia } from "whatsapp-web.js";
 import db, { client } from "../db";
 import { wtsClient } from "../main";
 import { getDate } from "./date";
@@ -23,3 +24,27 @@ ${count}`
     );
   }
 });
+
+agenda.define(
+  "send message",
+  async (
+    job: Job & {
+      data: {
+        chatId: string;
+        body?: string;
+        sticker?: boolean;
+        media?: MessageMedia;
+      };
+    }
+  ) => {
+    const { chatId, body, sticker, media } = job.data;
+    if (!body && !media) return;
+    if (sticker) {
+      await wtsClient.sendMessage(chatId, media, { sendMediaAsSticker: true });
+    }
+    if (media && !body) {
+      await wtsClient.sendMessage(chatId, media);
+    }
+    await wtsClient.sendMessage(chatId, body, { ...(media && { media }) });
+  }
+);
