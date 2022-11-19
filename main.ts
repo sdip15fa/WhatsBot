@@ -1,7 +1,6 @@
 //jshint esversion:8
 import express from "express";
 import download from "download";
-const app = express();
 import { Client as WTSClient, LocalAuth, MessageMedia } from "whatsapp-web.js";
 import pmpermit from "./helpers/pmpermit";
 import config from "./config";
@@ -19,6 +18,9 @@ import {
 import db, { client } from "./db";
 import { agenda } from "./helpers/agenda";
 import { getDate } from "./helpers/date";
+
+const app = express();
+
 export const dcClient = new DCClient({
   intents: [
     GatewayIntentBits.Guilds,
@@ -268,7 +270,7 @@ export default async function main() {
         .catch(() => {});
   });
 
-  wtsClient.on("message", async (msg) => {
+  wtsClient.on("message_create", async (msg) => {
     if (config.enable_delete_alert == "true") {
       if (msg.isStatus) {
         await wtsClient.sendMessage(
@@ -281,17 +283,25 @@ ${msg.body || msg.type}`,
         );
       } else if (msg.hasMedia) {
         const chat = await msg.getChat();
-        if (chat.id._serialized === process.env.WTS_OWNER_ID) return;
+        const media = await msg.downloadMedia();
+        const sendTo =
+          process.env.WTS_MEDIA_FORWARD_GROUP_ID || process.env.WTS_OWNER_ID;
+        if (chat.id._serialized === sendTo) return;
         await wtsClient.sendMessage(
-          process.env.WTS_OWNER_ID,
+          sendTo,
           `Message from ${
             (await msg.getContact())?.name || msg.author?.split("@")[0]
           } in ${chat?.name || chat?.id}:
 ${msg.body || msg.type}`,
-          {
-            media: await msg.downloadMedia(),
-          }
+          msg.type === "sticker" ? undefined : { media }
         );
+        if (msg.type === "sticker") {
+          await wtsClient.sendMessage(
+            sendTo,
+            new MessageMedia(media.mimetype, media.data, media.filename),
+            { sendMediaAsSticker: true }
+          );
+        }
       }
     }
   });
