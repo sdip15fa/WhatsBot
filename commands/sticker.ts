@@ -5,7 +5,10 @@ const execute = async (client: Client, msg: Message) => {
   const chatId = (await msg.getChat()).id._serialized;
   let quotedMsg = await msg.getQuotedMessage();
   if (quotedMsg.hasMedia) {
-    let attachmentData = await quotedMsg.downloadMedia().catch(() => null);
+    let attachmentData = await quotedMsg
+      .downloadMedia()
+      .then((media) => media)
+      .catch(() => null);
     if (!attachmentData) {
       return;
     }

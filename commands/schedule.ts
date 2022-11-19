@@ -1,6 +1,6 @@
 //jshint esversion:8
 import { randomBytes } from "crypto";
-import { Client, Message } from "whatsapp-web.js";
+import { Client, Message, MessageMedia } from "whatsapp-web.js";
 import { agenda } from "../helpers/agenda";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
@@ -16,14 +16,24 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   });
   const quoted = await msg.getQuotedMessage();
   const id = randomBytes(10).toString("hex");
-  const media = await quoted.downloadMedia().catch(() => null);
+  const media: MessageMedia | null = await quoted
+    .downloadMedia()
+    .then(media => media)
+    .catch(() => null);
   await agenda
     .schedule(date, "send message", {
       id,
       chatId,
       body: quoted.body,
       sticker: quoted.type === "sticker",
-      ...(quoted.hasMedia && media && { media }),
+      ...(quoted.hasMedia &&
+        media && {
+          media: {
+            mimetype: media.mimetype,
+            data: media.data,
+            filename: media.filename,
+          },
+        }),
     })
     .then(async () => {
       await msg.reply(`Scheduled for *_${date}_* with id \`\`\`${id}\`\`\`.`);

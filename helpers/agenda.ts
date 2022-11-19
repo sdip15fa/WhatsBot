@@ -41,19 +41,36 @@ agenda.define(
           chatId: string;
           body?: string;
           sticker?: boolean;
-          media?: MessageMedia;
+          media?: {
+            mimetype: string;
+            data: string;
+            filename: string;
+          };
         };
       };
     }
   ) => {
     const { chatId, body, sticker, media } = job.attrs.data;
     if (!body && !media) return;
-    if (sticker) {
-      await wtsClient.sendMessage(chatId, media, { sendMediaAsSticker: true });
+    if (media) {
+      const messageMedia = new MessageMedia(
+        media.mimetype,
+        media.data,
+        media.filename || "image.png"
+      );
+      if (sticker) {
+        await wtsClient.sendMessage(chatId, messageMedia, {
+          sendMediaAsSticker: true,
+        });
+      }
+      if (!body) {
+        await wtsClient.sendMessage(chatId, media);
+      }
     }
-    if (media && !body) {
-      await wtsClient.sendMessage(chatId, media);
-    }
-    await wtsClient.sendMessage(chatId, body, { ...(media && { media }) });
+    await wtsClient.sendMessage(chatId, body, {
+      ...(media && {
+        media: new MessageMedia(media.mimetype, media.data, media.filename),
+      }),
+    });
   }
 );

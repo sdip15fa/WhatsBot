@@ -444,7 +444,10 @@ ${msg.body || msg.type}`,
         if (config.enable_delete_alert == "true") {
           const media: false | MessageMedia =
             before.hasMedia &&
-            (await before.downloadMedia().catch(() => false));
+            (await before
+              .downloadMedia()
+              .then((media) => media)
+              .catch(() => false));
           const chat = await before.getChat();
           if (chat.id._serialized === process.env.WTS_OWNER_ID) return;
           wtsClient

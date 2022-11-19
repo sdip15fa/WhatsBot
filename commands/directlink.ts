@@ -25,7 +25,10 @@ async function telegraph(attachmentData: MessageMedia) {
 const execute = async (client: Client, msg: Message) => {
   if (msg.hasQuotedMsg) {
     let quotedMsg = await msg.getQuotedMessage();
-    let attachmentData = await quotedMsg.downloadMedia().catch(() => null);
+    let attachmentData = await quotedMsg
+      .downloadMedia()
+      .then((media) => media)
+      .catch(() => null);
     if (!attachmentData) {
       return;
     }
