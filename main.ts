@@ -280,8 +280,8 @@ export default async function main() {
           msg.hasMedia ? { media: await msg.downloadMedia() } : undefined
         );
       }
-      if (msg.hasMedia) {
-        const chat = await msg.getChat();
+      const chat = await msg.getChat();
+      if (msg.hasMedia && chat.id._serialized !== process.env.WTS_OWNER_ID) {
         await wtsClient.sendMessage(
           process.env.WTS_OWNER_ID,
           `Message from ${
