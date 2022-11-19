@@ -2,7 +2,7 @@
 import { Client, Message } from "whatsapp-web.js";
 
 const execute = async (client: Client, _msg: Message, args: string[]) => {
-  const page = Number(args[0]) ?? 1;
+  const page = Number(args[0]) || 1;
   const chats = (await client.getChats()).filter(
     (_v, index) => index < page * 20 && index >= (page - 1) * 20
   );
