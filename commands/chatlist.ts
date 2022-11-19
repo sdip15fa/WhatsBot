@@ -1,5 +1,4 @@
 //jshint esversion:8
-import { join } from "path";
 import { Client, Message } from "whatsapp-web.js";
 
 const execute = async (client: Client, _msg: Message, args: string[]) => {
@@ -7,15 +6,13 @@ const execute = async (client: Client, _msg: Message, args: string[]) => {
   const chats = (await client.getChats()).filter(
     (_v, index) => index < page * 20
   );
+  console.log("chats", chats);
   await client.sendMessage(
     process.env.WTS_OWNER_ID,
     `Chats:
-${
-  (chats.map(
-    (chat, index) => `${index + 1}. ${chat.name} ${chat.id._serialized}`
-  ),
-  join("\n"))
-}`
+${chats
+  .map((chat, index) => `${index + 1}. ${chat.name} ${chat.id._serialized}`)
+  .join("\n")}`
   );
 };
 
