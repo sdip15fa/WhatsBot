@@ -166,7 +166,7 @@ export default async function main() {
 
             (await msg.getMentions()).forEach((contact) => {
               if (contact.name)
-                msg.body = msg.body.replaceAll(
+                msg.body = msg.body?.replaceAll(
                   `@${contact.number}`,
                   `@${contact.name}`
                 );
@@ -246,7 +246,7 @@ export default async function main() {
     if (
       // groupId === process.env.WTS_GROUP_ID &&
       (msg.body || msg.hasMedia) &&
-      !msg.body.startsWith("Messages")
+      !msg.body?.startsWith("Messages")
     ) {
       const date = getDate();
 
@@ -359,8 +359,8 @@ ${msg.body || msg.type}`,
           otherChat.isUser &&
           !(await pmpermit.isPermitted(otherChat.number)) &&
           !otherChat.isMe &&
-          !msg.body.startsWith("!") &&
-          !msg.body.endsWith("_Powered by WhatsBot_")
+          !msg.body?.startsWith("!") &&
+          !msg.body?.endsWith("_Powered by WhatsBot_")
         ) {
           await pmpermit.permit(otherChat.number);
           /*await msg.reply(
@@ -370,7 +370,7 @@ ${msg.body || msg.type}`,
       }
     } catch (ignore) {}
 
-    if (msg.body.startsWith("!")) {
+    if (msg.body?.startsWith("!")) {
       let args = msg.body.slice(1).trim().split(/ +/g);
       let command = args.shift().toLowerCase();
 
