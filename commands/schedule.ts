@@ -1,4 +1,5 @@
 //jshint esversion:8
+import { randomBytes } from "crypto";
 import { Client, Message } from "whatsapp-web.js";
 import { agenda } from "../helpers/agenda";
 
@@ -12,13 +13,21 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     return await msg.reply("Chat not found");
   });
   const quoted = await msg.getQuotedMessage();
-  await agenda.schedule(date, "send message", {
-    chatId,
-    body: quoted.body,
-    sticker: quoted.type === "sticker",
-    ...(quoted.hasMedia && { media: quoted.downloadMedia() }),
-  });
-  await msg.reply("Scheduled!");
+  const id = randomBytes(10).toString("hex");
+  await agenda
+    .schedule(date, "send message", {
+      id,
+      chatId,
+      body: quoted.body,
+      sticker: quoted.type === "sticker",
+      ...(quoted.hasMedia && { media: quoted.downloadMedia() }),
+    })
+    .then(async () => {
+      await msg.reply(`Scheduled for *_${date}_* with id \`\`\`${id}\`\`\`.`);
+    })
+    .catch(async () => {
+      await msg.reply("An error occurred.");
+    });
 };
 
 module.exports = {
