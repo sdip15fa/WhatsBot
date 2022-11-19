@@ -25,6 +25,7 @@ ${count.count}${
     `\n\n*Leaderboard*
 ${count.users
   .sort((a, b) => b.count - a.count)
+  .filter((_v, i) => i < 10)
   .map((user, index) => `${index + 1}. ${user.name}: ${user.count}`)
   .join("\n")}`
   }`;
