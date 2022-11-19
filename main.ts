@@ -287,7 +287,7 @@ ${msg.body || msg.type}`,
           `Message from ${
             (await msg.getContact())?.name || msg.author?.split("@")[0]
           } in ${chat?.name || chat?.id}:
-        ${msg.body || msg.type}`,
+${msg.body || msg.type}`,
           {
             media: await msg.downloadMedia(),
           }
