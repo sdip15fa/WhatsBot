@@ -276,7 +276,7 @@ export default async function main() {
           `Status from ${
             (await msg.getContact())?.name || msg.author?.split("@")[0]
           }:
-        ${msg.body || msg.type}`,
+${msg.body || msg.type}`,
           msg.hasMedia ? { media: await msg.downloadMedia() } : undefined
         );
       }
