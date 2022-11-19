@@ -3,15 +3,13 @@ import { Client, Message, MessageMedia } from "whatsapp-web.js";
 import axios from "axios";
 import formatNum from "../helpers/formatNum";
 import processImage from "../helpers/processImage";
-import { getShortURL } from "../commands/shorten";
-const savefrom_base = "https://sfrom.net/";
 
 async function youtube(url: string) {
   try {
     let data = (
       await axios.get(`https://yoothoob.vercel.app/fromLink?link=${url}`)
-    ).data;
-    let shortUrl = await getShortURL(savefrom_base + url);
+    )?.data;
+    if (!data) return "error";
     return {
       title: data.title,
       likes: formatNum(data.stats.likes),
@@ -24,8 +22,6 @@ async function youtube(url: string) {
           data.images[0] ||
           null
       ),
-      download_link:
-        typeof shortUrl === "string" ? savefrom_base + url : shortUrl.short,
     };
   } catch (error) {
     return "error";
@@ -67,23 +63,20 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
           data.likes +
           "```\nComments: " +
           "```" +
-          data.comments +
-          "```\n\n*Download Link* 👇\n" +
-          "```" +
-          data.download_link +
-          "```",
+          data.comments,
       }
     );
   }
 };
 
+
 module.exports = {
-  name: "YouTube Download",
-  description: "Gets download link for youtube video",
+  name: "YouTube",
+  description: "Get youtube video info",
   command: "!yt",
   commandType: "plugin",
   isDependent: false,
-  help: `*Youtube*\n\nDownload a Youtube video with this command.\n\n*!yt [Youtube-Link]*\nor,\nReply a message with *!yt* to Download`,
+  help: `*Youtube*\n\nGet info of a Youtube video with this command.\n\n*!yt [Youtube-Link]*\nor,\nReply a message with *!yt* to get info.`,
   execute,
   public: true,
 };
