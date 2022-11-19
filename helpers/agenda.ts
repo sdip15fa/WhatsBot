@@ -1,29 +1,36 @@
 import { Agenda, Job } from "agenda";
 import { MessageMedia } from "whatsapp-web.js";
-import db, { client } from "../db";
+import { client } from "../db";
 import { wtsClient } from "../main";
+import { countMessage } from "./count";
 import { getDate } from "./date";
 
 export const agenda = new Agenda({ mongo: client.db("agenda") });
 
-agenda.define("send count", async (job: Job) => {
-  const { groupId } = job.attrs.data;
-  const date = getDate();
-  const count = (
-    await db("count").coll.findOne({
-      groupId,
-      date,
-    })
-  )?.count;
+agenda.define(
+  "send count",
+  async (
+    job: Job & {
+      attrs: {
+        data: {
+          groupId: string;
+        };
+      };
+    }
+  ) => {
+    const { groupId } = job.attrs.data;
+    const date = getDate();
 
-  if (count) {
     wtsClient.sendMessage(
       groupId,
-      `Messages ${date}:
-${count}`
+      await countMessage(
+        groupId,
+        (await wtsClient.getChatById(groupId)).name || "",
+        date
+      )
     );
   }
-});
+);
 
 agenda.define(
   "send message",

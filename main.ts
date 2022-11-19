@@ -245,8 +245,8 @@ export default async function main() {
     const groupId = (await msg.getChat()).id._serialized;
     if (
       // groupId === process.env.WTS_GROUP_ID &&
-      (msg.body || msg.hasMedia) &&
-      !msg.body?.startsWith("Messages")
+      groupId &&
+      !msg.isStatus
     ) {
       const date = getDate();
 
@@ -259,6 +259,40 @@ export default async function main() {
         ).modifiedCount
       ) {
         await db("count").coll.insertOne({ groupId, date, count: 1 });
+      }
+
+      if (
+        !(
+          await db("count").coll.updateOne(
+            {
+              groupId,
+              date,
+              users: {
+                $elemMatch: {
+                  id: msg.fromMe ? process.env.WTS_OWNER_ID : msg.author,
+                },
+              },
+            },
+            {
+              $inc: { "users.$.count": 1 },
+            }
+          )
+        ).modifiedCount
+      ) {
+        const contact = await msg.getContact();
+        await db("count").coll.updateOne(
+          { groupId, date },
+          {
+            $push: {
+              users: {
+                id: msg.fromMe ? process.env.WTS_OWNER_ID : msg.author,
+                name:
+                  contact.name || contact.number || msg.author?.split("@")[0],
+                count: 1,
+              },
+            },
+          }
+        );
       }
     }
   });
@@ -429,16 +463,8 @@ ${msg.body || msg.type}`,
   });
 
   app.get("/", (_req, res) => {
-    res.send(
-      '<h1>This server is powered by Whatsbot<br><a href="https://github.com/tuhinpal/WhatsBot">https://github.com/tuhinpal/WhatsBot</a></h1>'
-    );
+    res.send({ success: true });
   });
-
-  app.use(
-    "/public",
-    express.static("public"),
-    require("serve-index")("public", { icons: true })
-  ); // public directory will be publicly available
 
   app.listen(process.env.PORT || 8080, async () => {
     console.log(`Server listening at Port: ${process.env.PORT || 8080}`);

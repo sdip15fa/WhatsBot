@@ -9,7 +9,7 @@ const execute = async (_client: Client, msg: Message, args: string[]) => {
     await msg.reply("Please include an id!");
   }
   if (!(await agenda.jobs({ "data.id": id })).length) {
-    await msg.reply("Job not found!");
+    return await msg.reply("Job not found!");
   }
 
   await agenda.cancel({ "data.id": id });

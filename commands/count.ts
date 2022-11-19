@@ -1,30 +1,19 @@
 //jshint esversion:8
 // Coded by Sumanjay (https://github.com/cyberboysumanjay)
 import { Client, Message } from "whatsapp-web.js";
-import db from "../db";
+import { countMessage } from "../helpers/count";
 import { getDate } from "../helpers/date";
 
-async function getCount(groupId: string, date: string) {
-  const count = (await db("count").coll.findOne({ groupId, date }))?.count;
-  if (!count) {
-    return null;
-  }
-  return count;
-}
-
 const execute = async (client: Client, msg: Message, args: string[]) => {
-  const chatId = (await msg.getChat()).id._serialized;
+  const chat = await msg.getChat();
+  const chatId = chat.id._serialized;
   let date = /^20[0-9]{2}-[0-9]{2}-[0-9]{2}$/.test(args[0])
     ? args[0]
     : getDate();
-  const count = await getCount(chatId, date);
-  if (!count) {
-    client.sendMessage(chatId, `Count not available or date invalid.`);
-  }
+
   await client.sendMessage(
     chatId,
-    `Number of messages in ${(await msg.getChat()).name} on ${date}:
-${count}`
+    await countMessage(chatId, chat.name || "", date)
   );
 };
 
