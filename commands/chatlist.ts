@@ -11,7 +11,10 @@ const execute = async (client: Client, _msg: Message, args: string[]) => {
     process.env.WTS_OWNER_ID,
     `Chats:
 ${chats
-  .map((chat, index) => `${index + 1}. ${chat.name} ${chat.id._serialized}`)
+  .map(
+    (chat, index) =>
+      `${index + 1}. ${chat.name} \`\`\`${chat.id._serialized}\`\`\``
+  )
   .join("\n")}`
   );
 };

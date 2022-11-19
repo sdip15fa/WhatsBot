@@ -18,6 +18,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     sticker: quoted.type === "sticker",
     ...(quoted.hasMedia && { media: quoted.downloadMedia() }),
   });
+  await msg.reply("Scheduled!");
 };
 
 module.exports = {

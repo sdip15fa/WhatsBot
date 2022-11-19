@@ -4,7 +4,9 @@ import db, { client } from "../db";
 import { wtsClient } from "../main";
 import { getDate } from "./date";
 
-export const agenda = new Agenda({ mongo: client.db("agenda") });
+export const agenda = new Agenda({ mongo: client.db("agenda") }).processEvery(
+  "30 seconds"
+);
 
 agenda.define("send count", async (job: Job) => {
   const { groupId } = job.attrs.data;
@@ -29,15 +31,17 @@ agenda.define(
   "send message",
   async (
     job: Job & {
-      data: {
-        chatId: string;
-        body?: string;
-        sticker?: boolean;
-        media?: MessageMedia;
+      attrs: {
+        data: {
+          chatId: string;
+          body?: string;
+          sticker?: boolean;
+          media?: MessageMedia;
+        };
       };
     }
   ) => {
-    const { chatId, body, sticker, media } = job.data;
+    const { chatId, body, sticker, media } = job.attrs.data;
     if (!body && !media) return;
     if (sticker) {
       await wtsClient.sendMessage(chatId, media, { sendMediaAsSticker: true });
