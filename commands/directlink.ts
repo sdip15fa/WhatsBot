@@ -25,7 +25,10 @@ async function telegraph(attachmentData: MessageMedia) {
 const execute = async (client: Client, msg: Message) => {
   if (msg.hasQuotedMsg) {
     let quotedMsg = await msg.getQuotedMessage();
-    let attachmentData = await quotedMsg.downloadMedia();
+    let attachmentData = await quotedMsg.downloadMedia().catch(() => null);
+    if (!attachmentData) {
+      return;
+    }
     let data = await telegraph(attachmentData);
     if (data == "error") {
       quotedMsg.reply(`Error occured while create direct link.`);

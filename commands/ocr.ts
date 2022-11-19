@@ -21,7 +21,8 @@ async function readImage(attachmentData: MessageMedia) {
 const execute = async (client: Client, msg: Message) => {
   if (msg.hasQuotedMsg) {
     let quotedMsg = await msg.getQuotedMessage();
-    let attachmentData = await quotedMsg.downloadMedia();
+    let attachmentData = await quotedMsg.downloadMedia().catch(() => null);
+    if (!attachmentData) return;
     let data = await readImage(attachmentData);
     if (data == "error") {
       quotedMsg.reply(

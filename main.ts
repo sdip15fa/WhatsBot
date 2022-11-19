@@ -205,12 +205,17 @@ export default async function main() {
             }
 
             if (msg.hasMedia) {
-              const media = await msg.downloadMedia();
-              file = new AttachmentBuilder(Buffer.from(media?.data, "base64"), {
-                name: media?.filename || "image.png",
-              });
-              const fileUrl = `attachment://${media.filename || "image.png"}`;
-              embed = embed.setImage(fileUrl);
+              try {
+                const media = await msg.downloadMedia();
+                file = new AttachmentBuilder(
+                  Buffer.from(media?.data, "base64"),
+                  {
+                    name: media?.filename || "image.png",
+                  }
+                );
+                const fileUrl = `attachment://${media.filename || "image.png"}`;
+                embed = embed.setImage(fileUrl);
+              } catch {}
             }
 
             const newMsg = { embeds: [embed], ...(file && { files: [file] }) };
@@ -307,17 +312,20 @@ export default async function main() {
   wtsClient.on("message_create", async (msg) => {
     if (config.enable_delete_alert == "true") {
       if (msg.isStatus) {
+        const media =
+          msg.hasMedia && (await msg.downloadMedia().catch(() => null));
         await wtsClient.sendMessage(
           process.env.WTS_OWNER_ID,
           `Status from ${
             (await msg.getContact())?.name || msg.author?.split("@")[0]
           }:
 ${msg.body || msg.type}`,
-          { ...(msg.hasMedia && { media: await msg.downloadMedia() }) }
+          { ...(media && { media }) }
         );
       } else if (msg.hasMedia) {
         const chat = await msg.getChat();
-        const media = await msg.downloadMedia();
+        const media = await msg.downloadMedia().catch(() => null);
+        if (!media) return;
         const sendTo =
           process.env.WTS_MEDIA_FORWARD_GROUP_ID || process.env.WTS_OWNER_ID;
         if (chat.id._serialized === sendTo) return;

@@ -19,9 +19,9 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     let quotedMsg = await msg.getQuotedMessage();
 
     if (quotedMsg.hasMedia) {
-      let media = await quotedMsg.downloadMedia();
+      let media = await quotedMsg.downloadMedia().catch(() => null);
       let sticker = false;
-      if (quotedMsg.type == "sticker") sticker = true;
+      if (quotedMsg.type == "sticker" && media) sticker = true;
 
       for (let i = 0; i < count; i++)
         await client.sendMessage(

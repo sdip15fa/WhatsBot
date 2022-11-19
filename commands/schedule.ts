@@ -16,13 +16,14 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   });
   const quoted = await msg.getQuotedMessage();
   const id = randomBytes(10).toString("hex");
+  const media = await quoted.downloadMedia().catch(() => null);
   await agenda
     .schedule(date, "send message", {
       id,
       chatId,
       body: quoted.body,
       sticker: quoted.type === "sticker",
-      ...(quoted.hasMedia && { media: quoted.downloadMedia() }),
+      ...(quoted.hasMedia && media && { media }),
     })
     .then(async () => {
       await msg.reply(`Scheduled for *_${date}_* with id \`\`\`${id}\`\`\`.`);
