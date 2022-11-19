@@ -3,9 +3,6 @@ import { Client, Message } from "whatsapp-web.js";
 import { agenda } from "../helpers/agenda";
 
 const execute = async (_client: Client, msg: Message, args: string[]) => {
-  if (!msg.hasQuotedMsg) {
-    return await msg.reply("Please quote a message to schedule!");
-  }
   const id = args[0];
 
   if (!id) {
@@ -23,10 +20,10 @@ const execute = async (_client: Client, msg: Message, args: string[]) => {
 module.exports = {
   name: "Unschedule message",
   description: "Unschedule a message previously scheduled.",
-  command: "!schedule",
+  command: "!unschedule",
   commandType: "plugin",
   isDependent: false,
-  help: `**\n\nUnschedule a message previously scheduled.\n\n*!schedule [job id]`,
+  help: `**\n\nUnschedule a message previously scheduled.\n\n*!unschedule [job id]`,
   execute,
   public: false,
 };
