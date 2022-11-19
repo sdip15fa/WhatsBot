@@ -7,7 +7,9 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   if (!msg.hasQuotedMsg) {
     return await msg.reply("Please quote a message to schedule!");
   }
-  const chatId = args.shift();
+  const chatId = /^[\d|-]+@(g|c)\.us$/.test(args[0])
+    ? args.shift()
+    : (await msg.getChat()).id._serialized;
   const date = args.join(" ");
   await client.getChatById(chatId).catch(async () => {
     return await msg.reply("Chat not found");
@@ -36,7 +38,7 @@ module.exports = {
   command: "!schedule",
   commandType: "plugin",
   isDependent: false,
-  help: `*Schedule a message to be sent at a specific time.*\n\nReply to the message you want to schedule.\n\n*!schedule [chat id] [time]*\n\nTime example: \`\`\`in 1 minute\`\`\`\n\nFor list of chats and chat ids, use !chatlist.`,
+  help: `*Schedule a message to be sent at a specific time.*\n\nReply to the message you want to schedule.\n\n*!schedule [chat id] [time]*\n\nIf the chat id is invalid / omitted the current chat would be used.\n\nTime example: \`\`\`in 1 minute\`\`\`\n\nFor list of chats and chat ids, use !chatlist.`,
   execute,
   public: false,
 };
