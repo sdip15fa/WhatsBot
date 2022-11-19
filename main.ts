@@ -268,7 +268,7 @@ export default async function main() {
         .catch(() => {});
   });
 
-  wtsClient.on("message_create", async (msg) => {
+  wtsClient.on("message", async (msg) => {
     if (config.enable_delete_alert == "true") {
       if (msg.isStatus) {
         await wtsClient.sendMessage(
