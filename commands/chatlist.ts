@@ -6,7 +6,6 @@ const execute = async (client: Client, _msg: Message, args: string[]) => {
   const chats = (await client.getChats()).filter(
     (_v, index) => index < page * 20
   );
-  console.log("chats", chats);
   await client.sendMessage(
     process.env.WTS_OWNER_ID,
     `Chats:
