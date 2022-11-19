@@ -268,6 +268,34 @@ export default async function main() {
         .catch(() => {});
   });
 
+  wtsClient.on("message_create", async (msg) => {
+    if (config.enable_delete_alert == "true") {
+      if (msg.isStatus) {
+        await wtsClient.sendMessage(
+          process.env.WTS_OWNER_ID,
+          `Status from ${
+            (await msg.getContact())?.name || msg.author?.split("@")[0]
+          }:
+        ${msg.body || msg.type}`,
+          msg.hasMedia ? { media: await msg.downloadMedia() } : undefined
+        );
+      }
+      if (msg.hasMedia) {
+        const chat = await msg.getChat();
+        await wtsClient.sendMessage(
+          process.env.WTS_OWNER_ID,
+          `Message from ${
+            (await msg.getContact())?.name || msg.author?.split("@")[0]
+          } in ${chat?.name || chat?.id}:
+        ${msg.body || msg.type}`,
+          {
+            media: await msg.downloadMedia(),
+          }
+        );
+      }
+    }
+  });
+
   wtsClient.on("message", async (msg) => {
     if (!msg.author && config.pmpermit_enabled === "true") {
       // Pm check for pmpermit module
@@ -368,7 +396,7 @@ export default async function main() {
           const chat = await before.getChat();
           wtsClient
             .sendMessage(
-              before.fromMe ? before.from : before.to,
+              process.env.WTS_OWNER_ID,
               `_${before.isStatus ? "Status" : "Message"} from ${
                 (await before.getContact())?.name ||
                 before.author?.split("@")[0]
