@@ -58,21 +58,22 @@ async function getDetails(title: string) {
 }
 const execute = async (client: Client, msg: Message, args: string[]) => {
   let data = await getDetails(args.join(" "));
+  const chatId = (await msg.getChat()).id._serialized;
   if (data == "error") {
     await client.sendMessage(
-      msg.to,
+      chatId,
       `🙇‍♂️ *Error*\n\n` +
         "```Something Unexpected Happened while fetching Movie/TV Show Details.```"
     );
   } else if (data == "No Results") {
     await client.sendMessage(
-      msg.to,
+      chatId,
       `🙇‍♂️ *No Results Found!*\n\n` +
         "```Please check the name of Movie/TV Show you have entered.```"
     );
   } else if (typeof data !== "string") {
     await client.sendMessage(
-      msg.to,
+      chatId,
       new MessageMedia(data.mimetype, data.thumbdata, data.filename),
       { caption: data.caption }
     );
