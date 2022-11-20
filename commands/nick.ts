@@ -21,8 +21,8 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       id: userId,
       name: nickname,
     });
-    return await client.sendMessage(chatId, "Nickname set!");
   }
+  return await client.sendMessage(chatId, "Nickname set!");
 };
 
 module.exports = {
