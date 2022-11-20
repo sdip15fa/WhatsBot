@@ -2,7 +2,9 @@ import { Client, LocalAuth } from "whatsapp-web.js";
 import qrcode from "qrcode-terminal";
 import { write, clean } from "./manage";
 import readline from "readline";
+import dotenv from "dotenv";
 
+dotenv.config();
 clean();
 
 const client = new Client({
@@ -21,6 +23,7 @@ rl.question(
   "Enter password to encrypt session (You need to put this in ENV): ",
   (answer: string) => {
     password = answer;
+    if (!password) password = process.env.SESSION_KEY;
     console.log("Password set to:", password);
     console.log("Generating QR Code...");
     rl.close();

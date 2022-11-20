@@ -18,6 +18,9 @@ import {
 import db, { client } from "./db";
 import { agenda } from "./helpers/agenda";
 import { getDate } from "./helpers/date";
+import { Count } from "./models/count";
+import { Media } from "./models/media";
+import { timeToWord } from "./helpers/timeToWord";
 
 const app = express();
 
@@ -154,8 +157,10 @@ export default async function main() {
       try {
         const groupId = (await msg.getChat())?.id._serialized;
         console.log("new whatsapp message");
-        console.log(msg.author, groupId);
-        console.log(msg.id._serialized);
+        console.log("date", msg.timestamp * 1000);
+        console.log("author id", msg.author);
+        console.log("group id", groupId);
+        console.log("msg id", msg.id._serialized);
         if (groupId === process.env.WTS_GROUP_ID) {
           const channel = dcClient.channels.cache.get(
             process.env.DISCORD_FORWARD_CHANNEL_ID
@@ -248,11 +253,7 @@ export default async function main() {
 
   wtsClient.on("message_create", async (msg) => {
     const groupId = (await msg.getChat()).id._serialized;
-    if (
-      // groupId === process.env.WTS_GROUP_ID &&
-      groupId &&
-      !msg.isStatus
-    ) {
+    if (groupId && !msg.isStatus) {
       const date = getDate();
 
       if (
@@ -263,7 +264,7 @@ export default async function main() {
           )
         ).modifiedCount
       ) {
-        await db("count").coll.insertOne({ groupId, date, count: 1 });
+        await db("count").coll.insertOne(<Count>{ groupId, date, count: 1 });
       }
 
       if (
@@ -302,6 +303,33 @@ export default async function main() {
     }
   });
 
+  wtsClient.on("message_revoke_everyone", async (_msg, before) => {
+    const groupId = (await before.getChat())?.id?._serialized;
+    if (groupId && !before.isStatus) {
+      const date = getDate(before.timestamp * 1000);
+
+      await db("count").coll.updateOne(
+        { groupId, date },
+        { $inc: { count: -1 } }
+      );
+
+      await db("count").coll.updateOne(
+        {
+          groupId,
+          date,
+          users: {
+            $elemMatch: {
+              id: before.fromMe ? process.env.WTS_OWNER_ID : before.author,
+            },
+          },
+        },
+        {
+          $inc: { "users.$.count": -1 },
+        }
+      );
+    }
+  });
+
   wtsClient.on("message", async (msg) => {
     if (JSON.parse(process.env.MARK_AS_SEEN || ""))
       await wtsClient
@@ -314,14 +342,21 @@ export default async function main() {
       if (msg.isStatus) {
         const media =
           msg.hasMedia && (await msg.downloadMedia().catch(() => null));
-        await wtsClient.sendMessage(
-          process.env.WTS_OWNER_ID,
-          `Status from ${
-            (await msg.getContact())?.name || msg.author?.split("@")[0]
-          }:
+        await wtsClient
+          .sendMessage(
+            process.env.WTS_OWNER_ID,
+            `Status from ${
+              (await msg.getContact())?.name || msg.author?.split("@")[0]
+            } with id \`\`\`${msg.id._serialized}\`\`\`:
 ${msg.body || msg.type}`,
-          { ...(media && { media }) }
-        );
+            { ...(media && { media }) }
+          )
+          .then((newMsg) => {
+            db("media").coll.insertOne(<Media>{
+              orgId: msg.id._serialized,
+              fwdId: newMsg.id._serialized,
+            });
+          });
       } else if (msg.hasMedia) {
         const chat = await msg.getChat();
         const media = await msg.downloadMedia().catch(() => null);
@@ -329,14 +364,23 @@ ${msg.body || msg.type}`,
         const sendTo =
           process.env.WTS_MEDIA_FORWARD_GROUP_ID || process.env.WTS_OWNER_ID;
         if (chat.id._serialized === sendTo) return;
-        await wtsClient.sendMessage(
-          sendTo,
-          `Message from ${
-            (await msg.getContact())?.name || msg.author?.split("@")[0]
-          } in ${chat?.name || chat?.id}:
+        await wtsClient
+          .sendMessage(
+            sendTo,
+            `Message from ${
+              (await msg.getContact())?.name || msg.author?.split("@")[0]
+            } with id \`\`\`${msg.id._serialized}\`\`\` in ${
+              chat?.name || chat?.id
+            }:
 ${msg.body || msg.type}`,
-          { ...(msg.type !== "sticker" && { media }) }
-        );
+            { ...(msg.type !== "sticker" && { media }) }
+          )
+          .then((newMsg) => {
+            db("media").coll.insertOne(<Media>{
+              orgId: msg.id._serialized,
+              fwdId: newMsg.id._serialized,
+            });
+          });
         if (msg.type === "sticker") {
           await wtsClient.sendMessage(
             sendTo,
@@ -456,7 +500,9 @@ ${msg.body || msg.type}`,
               `_${before.isStatus ? "Status" : "Message"} from ${
                 (await before.getContact())?.name ||
                 before.author?.split("@")[0]
-              } was deleted in ${chat.name || chat.id}_ 👇👇\n\n${
+              } with id \`\`\`${before.id._serialized}\`\`\` sent *${timeToWord(
+                before.timestamp * 1000
+              )} from now* was deleted in ${chat.name || chat.id}_ 👇👇\n\n${
                 before.body || before.type
               }`,
               { ...(media && { media }) }
