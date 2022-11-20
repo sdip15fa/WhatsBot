@@ -25,6 +25,7 @@ services:
       DISCORD_TO_WHATSAPP: ${DISCORD_TO_WHATSAPP}
       WHATSAPP_TO_DISCORD: ${WHATSAPP_TO_DISCORD}
       DISCORD_OWNER_ID: ${DISCORD_OWNER_ID}
+      BITLY_API_KEY: ${BITLY_API_KEY}
     networks:
       - whatsbot-network
   wtstodis-mongo:
