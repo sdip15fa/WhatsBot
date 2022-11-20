@@ -4,7 +4,7 @@ import db from "../db";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
-  const userId = msg.fromMe ? process.env.WTS_OWNER_ID : msg.from;
+  const userId = msg.fromMe ? process.env.WTS_OWNER_ID : (msg.author || msg.from);
   const nickname = args.join(" ");
   if (!nickname) {
     return await client.sendMessage(chatId, "Please enter a nickname!");

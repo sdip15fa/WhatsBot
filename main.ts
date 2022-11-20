@@ -160,6 +160,7 @@ export default async function main() {
         console.log("new whatsapp message");
         console.log("date", msg.timestamp * 1000);
         console.log("author id", msg.author);
+        console.log("from", msg.from);
         console.log("group id", groupId);
         console.log("msg id", msg.id._serialized);
         if (groupId === process.env.WTS_GROUP_ID) {
@@ -201,7 +202,7 @@ export default async function main() {
 
               if (!disId) {
                 const name = await getName(
-                  quoted.fromMe ? process.env.WTS_OWNER_ID : quoted.from
+                  quoted.fromMe ? process.env.WTS_OWNER_ID : quoted.author
                 );
                 embed = embed.setFields([
                   {
@@ -280,7 +281,9 @@ export default async function main() {
               date,
               users: {
                 $elemMatch: {
-                  id: msg.fromMe ? process.env.WTS_OWNER_ID : msg.author,
+                  id: msg.fromMe
+                    ? process.env.WTS_OWNER_ID
+                    : msg.author || msg.from,
                 },
               },
             },
@@ -291,14 +294,16 @@ export default async function main() {
         ).modifiedCount
       ) {
         const name = await getName(
-          msg.fromMe ? process.env.WTS_OWNER_ID : msg.from
+          msg.fromMe ? process.env.WTS_OWNER_ID : msg.author || msg.from
         );
         await db("count").coll.updateOne(
           { groupId, date },
           {
             $push: {
               users: {
-                id: msg.fromMe ? process.env.WTS_OWNER_ID : msg.author,
+                id: msg.fromMe
+                  ? process.env.WTS_OWNER_ID
+                  : msg.author || msg.from,
                 name,
                 count: 1,
               },
@@ -325,7 +330,9 @@ export default async function main() {
           date,
           users: {
             $elemMatch: {
-              id: before.fromMe ? process.env.WTS_OWNER_ID : before.author,
+              id: before.fromMe
+                ? process.env.WTS_OWNER_ID
+                : before.author || before.from,
             },
           },
         },
@@ -352,7 +359,8 @@ export default async function main() {
           .sendMessage(
             process.env.WTS_OWNER_ID,
             `Status from ${
-              (await msg.getContact())?.name || msg.author?.split("@")[0]
+              (await msg.getContact())?.name ||
+              (msg.author || msg.from)?.split("@")[0]
             } with id \`\`\`${msg.id._serialized}\`\`\`:
 ${msg.body || msg.type}`,
             { ...(media && { media }) }
@@ -374,7 +382,8 @@ ${msg.body || msg.type}`,
           .sendMessage(
             sendTo,
             `Message from ${
-              (await msg.getContact())?.name || msg.author?.split("@")[0]
+              (await msg.getContact())?.name ||
+              (msg.author || msg.from)?.split("@")[0]
             } with id \`\`\`${msg.id._serialized}\`\`\` in ${
               chat?.name || chat?.id
             }:
@@ -504,7 +513,8 @@ ${msg.body || msg.type}`,
             .sendMessage(
               process.env.WTS_OWNER_ID,
               `_${before.isStatus ? "Status" : "Message"} from ${
-                (await before.getContact())?.name || before.author?.split("@")[0]
+                (await before.getContact())?.name ||
+                (before.author || before.from)?.split("@")[0]
               } with id \`\`\`${before.id._serialized}\`\`\` sent *${timeToWord(
                 before.timestamp * 1000
               )} from now* was deleted in ${chat.name || chat.id}_ 👇👇\n\n${
