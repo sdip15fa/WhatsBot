@@ -21,6 +21,7 @@ import { getDate } from "./helpers/date";
 import { Count } from "./models/count";
 import { Media } from "./models/media";
 import { timeToWord } from "./helpers/timeToWord";
+import { getName } from "./helpers/getName";
 
 const app = express();
 
@@ -168,19 +169,21 @@ export default async function main() {
 
           if (channel && channel instanceof TextChannel) {
             const contact = await msg.getContact();
+            const name = await getName(contact.id._serialized);
 
-            (await msg.getMentions()).forEach((contact) => {
-              if (contact.name)
+            (await msg.getMentions()).forEach(async (contact) => {
+              const name = await getName(contact.id._serialized);
+              if (name)
                 msg.body = msg.body?.replaceAll?.(
                   `@${contact.number}`,
-                  `@${contact.name}`
+                  `@${name}`
                 );
             });
 
             let embed = new EmbedBuilder()
               .setColor(0x0099ff)
               .setAuthor({
-                name: contact.name || msg.author?.split("@")[0] || "",
+                name,
                 iconURL: await contact.getProfilePicUrl(),
               })
               .setDescription(msg.body || msg.type || "")
@@ -197,11 +200,13 @@ export default async function main() {
               )?.disId;
 
               if (!disId) {
-                const contact = await quoted.getContact();
+                const name = await getName(
+                  quoted.fromMe ? process.env.WTS_OWNER_ID : quoted.from
+                );
                 embed = embed.setFields([
                   {
                     name: "Quoted Message",
-                    value: `${contact?.name || quoted.author}: ${
+                    value: `${name || quoted.author}: ${
                       quoted.body || quoted.type || ""
                     }`,
                   },
@@ -285,15 +290,16 @@ export default async function main() {
           )
         ).modifiedCount
       ) {
-        const contact = await msg.getContact();
+        const name = await getName(
+          msg.fromMe ? process.env.WTS_OWNER_ID : msg.from
+        );
         await db("count").coll.updateOne(
           { groupId, date },
           {
             $push: {
               users: {
                 id: msg.fromMe ? process.env.WTS_OWNER_ID : msg.author,
-                name:
-                  contact.name || contact.number || msg.author?.split("@")[0],
+                name,
                 count: 1,
               },
             },
@@ -342,12 +348,11 @@ export default async function main() {
       if (msg.isStatus) {
         const media =
           msg.hasMedia && (await msg.downloadMedia().catch(() => null));
+        const name = msg.fromMe ? process.env.WTS_OWNER_ID : msg.from;
         await wtsClient
           .sendMessage(
             process.env.WTS_OWNER_ID,
-            `Status from ${
-              (await msg.getContact())?.name || msg.author?.split("@")[0]
-            } with id \`\`\`${msg.id._serialized}\`\`\`:
+            `Status from ${name} with id \`\`\`${msg.id._serialized}\`\`\`:
 ${msg.body || msg.type}`,
             { ...(media && { media }) }
           )
@@ -364,14 +369,15 @@ ${msg.body || msg.type}`,
         const sendTo =
           process.env.WTS_MEDIA_FORWARD_GROUP_ID || process.env.WTS_OWNER_ID;
         if (chat.id._serialized === sendTo) return;
+        const name = await getName(
+          msg.fromMe ? process.env.WTS_OWNER_ID : msg.from
+        );
         await wtsClient
           .sendMessage(
             sendTo,
-            `Message from ${
-              (await msg.getContact())?.name || msg.author?.split("@")[0]
-            } with id \`\`\`${msg.id._serialized}\`\`\` in ${
-              chat?.name || chat?.id
-            }:
+            `Message from ${name} with id \`\`\`${
+              msg.id._serialized
+            }\`\`\` in ${chat?.name || chat?.id}:
 ${msg.body || msg.type}`,
             { ...(msg.type !== "sticker" && { media }) }
           )
@@ -497,10 +503,11 @@ ${msg.body || msg.type}`,
           wtsClient
             .sendMessage(
               process.env.WTS_OWNER_ID,
-              `_${before.isStatus ? "Status" : "Message"} from ${
-                (await before.getContact())?.name ||
-                before.author?.split("@")[0]
-              } with id \`\`\`${before.id._serialized}\`\`\` sent *${timeToWord(
+              `_${before.isStatus ? "Status" : "Message"} from ${await getName(
+                before.fromMe ? process.env.WTS_OWNER_ID : before.author
+              )} with id \`\`\`${
+                before.id._serialized
+              }\`\`\` sent *${timeToWord(
                 before.timestamp * 1000
               )} from now* was deleted in ${chat.name || chat.id}_ 👇👇\n\n${
                 before.body || before.type

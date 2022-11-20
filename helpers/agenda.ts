@@ -25,7 +25,7 @@ agenda.define(
       groupId,
       await countMessage(
         groupId,
-        (await wtsClient.getChatById(groupId)).name || "",
+        (await wtsClient.getChatById(groupId))?.name || "",
         date
       )
     );
@@ -59,12 +59,12 @@ agenda.define(
         media.filename || "image.png"
       );
       if (sticker) {
-        await wtsClient.sendMessage(chatId, messageMedia, {
+        return await wtsClient.sendMessage(chatId, messageMedia, {
           sendMediaAsSticker: true,
         });
       }
       if (!body) {
-        await wtsClient.sendMessage(chatId, media);
+        return await wtsClient.sendMessage(chatId, media);
       }
     }
     await wtsClient.sendMessage(chatId, body, {
