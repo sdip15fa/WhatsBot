@@ -7,7 +7,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     return await client.sendMessage(chatId, "Please provide an argument.");
   }
 
-  const definition = await dictionary(args.join(""));
+  const definition = await dictionary(args.join(" "));
 
   if ("status" in definition) {
     await client.sendMessage(
