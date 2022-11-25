@@ -3,9 +3,13 @@ import { Client, Message, MessageMedia } from "whatsapp-web.js";
 
 const execute = async (client: Client, msg: Message) => {
   const chatId = (await msg.getChat()).id._serialized;
-  let quotedMsg = await msg.getQuotedMessage();
-  if (quotedMsg.hasMedia) {
-    let attachmentData = await quotedMsg
+  let message: Message =
+    (await msg
+      .getQuotedMessage()
+      .then((msg) => msg)
+      .catch(() => null)) || msg;
+  if (message.hasMedia) {
+    let attachmentData = await message
       .downloadMedia()
       .then((media) => media)
       .catch(() => null);
