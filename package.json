@@ -55,7 +55,7 @@
     "strict-uri-encode": "^2.0.0",
     "urban-dictionary": "^3.0.2",
     "weather-js": "^2.0.0",
-    "whatsapp-web.js": "^1.18.3"
+    "whatsapp-web.js": "^1.18.4"
   },
   "devDependencies": {
     "@types/adm-zip": "^0.5.0",
