@@ -21,52 +21,52 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       chatId,
       `*${definition.word}*
 ${
-  definition.phonetics.length
+  definition.phonetics?.length
     ? `\n*Phonetics*
 
 ${definition.phonetics
-  .map(
+  ?.map(
     (phonetic, index) =>
       `${index + 1}.${phonetic.text ? `\nText: ${phonetic.text}` : ""}${
         phonetic.audio ? `\nAudio: ${phonetic.audio}` : ""
       }`
   )
-  .join("\n\n")}\n`
+  ?.join("\n\n")}\n`
     : ""
 }
 *Meanings*
 
 ${definition.meanings
-  .map(
+  ?.map(
     (meaning) =>
-      `*${meaning.partOfSpeech}*
+      `*${meaning?.partOfSpeech}*
 
 ${meaning.definitions
-  .map(
+  ?.map(
     (def, index) =>
-      `${index + 1}. ${def.definition}${
-        def.example
+      `${index + 1}. ${def?.definition}${
+        def?.example
           ? `\n_Example_:
-${def.example}`
+${def?.example}`
           : ""
       }${
-        def.synonyms.length
+        def?.synonyms?.length
           ? `\n_Synonyms_
-${def.synonyms.map((synonym) => `- ${synonym}`).join("\n")}`
+${def?.synonyms?.map((synonym) => `- ${synonym}`)?.join("\n")}`
           : ""
       }${
         def.antonyms.length
           ? `\n_Antonyms_
-${def.antonyms.map((antonym) => `- ${antonym}`).join("\n")}`
+${def?.antonyms?.map((antonym) => `- ${antonym}`)?.join("\n")}`
           : ""
       }`
   )
-  .join("\n\n")}`
+  ?.join("\n\n")}`
   )
-  .join("\n\n")}${
-        definition.origin
+  ?.join("\n\n")}${
+        definition?.origin
           ? `\n\n*Origin*:
-${definition.origin}`
+${definition?.origin}`
           : ""
       }`
     );

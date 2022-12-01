@@ -1,21 +1,21 @@
 import axios, { AxiosError } from "axios";
 
 interface definition {
-  word: string;
-  phonetic: string;
-  phonetics: {
-    text: string;
+  word?: string;
+  phonetic?: string;
+  phonetics?: {
+    text?: string;
     /** audio url */
-    audio: string;
+    audio?: string;
   }[];
-  origin: string;
-  meanings: {
-    partOfSpeech: string;
-    definitions: {
-      definition: string;
-      example: string;
-      synonyms: string[];
-      antonyms: string[];
+  origin?: string;
+  meanings?: {
+    partOfSpeech?: string;
+    definitions?: {
+      definition?: string;
+      example?: string;
+      synonyms?: string[];
+      antonyms?: string[];
     }[];
   }[];
 }
