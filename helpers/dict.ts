@@ -46,7 +46,7 @@ export default async function dictionary(word: string): Promise<
       ) => {
         return error?.response
           ? {
-              status: error?.response.status,
+              status: error?.response?.status,
               title: error?.response?.data?.title,
               message: error?.response?.data?.message,
               resolution: error?.response?.data?.resolution,

@@ -9,7 +9,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
 
   const definition = await dictionary(args.join(" "));
 
-  if ("status" in definition) {
+  if (typeof definition === "object" && "status" in definition) {
     await client.sendMessage(
       chatId,
       definition.status
