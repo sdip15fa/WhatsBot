@@ -9,7 +9,7 @@
     "build": "tsc",
     "dev": "nodemon startProcess.ts",
     "lint": "prettier --write **/*.ts",
-    "docker": "docker build . -t wtstodis",
+    "docker": "docker build . -t registry.gitlab.com/wcyat/whatsapp-to-discord",
     "gentoken": "ts-node session/genToken.ts",
     "gentokenwithdownload": "ts-node session/genTokenWithDownload.ts"
   },
@@ -33,7 +33,7 @@
     "adm-zip": "^0.5.9",
     "aes-encrypt-stream": "^0.2.0",
     "agenda": "^5.0.0",
-    "axios": "^1.2.0",
+    "axios": "^1.1.0",
     "child_process": "^1.0.2",
     "decode-uri-component": "^0.2.0",
     "discord.js": "^14.7.0",
