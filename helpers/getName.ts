@@ -9,14 +9,14 @@ export async function getName(id: string) {
         id,
       })) as Nickname | null
     )?.name;
-    if (nickname) return nickname;
     const contact = await wtsClient.getContactById(id);
     if (contact.name) {
-      return contact.name;
+      return nickname ? `${nickname} (${contact.name})` : contact.name;
     }
     if (contact.number) {
-      return contact.number;
+      return nickname ? `${nickname} (${contact.number})` : contact.number;
     }
+    return nickname ? `${nickname} (${id.split("@")[0]})` : id.split("@")[0];
   } catch {}
   return id.split("@")[0];
 }
