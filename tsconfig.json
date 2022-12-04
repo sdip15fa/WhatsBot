@@ -17,7 +17,7 @@
     "baseUrl": ".",
     "paths": {
       "*": ["node_modules/*"]
-    }
+    },
   },
   "include": ["**/*.ts", "*.ts"],
   "exclude": ["node_modules", "*.js", "dist"],

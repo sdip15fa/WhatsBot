@@ -58,7 +58,7 @@ Weather ${
             }
             return v.meaning;
           })
-          .join(" ") || "no data"
+          .join(" ") || "no special weather conditions"
       }
 Clouds ${
         data.clouds?.map((v) => `${v.meaning} ${v.altitude}ft`).join(", ") ||
