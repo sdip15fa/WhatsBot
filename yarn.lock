@@ -944,13 +944,6 @@
   dependencies:
     "@types/node" "*"
 
-"@types/better-sqlite3@^5.4.0":
-  version "5.4.3"
-  resolved "https://registry.yarnpkg.com/@types/better-sqlite3/-/better-sqlite3-5.4.3.tgz#4f1142c02db111627d9c5792f8aa349fcf46d100"
-  integrity sha512-d4T8Htgz3sQL3u5oVwkWipZLBYUooKEA4fhU9Sp4F6VDIhifQo1NR/IDtnAIID0Y9IXV3TQnNhv6S+m8TnkEdg==
-  dependencies:
-    "@types/integer" "*"
-
 "@types/body-parser@*":
   version "1.19.2"
   resolved "https://registry.yarnpkg.com/@types/body-parser/-/body-parser-1.19.2.tgz#aea2059e28b7658639081347ac4fab3de166e6f0"
@@ -1012,11 +1005,6 @@
   version "3.27.1"
   resolved "https://registry.yarnpkg.com/@types/humanize-duration/-/humanize-duration-3.27.1.tgz#f14740d1f585a0a8e3f46359b62fda8b0eaa31e7"
   integrity sha512-K3e+NZlpCKd6Bd/EIdqjFJRFHbrq5TzPPLwREk5Iv/YoIjQrs6ljdAUCo+Lb2xFlGNOjGSE0dqsVD19cZL137w==
-
-"@types/integer@*":
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/@types/integer/-/integer-4.0.1.tgz#022f2c77a899e383e6d3dd374142416c22a5b9df"
-  integrity sha512-QQojPymFcV1hrvWXA1h0pP9RmFBFNuWikZcUEjjVsS19IyKO+jqOX24lp2ZHF4A21EmkosJhJDX7CLG67F2s7A==
 
 "@types/mime@*":
   version "3.0.1"
@@ -1450,13 +1438,6 @@ braces@~3.0.2:
   integrity sha512-b8um+L1RzM3WDSzvhm6gIz1yfTbBt6YTlcEKAvsmqCZZFw46z626lVj9j1yEPW33H5H+lBQpZMP1k8l+78Ha0A==
   dependencies:
     fill-range "^7.0.1"
-
-brain.js@^2.0.0-beta.2:
-  version "2.0.0-beta.17"
-  resolved "https://registry.yarnpkg.com/brain.js/-/brain.js-2.0.0-beta.17.tgz#7136e405cc35bcb8c9687538ea19ab39a902ed0c"
-  integrity sha512-w5jYlX2MQxKDlZSQI3VcbkmW4MHGFX0UOULZLUJ63NGKExSNkXukonNShckiMhlt7x4j2VmDv6FHIgdXWsMgdg==
-  dependencies:
-    thaw.js "^2.1.4"
 
 bson@^4.7.0:
   version "4.7.0"
@@ -3552,25 +3533,6 @@ pkg-dir@4.2.0:
   dependencies:
     find-up "^4.0.0"
 
-pokemon-showdown@^0.11.7:
-  version "0.11.7"
-  resolved "https://registry.yarnpkg.com/pokemon-showdown/-/pokemon-showdown-0.11.7.tgz#26d66c75760cfa6328e381db13a52a3b497b5e84"
-  integrity sha512-OLtmxAEkojCrySehjlLE+bl0Ls/Q9SyzgEQJoms6SyOUAN98coiNZRya0zKdaGDYLe3S7JTNzJ/tNepScPy2TQ==
-  dependencies:
-    "@types/better-sqlite3" "^5.4.0"
-    probe-image-size "^5.0.0"
-    sockjs "^0.3.21"
-    sucrase "^3.15.0"
-  optionalDependencies:
-    better-sqlite3 "^7.1.0"
-    brain.js "^2.0.0-beta.2"
-    cloud-env "^0.2.3"
-    node-static "^0.7.11"
-    nodemailer "^6.4.6"
-    permessage-deflate "^0.1.7"
-    sql-template-strings "^2.2.2"
-    sqlite "^3.0.6"
-
 postgres-array@~2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/postgres-array/-/postgres-array-2.0.0.tgz#48f8fce054fbc69671999329b8834b772652d82e"
@@ -3744,6 +3706,10 @@ query-string@^5.0.1:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/query-string/-/query-string-5.1.1.tgz#a78c012b71c17e05f2e3fa2319dd330682efb3cb"
   integrity sha512-gjWOsm2SoGlgLEdAGt7a6slVOk9mGiXmPFMqrEhLQ68rhQuBnpfs3+EmlvqKyxnCo9/PPlF+9MtY02S1aFg+Jw==
+  dependencies:
+    decode-uri-component "^0.2.0"
+    object-assign "^4.1.0"
+    strict-uri-encode "^1.0.0"
 
 range-parser@~1.2.1:
   version "1.2.1"
@@ -4129,6 +4095,11 @@ streamsearch@^1.1.0:
   resolved "https://registry.yarnpkg.com/streamsearch/-/streamsearch-1.1.0.tgz#404dd1e2247ca94af554e841a8ef0eaa238da764"
   integrity sha512-Mcc5wHehp9aXz1ax6bZUyY5afg9u2rv5cqQI3mRrYkGC8rW2hM02jWuwjtL++LS5qinSyhj2QfLyNsuc+VsExg==
 
+strict-uri-encode@^1.0.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/strict-uri-encode/-/strict-uri-encode-1.1.0.tgz#279b225df1d582b1f54e65addd4352e18faa0713"
+  integrity sha512-R3f198pcvnB+5IpnBlRkphuE9n46WyVl8I39W/ZUTZLz4nqSP/oLYUrcnJrw462Ds8he4YKMov2efsTIw1BDGQ==
+
 strict-uri-encode@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/strict-uri-encode/-/strict-uri-encode-2.0.0.tgz#b9c7330c7042862f6b142dc274bbcc5866ce3546"
@@ -4289,11 +4260,6 @@ tar@^4:
     mkdirp "^0.5.5"
     safe-buffer "^5.2.1"
     yallist "^3.1.1"
-
-thaw.js@^2.1.4:
-  version "2.1.4"
-  resolved "https://registry.yarnpkg.com/thaw.js/-/thaw.js-2.1.4.tgz#d00fbb20b9b6c6bc2aef541199cc0717deedfde9"
-  integrity sha512-si9DSzEzOBUpbE41wE4Q6NXzXDYZfrniYocrduNtNDwLWj1Auueq8UzgePMQa5gfcQtVCG2OmlCTaHldtno3Vw==
 
 thenify-all@^1.0.0:
   version "1.6.0"
