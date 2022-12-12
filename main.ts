@@ -487,9 +487,9 @@ ${msg.body || msg.type}`,
           } catch (error) {
             console.log(error);
           }
-        } else {
+        } else if (msg.fromMe) {
           await wtsClient.sendMessage(
-            msg.to,
+            process.env.WTS_OWNER_ID,
             "No such command found. Type !help to get the list of available commands"
           );
         }
