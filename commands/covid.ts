@@ -73,7 +73,7 @@ ${(() => {
           .filter((v) => v.id === p)
           .map(
             (v) =>
-              `${v.time}: ${v.temperature}${v.symptoms ? ` ${v.symptoms}` : ""}`
+              `${v.time}: ${v.temperature || ""}${v.symptoms ? ` ${v.symptoms}` : ""}`
           )
           .join("\n")}`
     )
