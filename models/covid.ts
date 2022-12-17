@@ -12,6 +12,6 @@ export interface CovidStatus {
   name: string;
   time: string;
   rat: "positive" | "negative";
-  temperature: number;
+  temperature?: number;
   symptoms?: string;
 }

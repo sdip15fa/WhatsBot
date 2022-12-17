@@ -125,14 +125,14 @@ ${(() => {
   }
 
   const temperature = Number(args[1]);
-  if (temperature < 35 || temperature > 42 || !temperature) {
+  if (temperature < 35 || temperature > 42) {
     return await client.sendMessage(
       chatId,
       "Temperature must be between 35 and 42"
     );
   }
 
-  const symptoms = args.filter((_v, i) => i > 1).join(" ");
+  const symptoms = args.filter((_v, i) => i > (temperature ? 1 : 0)).join(" ");
 
   const date = getDate();
   const time = getTime();
@@ -150,7 +150,7 @@ ${(() => {
               name: await getName(userId),
               time,
               rat,
-              temperature,
+              ...(temperature && {temperature}),
               ...(symptoms && { symptoms }),
             },
           },
