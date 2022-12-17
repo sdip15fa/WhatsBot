@@ -144,13 +144,15 @@ ${(() => {
       await db("covid").coll.updateOne(
         { date, chatId },
         {
-          $push: <CovidStatus>{
-            id: userId,
-            name: await getName(userId),
-            time,
-            rat,
-            temperature,
-            ...(symptoms && { symptoms }),
+          $push: {
+            status: <CovidStatus>{
+              id: userId,
+              name: await getName(userId),
+              time,
+              rat,
+              temperature,
+              ...(symptoms && { symptoms }),
+            },
           },
         }
       )
