@@ -54,8 +54,9 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     return await client.sendMessage(
       chatId,
       `Covid status in ${chat.name} on ${covid.date}:${
-        positive.length &&
-        `
+        !positive.length
+          ? ""
+          : `
       
 *Positive*
 ${(() => {
@@ -79,8 +80,9 @@ ${(() => {
     .join("\n");
 })()}`
       }${
-        negative.length &&
-        `
+        !negative.length
+          ? ""
+          : `
       
 *Negative*
 ${(() => {
