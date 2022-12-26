@@ -17,6 +17,20 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
           "Word is too long (maximum is 15 characters)"
         );
       }
+      if (Number(args[2])) {
+        if (
+          !(
+            await db("story").coll.updateOne(
+              { chatId, id: Number(args[2]) },
+              { $push: { story: text }, $currentDate: { lastModified: true } }
+            )
+          ).matchedCount
+        ) {
+          return await client.sendMessage(chatId, "Story not found.");
+        } else {
+          return await client.sendMessage(chatId, `Story updated: added \`\`\`${text}\`\`\``);
+        }
+      }
       if (
         !(
           await db("story").coll.updateOne(
@@ -138,7 +152,7 @@ module.exports = {
   command: "!story",
   commandType: "plugin",
   isDependent: false,
-  help: `*Story*\n\n!story add [one word]\n!story new [one word]\n!story see [id]\n!story list\n!story remove`,
+  help: `*Story*\n\n!story add [one word] [id]\n!story new [one word]\n!story see [id]\n!story list\n!story remove`,
   execute,
   public: true,
 };
