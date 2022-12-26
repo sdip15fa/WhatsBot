@@ -92,7 +92,10 @@ ${story.story.join(" ")}`
         );
       }
 
-      await db("story").coll.updateMany({ chatId }, { $set: { current: false } });
+      await db("story").coll.updateMany(
+        { chatId },
+        { $set: { current: false } }
+      );
 
       await db("story").coll.insertOne(<Story>{
         id:
@@ -148,17 +151,14 @@ Content: ${story.story.filter((_v, i) => i < 10).join(" ")}${
     }
     case "current": {
       if (Number(args[1])) {
-        if (
-          (
-            await db("story").coll.updateOne(
-              { id: Number(args[1]) },
-              { $set: { current: true } }
-            )
-          ).matchedCount
-        ) {
+        if (await db("story").coll.findOne({ chatId, id: Number(args[1]) })) {
           await db("story").coll.updateMany(
-            { id: { $ne: Number(args[1]) } },
+            { chatId },
             { $set: { current: false } }
+          );
+          await db("story").coll.updateOne(
+            { chatId, id: Number(args[1]) },
+            { $set: { current: true } }
           );
           await client.sendMessage(
             chatId,
