@@ -8,7 +8,7 @@ export function getDate(date: Date | number | string = new Date()) {
     date = new Date();
   }
   return new Date(date)
-    .toLocaleDateString("en-UK", { timeZone: "Asia/Hong_Kong" })
+    .toLocaleDateString("en-UK", { timeZone: process.env.TZ })
     .split("/")
     .reverse()
     .join("-");
@@ -25,7 +25,7 @@ export function getTime(date: Date | number | string = new Date()) {
   }
   return new Date(date)
     .toLocaleTimeString("en-UK", {
-      timeZone: "Asia/Hong_Kong",
+      timeZone: process.env.TZ,
     })
     .split(":")
     .filter((_v, i) => i < 2)
