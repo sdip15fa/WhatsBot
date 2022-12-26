@@ -140,7 +140,7 @@ module.exports = {
   command: "!story",
   commandType: "plugin",
   isDependent: false,
-  help: `*Story*\n\n!story add [one word]\n\n!story new [one word]\n\n!story see [id]\n\n!story list\n\n!story remove`,
+  help: `*Story*\n\n!story add [one word]\n!story new [one word]\n!story see [id]\n!story list\n!story remove`,
   execute,
   public: true,
 };
