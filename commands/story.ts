@@ -125,9 +125,7 @@ ${story.story.filter((_v, i) => i < 10).join(" ")}${
     default: {
       await client.sendMessage(
         chatId,
-        `Syntax:
-\`\`\`!story add [one word]\`\`\`
-\`\`\`!story see\`\`\``
+        `Use \`\`\`!help todo\`\`\` for syntax.`
       );
       break;
     }
