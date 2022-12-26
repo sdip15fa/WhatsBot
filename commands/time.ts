@@ -2,6 +2,10 @@
 import { Client, Message } from "whatsapp-web.js";
 
 function isValidTimeZone(tz: string) {
+  if (!tz) {
+    return false;
+  }
+  
   if (!Intl || !Intl.DateTimeFormat().resolvedOptions().timeZone) {
     throw new Error("Time zones are not available in this environment");
   }
@@ -27,6 +31,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
 ${date.toLocaleString("en-UK", {
   timeZone,
 })}
+
 ISO:
 \`\`\`${date.toISOString()}\`\`\``
     );
