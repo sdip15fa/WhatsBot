@@ -19,6 +19,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         await db("story").coll.insertOne(<Story>{ chatId, story: [text] });
       }
       await client.sendMessage(chatId, `Story updated: added ${text}`);
+      break;
     }
     case "see": {
       const story = (await db("story").coll.findOne({
@@ -33,14 +34,16 @@ ${story.story.join(" ")}`
       } else {
         await client.sendMessage(chatId, "Story doesn't exist (yet)");
       }
+      break;
     }
     default: {
       await client.sendMessage(
         chatId,
         `Syntax:
-          !story add [one word]
-          !story see`
+!story add [one word]
+!story see`
       );
+      break;
     }
   }
 };
