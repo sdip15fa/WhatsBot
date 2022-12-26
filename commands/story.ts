@@ -72,7 +72,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       if (story) {
         await client.sendMessage(
           chatId,
-          `Story ${Number(args[1]) || 0}:
+          `${Number(args[1]) ? `Story ${Number(args[1])}` : "Current story"}:
 ${story.story.join(" ")}`
         );
       } else {
@@ -132,8 +132,12 @@ ${story.story.join(" ")}`
 ${stories
   .map((story) => {
     return `${story.id}${story.current ? " (Current)" : ""}:
-Created: ${new Date(story.createdAt).toLocaleString("en-UK", {timeZone: process.env.TZ})}
-Last modified: ${new Date(story.lastModified).toLocaleString("en-UK", {timeZone: process.env.TZ})}
+Created: ${new Date(story.createdAt).toLocaleString("en-UK", {
+      timeZone: process.env.TZ,
+    })}
+Last modified: ${new Date(story.lastModified).toLocaleString("en-UK", {
+      timeZone: process.env.TZ,
+    })}
 Content: ${story.story.filter((_v, i) => i < 10).join(" ")}${
       story.story.length > 10 ? "..." : ""
     }`;
