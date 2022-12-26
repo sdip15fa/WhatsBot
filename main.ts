@@ -1,5 +1,4 @@
 //jshint esversion:8
-import express from "express";
 import download from "download";
 import { Client as WTSClient, LocalAuth, MessageMedia } from "whatsapp-web.js";
 import pmpermit from "./helpers/pmpermit";
@@ -22,8 +21,6 @@ import { Count } from "./models/count";
 import { Media } from "./models/media";
 import { timeToWord } from "./helpers/timeToWord";
 import { getName } from "./helpers/getName";
-
-const app = express();
 
 export const dcClient = new DCClient({
   intents: [
@@ -182,7 +179,7 @@ export default async function main() {
             });
 
             let embed = new EmbedBuilder()
-              .setColor(0x0099ff)
+              .setColor(0x47ad5d)
               .setAuthor({
                 name,
                 iconURL: await contact.getProfilePicUrl(),
@@ -534,17 +531,11 @@ ${msg.body || msg.type}`,
     console.log("Client was logged out", reason);
   });
 
-  app.get("/", (_req, res) => {
-    res.send({ success: true });
-  });
-
-  app.listen(process.env.PORT || 8080, async () => {
-    console.log(`Server listening at Port: ${process.env.PORT || 8080}`);
-    await Promise.all([
-      wtsClient.initialize(),
-      dcClient.login(process.env.DISCORD_TOKEN).then(() => {
-        console.log("Discord logged in");
-      }),
-    ]);
-  });
+  (async () => {
+    console.log("starting...");
+    wtsClient.initialize();
+    dcClient.login(process.env.DISCORD_TOKEN).then(() => {
+      console.log("Discord logged in");
+    });
+  })();
 }
