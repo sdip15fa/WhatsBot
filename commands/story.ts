@@ -132,7 +132,9 @@ ${story.story.join(" ")}`
 ${stories
   .map((story) => {
     return `${story.id}${story.current ? "(Current)" : ""}:
-${story.story.filter((_v, i) => i < 10).join(" ")}${
+Created: ${new Date(story.createdAt).toLocaleString("en-UK", {timeZone: process.env.TZ})}
+Last modified: ${new Date(story.lastModified).toLocaleString("en-UK", {timeZone: process.env.TZ})}
+Content: ${story.story.filter((_v, i) => i < 10).join(" ")}${
       story.story.length > 10 ? "..." : ""
     }`;
   })
