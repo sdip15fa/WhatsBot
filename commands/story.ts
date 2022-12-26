@@ -44,13 +44,13 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       ) {
         await db("story").coll.insertOne(<Story>{
           id:
-            (
+            ((
               (await db("story")
                 .coll.find({ chatId })
                 .sort({ id: -1 })
                 .limit(1)
                 .toArray()) as Story[]
-            )?.[0]?.id || 0 + 1,
+            )?.[0]?.id || 0) + 1,
           chatId,
           current: true,
           story: [text],
@@ -99,13 +99,13 @@ ${story.story.join(" ")}`
 
       await db("story").coll.insertOne(<Story>{
         id:
-          (
+          ((
             (await db("story")
               .coll.find({ chatId })
               .sort({ id: -1 })
               .limit(1)
               .toArray()) as Story[]
-          )?.[0]?.id || 0 + 1,
+          )?.[0]?.id || 0) + 1,
         current: true,
         chatId,
         story: [text],
