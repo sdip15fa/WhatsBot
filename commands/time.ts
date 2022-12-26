@@ -5,7 +5,7 @@ function isValidTimeZone(tz: string) {
   if (!tz) {
     return false;
   }
-  
+
   if (!Intl || !Intl.DateTimeFormat().resolvedOptions().timeZone) {
     throw new Error("Time zones are not available in this environment");
   }
@@ -36,7 +36,7 @@ ISO:
 \`\`\`${date.toISOString()}\`\`\``
     );
   } catch {
-    return await client.sendMessage(chatId, "Invalid date.");
+    return await client.sendMessage(chatId, "An error occured.");
   }
 };
 
