@@ -8,6 +8,9 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   switch (args[0]) {
     case "add": {
       const text = args[1];
+      if (!text) {
+        return await client.sendMessage(chatId, "Please provide a word!");
+      }
       if (
         !(
           await db("story").coll.updateOne(
