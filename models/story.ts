@@ -7,4 +7,5 @@ export default interface Story {
   createdAt: Date;
   lastModified: Date;
   story: string[];
+  current: boolean;
 }
