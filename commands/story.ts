@@ -26,6 +26,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         ).matchedCount
       ) {
         await db("story").coll.insertOne(<Story>{
+          id: (await db("story").coll.countDocuments({ chatId })) + 1,
           chatId,
           story: [text],
           createdAt: new Date(),
@@ -43,14 +44,15 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         await db("story")
           .coll.find({
             chatId,
+            ...(Number(args[1]) && { id: Number(args[1]) }),
           })
           .sort({ createdAt: -1 })
           .toArray()
-      )?.[Number(args[1]) || 0] as Story | null;
+      )?.[0] as Story | null;
       if (story) {
         await client.sendMessage(
           chatId,
-          `Current story:
+          `Story ${Number(args[1]) || 0}:
 ${story.story.join(" ")}`
         );
       } else {
@@ -71,6 +73,7 @@ ${story.story.join(" ")}`
       }
 
       await db("story").coll.insertOne(<Story>{
+        id: (await db("story").coll.countDocuments({ chatId })) + 1,
         chatId,
         story: [text],
         createdAt: new Date(),
@@ -93,17 +96,14 @@ ${story.story.join(" ")}`
       }
       await client.sendMessage(
         chatId,
-        `Current stories:
+        `Stories:
 
 ${stories
-  .map((story, index) => {
-    return `${index}:
-  Created: ${new Date(story.createdAt).toLocaleString("en-UK", {
-    timeZone: process.env.TZ,
-  })}
-  Last modified: ${new Date(story.createdAt).toLocaleString("en-UK", {
-    timeZone: process.env.TZ,
-  })}`;
+  .map((story) => {
+    return `${story.id}:
+${story.story.filter((_v, i) => i < 10).join(" ")}${
+      story.story.length > 10 ? "..." : ""
+    }`;
   })
   .join("\n")}`
       );
