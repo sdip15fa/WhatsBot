@@ -179,6 +179,7 @@ Content: ${story.story.filter((_v, i) => i < 10).join(" ")}${
           id ? `Current story id: ${id}` : "No stories yet."
         );
       }
+      break;
     }
     case "pop": {
       if (!msg.fromMe) {
