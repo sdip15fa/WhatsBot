@@ -92,7 +92,7 @@ ${story.story.join(" ")}`
         );
       }
 
-      await db("story").coll.updateMany({}, { $set: { current: false } });
+      await db("story").coll.updateMany({ chatId }, { $set: { current: false } });
 
       await db("story").coll.insertOne(<Story>{
         id:
