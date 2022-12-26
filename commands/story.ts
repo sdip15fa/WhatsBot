@@ -43,7 +43,14 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         ).matchedCount
       ) {
         await db("story").coll.insertOne(<Story>{
-          id: (await db("story").coll.countDocuments({ chatId })) + 1,
+          id:
+            (
+              (await db("story")
+                .coll.find({ chatId })
+                .sort({ id: -1 })
+                .limit(1)
+                .toArray()) as Story[]
+            )?.[0]?.id || 0 + 1,
           chatId,
           current: true,
           story: [text],
@@ -88,7 +95,14 @@ ${story.story.join(" ")}`
       await db("story").coll.updateMany({}, { $set: { current: false } });
 
       await db("story").coll.insertOne(<Story>{
-        id: (await db("story").coll.countDocuments({ chatId })) + 1,
+        id:
+          (
+            (await db("story")
+              .coll.find({ chatId })
+              .sort({ id: -1 })
+              .limit(1)
+              .toArray()) as Story[]
+          )?.[0]?.id || 0 + 1,
         current: true,
         chatId,
         story: [text],
@@ -105,7 +119,8 @@ ${story.story.join(" ")}`
     case "list": {
       const stories = (await db("story")
         .coll.find({ chatId })
-        .sort({ createdAt: -1 })
+        .sort({ id: 1 })
+        .limit(10)
         .toArray()) as Story[];
       if (!stories.length) {
         return await client.sendMessage(chatId, "No stories created yet");
@@ -159,23 +174,45 @@ ${story.story.filter((_v, i) => i < 10).join(" ")}${
         );
       }
     }
-    case "remove": {
+    case "pop": {
       if (!msg.fromMe) {
-        return await client.sendMessage(chatId, "You cannot remove.");
+        return await client.sendMessage(chatId, "You can't do that.");
       }
-      if (!(await db("story").coll.updateOne(
-        {
-          chatId,
-          ...(Number(args[1]) ? { id: Number(args[1]) } : { current: true }),
-        },
-        { $pop: { story: 1 } }
-      )).modifiedCount) {
+      if (
+        !(
+          await db("story").coll.updateOne(
+            {
+              chatId,
+              ...(Number(args[1])
+                ? { id: Number(args[1]) }
+                : { current: true }),
+            },
+            { $pop: { story: 1 } }
+          )
+        ).modifiedCount
+      ) {
         return await client.sendMessage(
           chatId,
           "Nothing was removed. Please check."
         );
-      };
-      await client.sendMessage(chatId, "Last item removed.");
+      }
+      await client.sendMessage(chatId, "Last word removed.");
+      break;
+    }
+    case "remove": {
+      if (!msg.fromMe) {
+        return await client.sendMessage(chatId, "You can't do that.");
+      }
+      if (
+        !(await db("story").coll.deleteOne({ chatId, id: Number(args[1]) }))
+          .deletedCount
+      ) {
+        return await client.sendMessage(
+          chatId,
+          "Nothing was removed. Please check."
+        );
+      }
+      await client.sendMessage(chatId, `Story ${Number(args[1])} removed.`);
       break;
     }
     default: {
@@ -194,7 +231,7 @@ module.exports = {
   command: "!story",
   commandType: "plugin",
   isDependent: false,
-  help: `*Story*\n\n!story add [one word] [id]\n!story new [one word]\n!story see [id]\n!story list\n!story remove [id]\n!story current [id]`,
+  help: `*Story*\n\n!story add [one word] [id]\n!story new [one word]\n!story see [id]\n!story list\n!story pop [id]\n!story remove [id]\n!story current [id]`,
   execute,
   public: true,
 };
