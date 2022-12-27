@@ -468,7 +468,7 @@ ${msg.body || msg.type}`,
       }
     } catch (ignore) {}
 
-    if (msg.body?.startsWith?.("!")) {
+    if (msg.body?.startsWith?.("!") && (await msg.getContact())?.isMyContact) {
       let args = msg.body?.slice?.(1)?.trim?.()?.split?.(/ +/g);
       let command = args.shift().toLowerCase();
 
