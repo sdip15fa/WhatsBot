@@ -127,7 +127,7 @@ ${story.story.join(" ")}`
         .limit(10)
         .toArray()) as Story[];
       if (!stories.length) {
-        return await client.sendMessage(chatId, "No stories created yet");
+        return await client.sendMessage(chatId, "No stories found.");
       }
       await client.sendMessage(
         chatId,
