@@ -447,6 +447,7 @@ ${msg.body || msg.type}`,
   });
 
   wtsClient.on("message_create", async (msg) => {
+    const chatId = (await msg.getChat())?.id._serialized;
     // auto pmpermit
     try {
       if (config.pmpermit_enabled == "true") {
@@ -471,6 +472,13 @@ ${msg.body || msg.type}`,
     if (msg.body?.startsWith?.("!") && (await msg.getContact())?.isMyContact) {
       let args = msg.body?.slice?.(1)?.trim?.()?.split?.(/ +/g);
       let command = args.shift().toLowerCase();
+
+      if (
+        (await db("chats").coll.findOne({ chatId, disabled: true })) &&
+        command !== "!enable"
+      ) {
+        return;
+      }
 
       if (
         msg.fromMe ||
