@@ -6,7 +6,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat())?.id._serialized;
   if (
     !(
-      await db("chats").coll.updateOne({ chatId }, { $set: { enabled: false } })
+      await db("chats").coll.updateOne({ chatId }, { $set: { disabled: false } })
     ).matchedCount
   ) {
     return await client.sendMessage(chatId, "Bot is not disabled.");
