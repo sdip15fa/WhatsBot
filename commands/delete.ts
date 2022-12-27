@@ -12,8 +12,8 @@ const execute = async (client: Client, msg: Message, _args: string[]) => {
   const quote = await msg.getQuotedMessage();
 
   try {
-    await msg.delete(true);
     await quote.delete(true);
+    await msg.delete(true);
   } catch {
     await client.sendMessage(chatId, "Something went wrong while deleting.");
   }
