@@ -123,6 +123,7 @@ ${story.story.join(" ")}`
       const stories = (await db("story")
         .coll.find({ chatId })
         .sort({ id: 1 })
+        .skip(((Number(args[1]) || 1) - 1) * 10)
         .limit(10)
         .toArray()) as Story[];
       if (!stories.length) {
@@ -238,7 +239,7 @@ module.exports = {
   command: "!story",
   commandType: "plugin",
   isDependent: false,
-  help: `*Story*\n\n!story add [one word] [id]\n!story new [one word]\n!story see [id]\n!story list\n!story pop [id]\n!story remove [id]\n!story current [id]`,
+  help: `*Story*\n\nOne word story. See the commands.\n\n*Commands*\n\n!story add [one word] [id]\n!story new [one word]\n!story see [id]\n!story list [page]\n!story current [id]\n\n*Owner Only*\n\n!story pop [id]\n!story remove [id]`,
   execute,
   public: true,
 };
