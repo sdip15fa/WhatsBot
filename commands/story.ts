@@ -226,7 +226,7 @@ Content: ${story.story.filter((_v, i) => i < 10).join(" ")}${
     default: {
       await client.sendMessage(
         chatId,
-        `Use \`\`\`!help todo\`\`\` for syntax.`
+        `Use \`\`\`!help story\`\`\` for syntax.`
       );
       break;
     }
