@@ -475,7 +475,7 @@ ${msg.body || msg.type}`,
 
       if (
         (await db("chats").coll.findOne({ chatId, disabled: true })) &&
-        command !== "!enable"
+        command !== "enable"
       ) {
         return;
       }
