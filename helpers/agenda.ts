@@ -38,7 +38,8 @@ agenda.define(
     job: Job & {
       attrs: {
         data: {
-          chatId: string;
+          chatId?: string;
+          chats?: string[];
           body?: string;
           sticker?: boolean;
           media?: {
@@ -51,26 +52,33 @@ agenda.define(
     }
   ) => {
     const { chatId, body, sticker, media } = job.attrs.data;
+    let { chats } = job.attrs.data;
+    if (!chatId && !chats?.length) return;
     if (!body && !media) return;
-    if (media) {
-      const messageMedia = new MessageMedia(
-        media.mimetype,
-        media.data,
-        media.filename || "image.png"
-      );
-      if (sticker) {
-        return await wtsClient.sendMessage(chatId, messageMedia, {
-          sendMediaAsSticker: true,
+    chats = chats || [chatId];
+    await Promise.all(
+      chats.map(async (chatId) => {
+        if (media) {
+          const messageMedia = new MessageMedia(
+            media.mimetype,
+            media.data,
+            media.filename || "image.png"
+          );
+          if (sticker) {
+            return await wtsClient.sendMessage(chatId, messageMedia, {
+              sendMediaAsSticker: true,
+            });
+          }
+          if (!body) {
+            return await wtsClient.sendMessage(chatId, media);
+          }
+        }
+        await wtsClient.sendMessage(chatId, body, {
+          ...(media && {
+            media: new MessageMedia(media.mimetype, media.data, media.filename),
+          }),
         });
-      }
-      if (!body) {
-        return await wtsClient.sendMessage(chatId, media);
-      }
-    }
-    await wtsClient.sendMessage(chatId, body, {
-      ...(media && {
-        media: new MessageMedia(media.mimetype, media.data, media.filename),
-      }),
-    });
+      })
+    );
   }
 );

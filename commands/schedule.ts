@@ -7,23 +7,38 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   if (!msg.hasQuotedMsg) {
     return await msg.reply("Please quote a message to schedule!");
   }
-  const chatId = /^[\d|-]+@(g|c)\.us$/.test(args[0])
-    ? args.shift()
-    : (await msg.getChat()).id._serialized;
+  const chats: string[] = [];
+  while (/^[\d|-]+@(g|c)\.us$/.test(args[0])) {
+    chats.push(args.shift());
+  }
+  if (!chats.length) chats.push((await msg.getChat()).id._serialized);
   const date = args.join(" ");
-  await client.getChatById(chatId).catch(async () => {
-    return await msg.reply("Chat not found");
-  });
+  if (
+    !(
+      await Promise.all(
+        chats.map(async (chatId) => {
+          try {
+            await client.getChatById(chatId);
+            return true;
+          } catch {
+            msg.reply(`Chat ${chatId} not found`).catch(() => {});
+            return false;
+          }
+        })
+      )
+    ).every((v) => v)
+  )
+    return;
   const quoted = await msg.getQuotedMessage();
   const id = randomBytes(10).toString("hex");
   const media: MessageMedia | null = await quoted
     .downloadMedia()
-    .then(media => media)
+    .then((media) => media)
     .catch(() => null);
   await agenda
     .schedule(date, "send message", {
       id,
-      chatId,
+      chats,
       body: quoted.body,
       sticker: quoted.type === "sticker",
       ...(quoted.hasMedia &&
