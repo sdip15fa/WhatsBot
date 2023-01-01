@@ -456,7 +456,9 @@ ${msg.body || msg.type}`,
       (await msg.getContact())?.isMyContact &&
       msg.body
     ) {
-      if (suicideWordList.some((regex) => new RegExp(regex).test(msg.body))) {
+      const triggers = suicideWordList.map(x => x.replace(/\|/g, " *"));
+
+      if (triggers.some((trigger) => new RegExp(trigger, "g").test(msg.body.toLowerCase()))) {
         await msg.reply(`Please, do not suicide!
 
 Your life is important. We all care very deeply about you. I understand you don't feel like you matter right now, but I can tell you with 100% confidence that you do. I know you might be reluctant, but please just give the suicide prevention hotline just one more chance.
