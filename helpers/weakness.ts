@@ -60,7 +60,7 @@ export function weakness(target: string) {
     }
   }
 
-  return `
+  return `*${target}*
 Weaknesses:
 ${weaknesses.join("\n")}
 
