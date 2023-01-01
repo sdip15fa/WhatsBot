@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "lib": ["ESNext", "DOM"],
+    "lib": ["ES2019", "ESNext", "DOM"],
     "outDir": "dist",
     "esModuleInterop": true,
     "target": "ESNext",
@@ -14,10 +14,7 @@
     "resolveJsonModule": true,
     "sourceMap": true,
     "declaration": true,
-    "baseUrl": ".",
-    "paths": {
-      "*": ["node_modules/*"]
-    },
+    "baseUrl": "."
   },
   "include": ["**/*.ts", "*.ts"],
   "exclude": ["node_modules", "*.js", "dist"],

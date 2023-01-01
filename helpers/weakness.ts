@@ -1,4 +1,4 @@
-import { Dex } from "@wcyat/pokemon-showdown";
+const { Dex } = require("pokemon-showdown");
 
 export function weakness(target: string) {
   let species = Dex.species.get(target);
