@@ -21,6 +21,7 @@ import { Count } from "./models/count";
 import { Media } from "./models/media";
 import { timeToWord } from "./helpers/timeToWord";
 import { getName } from "./helpers/getName";
+import { suicideWordList } from "./helpers/suicide-wordlist";
 
 export const dcClient = new DCClient({
   intents: [
@@ -442,6 +443,34 @@ ${msg.body || msg.type}`,
             }`
           );
         }
+      }
+    }
+  });
+
+  // suicide
+  wtsClient.on("message", async (msg) => {
+    const chatId = (await msg.getChat())?.id;
+    if (
+      chatId &&
+      !(await db("chats").coll.findOne({ chatId, disabled: true })) &&
+      (await msg.getContact())?.isMyContact &&
+      msg.body
+    ) {
+      if (suicideWordList.some((regex) => new RegExp(regex).test(msg.body))) {
+        await msg.reply(`Please, do not suicide!
+
+Your life is important. We all care very deeply about you. I understand you don't feel like you matter right now, but I can tell you with 100% confidence that you do. I know you might be reluctant, but please just give the suicide prevention hotline just one more chance.
+
+Hong Kong
+Call 2896 0000 (The Samaritans)
+
+United Kingdom
+Call 116-123 or Text SHOUT to 85258
+
+Other countries
+https://faq.whatsapp.com/1417269125743673
+
+*_This is an automated message as I have detected a keyword related to suicide_*`)
       }
     }
   });

@@ -1,0 +1,40 @@
+/**
+ * Copyright (c) James Hacker, GNU GPLv2
+ * https://github.com/Bobrobot1/Suicide-Prevention-Bot/blob/main/database/triggers.json
+ */
+
+export const suicideWordList = [
+  "suicide",
+  "kill|myself",
+  "end|myself",
+  "jump.*bridge",
+  "jump.*train",
+  "end|my|life",
+  "commit|die",
+  "wish|i|was|dead",
+  "want|to|die",
+  "shoot|myself",
+  "kms",
+  "ima|kms",
+  "just|kms",
+  "commit|die",
+  "suicidio",
+  "suicidarme",
+  "terminar|mi|vida",
+  "cometer|troquel",
+  "ojalá|estuviera|muerto",
+  "disparar|a|mí|mismo",
+  "su1cide",
+  "suic1de",
+  "su1c1de",
+  "d1e | kike",
+  "d1e | jew",
+  "d1e | n1gger",
+  "d1e | n1gga",
+  "suizid",
+  "suisid",
+  "selbst|mord",
+  "bring|mich|um",
+  "töte|mich",
+  "kill|mich",
+];
