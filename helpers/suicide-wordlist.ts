@@ -12,6 +12,7 @@ export const suicideWordList = [
   "jump.*train",
   "jump.*down",
   "jump.*river",
+  "jump.*sea",
   "jump.*building",
   "jump.*home",
   "jump.*school",
@@ -44,5 +45,7 @@ export const suicideWordList = [
   "想死",
   "殺.*自己",
   "吊頸",
-  "死.*自己"
+  "死.*自己",
+  "自殘",
+  "跳海"
 ];
