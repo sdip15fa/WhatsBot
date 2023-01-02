@@ -7,6 +7,7 @@ export const suicideWordList = [
   "suicide",
   "defenestrate|myself",
   "kill|myself",
+  "kill|me",
   "end|myself",
   "jump.*bridge",
   "jump.*train",
@@ -40,12 +41,13 @@ export const suicideWordList = [
   "suic1de",
   "su1c1de",
   "自殺",
-  "跳樓",
+  "跳.*樓",
   "燒炭",
-  "想死",
+  "想.*死",
   "殺.*自己",
-  "吊頸",
+  "殺.*我",
+  "吊.*頸",
   "死.*自己",
   "自殘",
-  "跳海"
+  "跳.*海"
 ];
