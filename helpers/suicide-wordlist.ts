@@ -5,7 +5,7 @@
 
 export const suicideWordList = [
   "suicide",
-  "defenestrate",
+  "defenestrate|myself",
   "kill|myself",
   "end|myself",
   "jump.*bridge",
