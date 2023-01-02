@@ -14,6 +14,12 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     );
   }
 
+  const text = args.join(" ") || quotedMsg.body;
+
+  if (text.length > 50) {
+    return client.sendMessage(chatId, "Text too long.")
+  }
+
   await client.sendMessage(chatId, natoPad(args.join(" ") || quotedMsg.body));
 };
 
