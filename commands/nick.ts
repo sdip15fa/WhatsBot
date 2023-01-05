@@ -9,6 +9,9 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   if (!nickname) {
     return await client.sendMessage(chatId, "Please enter a nickname!");
   }
+  if (nickname.length > 20) {
+      return await client.sendMessage(chatId, "Nickname too long (maximum is 20 characters).")
+  }
   if (
     !(
       await db("nickname").coll.updateOne(
