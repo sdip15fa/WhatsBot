@@ -28,9 +28,9 @@ ${count.users
   .filter((_v, i) => i < 10)
   .map(
     (user, index) =>
-      `${index + 1}. ${user.name}: ${user.count} (${user.words || 0} words) (${
-        (user.count / count.count) * 100
-      }%)`
+      `${index + 1}. ${user.name}: ${user.count} (${
+        user.words || 0
+      } words) (${Math.round((user.count / count.count) * 100)}%)`
   )
   .join("\n")}`
       : ""
