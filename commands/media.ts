@@ -3,9 +3,9 @@ import { Client, Message, MessageMedia } from "whatsapp-web.js";
 
 const execute = async (client: Client, msg: Message) => {
   const chatId = (await msg.getChat()).id._serialized;
-  let quotedMsg = await msg.getQuotedMessage();
+  const quotedMsg = await msg.getQuotedMessage();
   if (quotedMsg.hasMedia) {
-    let attachmentData = await quotedMsg
+    const attachmentData = await quotedMsg
       .downloadMedia()
       .then((media) => media)
       .catch(() => null);

@@ -6,7 +6,7 @@ import processImage from "../helpers/processImage";
 
 async function youtube(url: string) {
   try {
-    let data = (
+    const data = (
       await axios.get(`https://yoothoob.vercel.app/fromLink?link=${url}`)
     )?.data;
     if (!data) return "error";
@@ -33,7 +33,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   let data;
 
   if (msg.hasQuotedMsg) {
-    let quotedMsg = await msg.getQuotedMessage();
+    const quotedMsg = await msg.getQuotedMessage();
     data = await youtube(quotedMsg.body);
   } else {
     data = await youtube(args[0]);
@@ -68,7 +68,6 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     );
   }
 };
-
 
 module.exports = {
   name: "YouTube",

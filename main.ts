@@ -65,7 +65,8 @@ export default async function main() {
     if (err) return console.error(err);
     files.forEach((commandFile) => {
       if (commandFile.endsWith(".js")) {
-        let commandName = commandFile.replace(".js", "");
+        const commandName = commandFile.replace(".js", "");
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
         const command = require(`./commands/${commandName}`);
         commands.set(commandName, command);
       }
@@ -438,7 +439,7 @@ ${msg.body || msg.type}`,
     async function checkAndApplyAfkMode() {
       if (!msg.author) {
         try {
-          let getstatus = await afkStatus();
+          const getstatus = await afkStatus();
           if (getstatus.on) {
             await msg.reply(`${getstatus.message}\n\n_Powered by WhatsBot_`);
           }
@@ -512,8 +513,8 @@ https://faq.whatsapp.com/1417269125743673
     } catch (ignore) {}
 
     if (msg.body?.startsWith?.("!") && (await msg.getContact())?.isMyContact) {
-      let args = msg.body?.slice?.(1)?.trim?.()?.split?.(/ +/g);
-      let command = args.shift().toLowerCase();
+      const args = msg.body?.slice?.(1)?.trim?.()?.split?.(/ +/g);
+      const command = args.shift().toLowerCase();
 
       if (
         (await db("chats").coll.findOne({ chatId, disabled: true })) &&

@@ -8,11 +8,12 @@ import {
 import crypto from "crypto";
 import config from "../config";
 import axios from "axios";
-require("dotenv").config();
+import dotenv from "dotenv";
+dotenv.config();
 
-let base = `${__dirname}/../.wwebjs_auth/`;
+const base = `${__dirname}/../.wwebjs_auth/`;
 
-let excludedDir = [
+const excludedDir = [
   "session-whatsbot/Default/Cache",
   "session-whatsbot/Default/Code Cache",
   "session-whatsbot/Default/Code Storage",
@@ -57,7 +58,7 @@ export async function replicate() {
         .on("finish", resolve);
     });
 
-    let unzip = new AdmZip(fs.readFileSync(`${__dirname}/temp.zip`));
+    const unzip = new AdmZip(fs.readFileSync(`${__dirname}/temp.zip`));
     unzip.extractAllToAsync(base, true);
     console.log("Session files replicated");
   } catch (error) {
@@ -73,7 +74,7 @@ export async function replicate() {
 export async function fetchSession() {
   try {
     if (process.env.SESSION_URL) {
-      let response = await axios.get(process.env.SESSION_URL, {
+      const response = await axios.get(process.env.SESSION_URL, {
         responseType: "arraybuffer",
       });
       fs.writeFileSync(`${__dirname}/../session.secure`, response.data, {

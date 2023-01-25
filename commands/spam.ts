@@ -2,7 +2,7 @@
 import { Client, Message, MessageMedia } from "whatsapp-web.js";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
-  let count = Number(args.shift());
+  const count = Number(args.shift());
   if (isNaN(count)) {
     await client.sendMessage(msg.to, `🙇‍♂️ *Error*\n\n` + "```Invalid count```");
     return 0;
@@ -16,10 +16,10 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   }
 
   if (msg.hasQuotedMsg) {
-    let quotedMsg = await msg.getQuotedMessage();
+    const quotedMsg = await msg.getQuotedMessage();
 
     if (quotedMsg.hasMedia) {
-      let media = await quotedMsg
+      const media = await quotedMsg
         .downloadMedia()
         .then((media) => media)
         .catch(() => null);
@@ -38,7 +38,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     }
   } else {
     if (args.length) {
-      let text = args.join(" ");
+      const text = args.join(" ");
       for (let i = 0; i < count; i++) await client.sendMessage(msg.to, text);
     } else {
       await client.sendMessage(

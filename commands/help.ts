@@ -1,5 +1,6 @@
 import { Client, Message } from "whatsapp-web.js";
 import { commands } from "../main";
+import { Command } from "../types/command";
 
 //jshint esversion:8
 const execute = async (client: Client, msg: Message, args: string[]) => {
@@ -8,7 +9,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     let adminHelp = "🔱 *Administration*\n\n";
     let infoHelp = "🔱 *Info*\n\n";
     let pluginHelp = "🔱 *Plugins*\n\n";
-    commands.forEach((command: any) => {
+    commands.forEach((command: Command) => {
       if (!command.isDependent) {
         if (command.commandType === "admin")
           adminHelp += `⭐ *${command.name} (${command.command})*  - ${
@@ -24,7 +25,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
           } (public: ${command.public ? "yes" : "no"})\n`;
       }
     });
-    let help = `Welcome to KK park!\n\n${adminHelp}\n${infoHelp}\n${pluginHelp}\n${
+    const help = `Welcome to KK park!\n\n${adminHelp}\n${infoHelp}\n${pluginHelp}\n${
       commands.get("help").help
     }`;
     await client.sendMessage(chatId, help);

@@ -8,8 +8,8 @@ async function readImage(attachmentData: MessageMedia) {
     const res = await ocrSpace(`data:image/png;base64,${attachmentData.data}`, {
       apiKey: `${config.ocr_space_api_key}`,
     });
-    let parsedText = res.ParsedResults[0].ParsedText;
-    let out = {
+    const parsedText = res.ParsedResults[0].ParsedText;
+    const out = {
       parsedText: parsedText,
     };
     return out;
@@ -20,13 +20,13 @@ async function readImage(attachmentData: MessageMedia) {
 
 const execute = async (client: Client, msg: Message) => {
   if (msg.hasQuotedMsg) {
-    let quotedMsg = await msg.getQuotedMessage();
-    let attachmentData = await quotedMsg
+    const quotedMsg = await msg.getQuotedMessage();
+    const attachmentData = await quotedMsg
       .downloadMedia()
       .then((media) => media)
       .catch(() => null);
     if (!attachmentData) return;
-    let data = await readImage(attachmentData);
+    const data = await readImage(attachmentData);
     if (data == "error") {
       quotedMsg.reply(
         `Error occured while reading the image. Please make sure the image is clear.`

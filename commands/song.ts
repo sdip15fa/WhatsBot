@@ -6,8 +6,8 @@ import path from "path";
 import { search } from "../helpers/song";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
-  let getdata = await search(args.join(" "));
-  let sendmessage = await client.sendMessage(
+  const getdata = await search(args.join(" "));
+  const sendmessage = await client.sendMessage(
     (
       await msg.getChat()
     ).id._serialized,

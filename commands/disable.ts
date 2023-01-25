@@ -2,7 +2,7 @@ import { Client, Message } from "whatsapp-web.js";
 import db from "../db";
 
 //jshint esversion:8
-const execute = async (client: Client, msg: Message, args: string[]) => {
+const execute = async (client: Client, msg: Message) => {
   const chatId = (await msg.getChat())?.id._serialized;
   if (
     !(

@@ -3,7 +3,7 @@ import { Client, Message } from "whatsapp-web.js";
 import config from "../config";
 import pmpermit from "../helpers/pmpermit";
 
-const execute = async (client: Client, msg: Message, args: string[]) => {
+const execute = async (client: Client, msg: Message) => {
   msg.delete(true);
   if (config.pmpermit_enabled == "true" && !msg.to.includes("-")) {
     await pmpermit.permit(msg.to.split("@")[0]);

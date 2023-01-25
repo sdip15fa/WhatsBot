@@ -63,7 +63,7 @@ async function gitinfo(url: string) {
 }
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
-  let data = await gitinfo(args[0]);
+  const data = await gitinfo(args[0]);
   if (data.status) {
     if (data.data.status) {
       await client.sendMessage(

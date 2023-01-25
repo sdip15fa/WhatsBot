@@ -3,6 +3,7 @@
 import fs from "fs";
 import path from "path";
 import database from "../db";
+import { Permit } from "../types/pmpermit";
 
 export async function insert(id: string) {
   try {
@@ -74,14 +75,14 @@ export async function nopermit(id: string) {
 export async function handler(id: string) {
   // first check for cache
 
-  let checkPermit: { [key: string]: any };
+  let checkPermit: Permit;
 
   try {
     checkPermit = JSON.parse(
       fs.readFileSync(path.join(__dirname, `../cache/${id}.json`), "utf8")
     );
   } catch (error) {
-    checkPermit = await read(id);
+    checkPermit = (await read(id)) as Permit;
   }
 
   if (!checkPermit.found) {
@@ -99,7 +100,7 @@ export async function handler(id: string) {
         msg: `*❌ Blocked*\n\n You have been blocked for spamming.\n\n _Powered by WhatsBot_`,
       };
     } else {
-      var updateIt = await updateviolant(id, checkPermit.times + 1);
+      const updateIt = await updateviolant(id, checkPermit.times + 1);
       if (!updateIt) {
         console.log(
           `That's an error, Possible reason is your MongoDB url is not working ❌`
@@ -118,13 +119,13 @@ export async function handler(id: string) {
 
 export async function isPermitted(id: string) {
   try {
-    let checkPermit: { [key: string]: any };
+    let checkPermit: Permit;
     try {
       checkPermit = JSON.parse(
         fs.readFileSync(path.join(__dirname, `../cache/${id}.json`), "utf8")
       );
     } catch (error) {
-      checkPermit = await read(id);
+      checkPermit = (await read(id)) as Permit;
     }
     return checkPermit.permit;
   } catch (e) {

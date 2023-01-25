@@ -2,11 +2,14 @@ import { Client, Message } from "whatsapp-web.js";
 import db from "../db";
 
 //jshint esversion:8
-const execute = async (client: Client, msg: Message, args: string[]) => {
+const execute = async (client: Client, msg: Message) => {
   const chatId = (await msg.getChat())?.id._serialized;
   if (
     !(
-      await db("chats").coll.updateOne({ chatId }, { $set: { disabled: false } })
+      await db("chats").coll.updateOne(
+        { chatId },
+        { $set: { disabled: false } }
+      )
     ).matchedCount
   ) {
     return await client.sendMessage(chatId, "Bot is not disabled.");

@@ -13,7 +13,7 @@ export async function search(query: string) {
       throw "not-found";
     } else {
       let content = `*Results for* _'${query}'_\n\n`;
-      let songarray = [];
+      const songarray = [];
       for (let i = 0; i < response.length; i++) {
         content += `*${i + 1}.* ${response[i].title} - ${
           response[i].more_info.singers
@@ -37,16 +37,16 @@ export async function search(query: string) {
 }
 
 export async function download(songkey: string, id: string) {
-  let pretifiedsongkey = Number(songkey.trim());
+  const pretifiedsongkey = Number(songkey.trim());
   try {
-    let saveddata: { key: number, id: string }[] = JSON.parse(
+    const saveddata: { key: number; id: string }[] = JSON.parse(
       fs.readFileSync(path.join(__dirname, `../cache/song~${id}.json`), "utf8")
     );
-    let song = saveddata.find((d) => d.key === pretifiedsongkey);
+    const song = saveddata.find((d) => d.key === pretifiedsongkey);
 
     if (song) {
       try {
-        let data = (
+        const data = (
           await axios.get(`https://jiosaavn-api.vercel.app/song?id=${song.id}`)
         ).data;
 
@@ -93,7 +93,7 @@ export async function download(songkey: string, id: string) {
 
 export async function image(link: string) {
   try {
-    let respoimage = await axios.get(link, { responseType: "arraybuffer" });
+    const respoimage = await axios.get(link, { responseType: "arraybuffer" });
 
     return {
       mimetype: "image/jpeg",

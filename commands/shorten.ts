@@ -6,7 +6,7 @@ import { Client, Message } from "whatsapp-web.js";
 export async function getShortURL(input: string) {
   return axios
     .post<{
-      references: any;
+      references: unknown;
       link: string;
       id: string;
       long_url: string;
@@ -45,7 +45,7 @@ export async function getShortURL(input: string) {
       };
     })
     .catch(function (err) {
-      console.log(err.response.data)
+      console.log(err.response.data);
       return "error";
     });
 }
@@ -53,7 +53,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   let data;
   const chatId = (await msg.getChat()).id._serialized;
   if (msg.hasQuotedMsg) {
-    let quotedMsg = await msg.getQuotedMessage();
+    const quotedMsg = await msg.getQuotedMessage();
     data = await getShortURL(quotedMsg.body);
   } else {
     data = await getShortURL(args[0]);

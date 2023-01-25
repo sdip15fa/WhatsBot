@@ -12,7 +12,7 @@ async function ud(term: string) {
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
-  let data = await ud(args.join(" "));
+  const data = await ud(args.join(" "));
   if (data == "error") {
     await client.sendMessage(
       chatId,

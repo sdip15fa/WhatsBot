@@ -1,11 +1,10 @@
 //jshint esversion:8
 import { Client, Message } from "whatsapp-web.js";
-import config from "../config";
 
 const execute = async (client: Client, msg: Message) => {
   if (!msg.to.includes("-")) {
-    let chat = await msg.getChat();
-    let unmuteDate = new Date();
+    const chat = await msg.getChat();
+    const unmuteDate = new Date();
     unmuteDate.setSeconds(Number(unmuteDate.getSeconds()) + 3600);
     await chat.mute(unmuteDate);
     msg.reply(

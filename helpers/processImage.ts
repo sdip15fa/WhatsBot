@@ -3,7 +3,7 @@ import axios from "axios";
 export default async function processImage(link: string) {
   if (!link) throw new Error("No link provided");
   try {
-    let image = await axios.get(link, { responseType: "arraybuffer" });
+    const image = await axios.get(link, { responseType: "arraybuffer" });
 
     return {
       mimetype: "image/jpeg",
@@ -19,4 +19,4 @@ export default async function processImage(link: string) {
       error: error.message,
     };
   }
-};
+}

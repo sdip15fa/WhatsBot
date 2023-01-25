@@ -2,7 +2,6 @@
 import { Client, Message } from "whatsapp-web.js";
 import db from "../db";
 import { agenda } from "../helpers/agenda";
-import { countMessage } from "../helpers/count";
 import { getDate, getTime } from "../helpers/date";
 import { getName } from "../helpers/getName";
 import Covid, { CovidStatus } from "../models/covid";
@@ -73,7 +72,9 @@ ${(() => {
           .filter((v) => v.id === p)
           .map(
             (v) =>
-              `${v.time}: ${v.temperature || ""}${v.symptoms ? ` ${v.symptoms}` : ""}`
+              `${v.time}: ${v.temperature || ""}${
+                v.symptoms ? ` ${v.symptoms}` : ""
+              }`
           )
           .join("\n")}`
     )
@@ -99,7 +100,9 @@ ${(() => {
           .filter((v) => v.id === p)
           .map(
             (v) =>
-              `${v.time}: ${v.temperature || ""}${v.symptoms ? ` ${v.symptoms}` : ""}`
+              `${v.time}: ${v.temperature || ""}${
+                v.symptoms ? ` ${v.symptoms}` : ""
+              }`
           )
           .join("\n")}`
     )
@@ -150,7 +153,7 @@ ${(() => {
               name: await getName(userId),
               time,
               rat,
-              ...(temperature && {temperature}),
+              ...(temperature && { temperature }),
               ...(symptoms && { symptoms }),
             },
           },

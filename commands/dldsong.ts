@@ -5,8 +5,8 @@ import { download } from "../helpers/song";
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
   if (msg.hasQuotedMsg) {
-    let quotedMsg = await msg.getQuotedMessage();
-    let getdata = await download(args[0], quotedMsg.id.id);
+    const quotedMsg = await msg.getQuotedMessage();
+    const getdata = await download(args[0], quotedMsg.id.id);
     if (getdata.status && typeof getdata.content !== "string") {
       await client.sendMessage(
         chatId,

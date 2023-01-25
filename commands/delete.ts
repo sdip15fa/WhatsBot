@@ -1,6 +1,6 @@
 import { Client, Message } from "whatsapp-web.js";
 
-const execute = async (client: Client, msg: Message, _args: string[]) => {
+const execute = async (client: Client, msg: Message) => {
   const chatId = (await msg.getChat()).id._serialized;
   if (!msg.hasQuotedMsg) {
     return await client.sendMessage(

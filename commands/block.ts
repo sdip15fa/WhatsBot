@@ -1,14 +1,14 @@
 import { Client, Message } from "whatsapp-web.js";
 
 //jshint esversion:8
-const execute = async (client: Client, msg: Message, args: string[]) => {
+const execute = async (client: Client, msg: Message) => {
   msg.delete(true);
   if (!msg.to.includes("-")) {
     await msg.reply(
       `*❌ Blocked* \n\n You have been blocked\n\n _Powered by WhatsBot_`
     );
-    let chat = await msg.getChat();
-    let contact = await chat.getContact();
+    const chat = await msg.getChat();
+    const contact = await chat.getContact();
     contact.block();
   }
 };

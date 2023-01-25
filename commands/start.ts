@@ -36,7 +36,7 @@ async function get(battery: BatteryInfo, phn_info: ClientInfoPhone) {
 }
 
 const execute = async (client: Client, msg: Message) => {
-  let startdata = await get(
+  const startdata = await get(
     await client.info.getBatteryStatus(),
     client.info.phone
   );

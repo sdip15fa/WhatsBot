@@ -2,10 +2,11 @@
 import axios from "axios";
 import FormData from "form-data";
 import { Client, Message, MessageMedia } from "whatsapp-web.js";
-let mime = require("mime-to-extensions");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const mime = require("mime-to-extensions");
 
 async function telegraph(attachmentData: MessageMedia) {
-  let form = new FormData();
+  const form = new FormData();
   form.append("file", Buffer.from(attachmentData.data, "base64"), {
     filename: `telegraph.${mime.extension(attachmentData.mimetype)}`,
   });
@@ -18,21 +19,21 @@ async function telegraph(attachmentData: MessageMedia) {
     .then((response) => {
       return "https://telegra.ph" + response.data[0].src;
     })
-    .catch((error) => {
+    .catch(() => {
       return "error";
     });
 }
 const execute = async (client: Client, msg: Message) => {
   if (msg.hasQuotedMsg) {
-    let quotedMsg = await msg.getQuotedMessage();
-    let attachmentData = await quotedMsg
+    const quotedMsg = await msg.getQuotedMessage();
+    const attachmentData = await quotedMsg
       .downloadMedia()
       .then((media) => media)
       .catch(() => null);
     if (!attachmentData) {
       return;
     }
-    let data = await telegraph(attachmentData);
+    const data = await telegraph(attachmentData);
     if (data == "error") {
       quotedMsg.reply(`Error occured while create direct link.`);
     } else {

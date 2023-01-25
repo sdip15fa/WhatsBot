@@ -1,7 +1,7 @@
 import { Dex } from "@wcyat/pokemon-showdown";
 
 export function weakness(target: string) {
-  let species = Dex.species.get(target);
+  const species = Dex.species.get(target);
   const type1 = Dex.types.get(species.types[0]);
   const type2 = Dex.types.get(species.types[1]);
   const type3 = Dex.types.get(species.types[2]);

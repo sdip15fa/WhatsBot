@@ -3,30 +3,30 @@ import { startAfk, afkStatus, stopAfk } from "../helpers/afkWrapper";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   try {
-    let commandType = args.shift();
+    const commandType = args.shift();
 
     switch (commandType) {
       case "on": {
-        let getstatus = afkStatus();
+        const getstatus = afkStatus();
         if (getstatus.on) throw new Error("Already AFK mode is on.");
         let message = args.join(" ");
         if (!message) message = "Currently I'm away. I will be back soon!";
         startAfk(message);
-        let msgtosend = `AFK mode is now on.\n\nMessage: ${message}`;
+        const msgtosend = `AFK mode is now on.\n\nMessage: ${message}`;
         await client.sendMessage(msg.to, msgtosend);
         break;
       }
       case "off": {
-        let getstatus = afkStatus();
+        const getstatus = afkStatus();
         if (!getstatus.on) throw new Error("Already AFK mode is off.");
         stopAfk();
-        let msgtosend = "AFK mode is now off.";
+        const msgtosend = "AFK mode is now off.";
         await client.sendMessage(msg.to, msgtosend);
         break;
       }
       case "status": {
-        let getstatus = afkStatus();
-        let msgtosend = `AFK mode is ${getstatus.on ? "on" : "off"}.${
+        const getstatus = afkStatus();
+        const msgtosend = `AFK mode is ${getstatus.on ? "on" : "off"}.${
           getstatus.on ? `\n\nMessage: ${getstatus.message}` : ""
         }`;
 
@@ -40,7 +40,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       }
     }
   } catch (error) {
-    let messagetosend = `Afk command failed.\n\n${error?.message}`;
+    const messagetosend = `Afk command failed.\n\n${error?.message}`;
     await client.sendMessage(msg.to, messagetosend);
   }
 };

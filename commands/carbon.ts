@@ -5,7 +5,7 @@ import { Client, Message, MessageMedia } from "whatsapp-web.js";
 import axios from "axios";
 
 async function carbon(text: string) {
-  let respoimage = await axios
+  const respoimage = await axios
     .get<ArrayBuffer>(
       `https://carbonnowsh.herokuapp.com/?code=${text.replace(
         / /gi,
@@ -32,7 +32,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   let data;
 
   if (msg.hasQuotedMsg) {
-    let quotedMsg = await msg.getQuotedMessage();
+    const quotedMsg = await msg.getQuotedMessage();
     data = await carbon(quotedMsg.body);
     msg = quotedMsg;
   } else {

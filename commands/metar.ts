@@ -1,11 +1,10 @@
 //jshint esversion:8
-// @ts-ignore
 import axios from "axios";
 import { Client, Message } from "whatsapp-web.js";
 import { parse } from "node-html-parser";
 import parseMETAR from "metar";
 
-async function fetchmetar(airport: string = "VHHH") {
+async function fetchmetar(airport = "VHHH") {
   try {
     const { data } = await axios.get(
       `https://en.allmetsat.com/metar-taf/asia.php?icao=${airport}`

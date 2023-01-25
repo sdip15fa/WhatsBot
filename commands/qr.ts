@@ -15,7 +15,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   let data;
 
   if (msg.hasQuotedMsg) {
-    let quotedMsg = await msg.getQuotedMessage();
+    const quotedMsg = await msg.getQuotedMessage();
     data = await qrgen(quotedMsg.body);
     msg = quotedMsg;
   } else {

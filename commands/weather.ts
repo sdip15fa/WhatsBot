@@ -1,13 +1,13 @@
 //jshint esversion:8
-// @ts-ignore
-import weatherjs from "weather-js";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const weatherjs = require("weather-js");
 import { Client, Message } from "whatsapp-web.js";
 
 async function fetchweather(query: string) {
-  const weatherfind = new Promise((resolve, reject) => {
+  const weatherfind = new Promise((resolve) => {
     weatherjs.find(
       { search: query, degreeType: "C" },
-      function (err: Error, result: any) {
+      function (err: Error, result: unknown) {
         if (err) {
           resolve("error");
         } else {

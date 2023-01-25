@@ -7,16 +7,16 @@ const imdb_host = `https://imdb-api.tprojects.workers.dev`; // no slash at the e
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
   try {
-    let query = args.join(" ");
-    let res = await axios.get(`${imdb_host}/search?query=${query}`);
+    const query = args.join(" ");
+    const res = await axios.get(`${imdb_host}/search?query=${query}`);
     const data = res.data;
     if (data.results.length == 0) throw new Error("No results found.");
     let result = data.results[0];
 
     result = await axios.get(`${imdb_host}${result.api_path}`);
     result = result.data;
-    let image = await processImage(result.image);
-    let text = `*${result.title}*\n_${
+    const image = await processImage(result.image);
+    const text = `*${result.title}*\n_${
       result.contentType === "Movie"
         ? `Movie · ${result.contentRating} · ${result.runtime} · ${result.year}`
         : result.contentType
@@ -37,7 +37,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       { caption: text }
     );
   } catch (error) {
-    let messagetosend = `Something went wrong to get this content\n\n${error?.message}`;
+    const messagetosend = `Something went wrong to get this content\n\n${error?.message}`;
     await client.sendMessage(chatId, messagetosend);
   }
 };

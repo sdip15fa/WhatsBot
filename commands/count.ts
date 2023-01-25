@@ -54,7 +54,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     }
   }
 
-  let date = /^20[0-9]{2}-[0-9]{2}-[0-9]{2}$/.test(args[0])
+  const date = /^20[0-9]{2}-[0-9]{2}-[0-9]{2}$/.test(args[0])
     ? args[0]
     : getDate();
 

@@ -1,5 +1,5 @@
 export default function (number: number) {
-  let num = Number(number);
+  const num = Number(number);
   let out;
   if (Math.abs(num) < 999) {
     out = num;
@@ -11,7 +11,8 @@ export default function (number: number) {
     out = Math.sign(num) * Number((Math.abs(num) / 1000000).toFixed(1)) + "m+";
   }
   if (Math.abs(num) >= 999999999) {
-    out = Math.sign(num) * Number((Math.abs(num) / 1000000000).toFixed(1)) + "b+";
+    out =
+      Math.sign(num) * Number((Math.abs(num) / 1000000000).toFixed(1)) + "b+";
   }
   return out;
-};
+}

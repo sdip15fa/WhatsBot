@@ -21,7 +21,7 @@ async function translator(langReq: string, text: string) {
         trans_lang: lang,
       };
     })
-    .catch((err) => {
+    .catch(() => {
       return "error";
     });
 }
@@ -30,11 +30,11 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   let data;
 
   if (msg.hasQuotedMsg) {
-    let quotedMsg = await msg.getQuotedMessage();
-    let langText = getLanguageandText(args);
+    const quotedMsg = await msg.getQuotedMessage();
+    const langText = getLanguageandText(args);
     data = await translator(langText.lang, quotedMsg.body);
   } else {
-    let langText = getLanguageandText(args);
+    const langText = getLanguageandText(args);
     data = await translator(langText.lang, langText.text);
   }
 
@@ -65,10 +65,10 @@ function getLanguageandText(args: string[]) {
   let text;
 
   if (args[0]) {
-    let getLangFromFullname = tr_languages().find(
+    const getLangFromFullname = tr_languages().find(
       (fullName) => fullName.matchName === args[0].toLowerCase()
     ); // match the full name
-    let getLangFromCode = tr_languages().find(
+    const getLangFromCode = tr_languages().find(
       (shortName) => shortName.code === args[0].toLowerCase()
     ); // match the lang code
 

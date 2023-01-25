@@ -8,11 +8,11 @@ async function getPrice(cryptoCode: string) {
   return axios
     .get("https://public.coindcx.com/market_data/current_prices")
     .then(async function (response) {
-      let data = response.data;
-      let cryptoCodeINR = cryptoCode + "INR";
+      const data = response.data;
+      const cryptoCodeINR = cryptoCode + "INR";
       if (data[cryptoCode] != undefined || data[cryptoCodeINR] != undefined) {
         cryptoCode = data[cryptoCode] == undefined ? cryptoCodeINR : cryptoCode;
-        let out = {
+        const out = {
           name: cryptoCode,
           price: data[cryptoCode],
         };
@@ -21,12 +21,12 @@ async function getPrice(cryptoCode: string) {
         return "unsupported";
       }
     })
-    .catch(function (error) {
+    .catch(function () {
       return "error";
     });
 }
 const execute = async (client: Client, msg: Message, args: string[]) => {
-  let data = await getPrice(args[0]);
+  const data = await getPrice(args[0]);
   const chatId = (await msg.getChat()).id._serialized;
   if (data == "error") {
     await client.sendMessage(
@@ -42,7 +42,9 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         "```Support for this CryptoCurrency is not yet added```"
     );
   } else if (data instanceof Object) {
-    let date = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
+    const date = new Date().toLocaleString("en-US", {
+      timeZone: "Asia/Kolkata",
+    });
     await client.sendMessage(
       chatId,
       `Price of *${data.name}* as of ${date} is *₹ ${data.price}*`

@@ -3,7 +3,7 @@ import { Client, Message } from "whatsapp-web.js";
 //jshint esversion:8
 const execute = async (client: Client, msg: Message) => {
   if (!msg.to.includes("-")) {
-    let chat = await msg.getChat();
+    const chat = await msg.getChat();
     await chat.unmute();
     msg.reply(`*🗣 Unmuted*\n\nYou have been unmuted\n\n _Powered by WhatsBot_`);
   }
