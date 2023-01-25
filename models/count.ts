@@ -5,5 +5,6 @@ export interface Count {
   groupId: string;
   date: string;
   count: number;
-  users?: { id: string; name: string; count: number }[];
+  words?: number;
+  users?: { id: string; name: string; count: number; words?: number }[];
 }

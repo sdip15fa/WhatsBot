@@ -26,7 +26,12 @@ ${count.count}${
 ${count.users
   .sort((a, b) => b.count - a.count)
   .filter((_v, i) => i < 10)
-  .map((user, index) => `${index + 1}. ${user.name}: ${user.count}`)
+  .map(
+    (user, index) =>
+      `${index + 1}. ${user.name}: ${user.count} (${user.words || 0} words) (${
+        (user.count / count.count) * 100
+      }%)`
+  )
   .join("\n")}`
       : ""
   }`;

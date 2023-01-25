@@ -257,6 +257,7 @@ export default async function main() {
 
   wtsClient.on("message_create", async (msg) => {
     const groupId = (await msg.getChat()).id._serialized;
+    const words = msg.body?.split(" ").length || 0;
     if (groupId && !msg.isStatus) {
       const date = getDate();
 
@@ -264,11 +265,16 @@ export default async function main() {
         !(
           await db("count").coll.updateOne(
             { groupId, date },
-            { $inc: { count: 1 } }
+            { $inc: { count: 1, words } }
           )
         ).modifiedCount
       ) {
-        await db("count").coll.insertOne(<Count>{ groupId, date, count: 1 });
+        await db("count").coll.insertOne(<Count>{
+          groupId,
+          date,
+          count: 1,
+          words,
+        });
       }
 
       if (
@@ -286,7 +292,7 @@ export default async function main() {
               },
             },
             {
-              $inc: { "users.$.count": 1 },
+              $inc: { "users.$.count": 1, "users.$.words": words },
             }
           )
         ).modifiedCount
@@ -304,6 +310,7 @@ export default async function main() {
                   : msg.author || msg.from,
                 name,
                 count: 1,
+                words,
               },
             },
           }
@@ -456,9 +463,13 @@ ${msg.body || msg.type}`,
       (await msg.getContact())?.isMyContact &&
       msg.body
     ) {
-      const triggers = suicideWordList.map(x => x.replace(/\|/g, " *"));
+      const triggers = suicideWordList.map((x) => x.replace(/\|/g, " *"));
 
-      if (triggers.some((trigger) => new RegExp(trigger, "g").test(msg.body.toLowerCase()))) {
+      if (
+        triggers.some((trigger) =>
+          new RegExp(trigger, "g").test(msg.body.toLowerCase())
+        )
+      ) {
         await msg.reply(`Please, do not suicide!
 
 Your life is important. We all care very deeply about you. I understand you don't feel like you matter right now, but I can tell you with 100% confidence that you do. I know you might be reluctant, but please just give the suicide prevention hotline just one more chance.
@@ -472,7 +483,7 @@ Call 116-123 or Text SHOUT to 85258
 Other countries
 https://faq.whatsapp.com/1417269125743673
 
-*_This is an automated message as I have detected a keyword related to suicide_*`)
+*_This is an automated message as I have detected a keyword related to suicide_*`);
       }
     }
   });
