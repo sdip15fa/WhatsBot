@@ -1,11 +1,8 @@
 //jshint esversion:8
 import { Client, Message } from "whatsapp-web.js";
-// force esmodule mode
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-const { ChatGPTAPI } = import("chatgpt");
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
+  const { ChatGPTAPI } = await import("chatgpt");
   const chatId = (await msg.getChat()).id._serialized;
 
   const quotedMsg = msg.hasQuotedMsg && (await msg.getQuotedMessage());
