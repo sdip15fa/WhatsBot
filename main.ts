@@ -588,5 +588,6 @@ https://faq.whatsapp.com/1417269125743673
     dcClient.login(process.env.DISCORD_TOKEN).then(() => {
       console.log("Discord logged in");
     });
+    //    console.log(await wtsClient.getWWebVersion());
   })();
 }
