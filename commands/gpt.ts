@@ -1,6 +1,9 @@
 //jshint esversion:8
 import { Client, Message } from "whatsapp-web.js";
-import { ChatGPTAPI } from "chatgpt";
+// force esmodule mode
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+const { ChatGPTAPI } = import("chatgpt");
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
