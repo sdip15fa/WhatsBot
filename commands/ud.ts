@@ -35,7 +35,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   }
 };
 
-module.exports = {
+export default {
   name: "Urban Dictionary",
   description: "Gets dictionary meanings of words",
   command: "!ud",

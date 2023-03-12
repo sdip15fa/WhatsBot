@@ -1,5 +1,5 @@
 import { Client, Message } from "whatsapp-web.js";
-import db from "../db";
+import db from "../db/index.js";
 
 //jshint esversion:8
 const execute = async (client: Client, msg: Message) => {
@@ -17,7 +17,7 @@ const execute = async (client: Client, msg: Message) => {
   return client.sendMessage(chatId, "Bot enabled.");
 };
 
-module.exports = {
+export default {
   name: "Enable", //name of the module
   description: "Enable the bot in this chat", // short description of what this command does
   command: "!enable", //command with prefix. Ex command: '!test'

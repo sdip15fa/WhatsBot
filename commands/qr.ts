@@ -1,5 +1,6 @@
 //jshint esversion:8
-import { Client, Message, MessageMedia } from "whatsapp-web.js";
+import whatsapp, { Client, Message } from "whatsapp-web.js";
+const { MessageMedia } = whatsapp;
 import qr from "qr-image";
 
 async function qrgen(text: string) {
@@ -31,7 +32,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   );
 };
 
-module.exports = {
+export default {
   name: "QR generator",
   description: "Generates QR for given text",
   command: "!qr",

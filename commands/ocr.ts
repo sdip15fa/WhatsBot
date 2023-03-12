@@ -1,7 +1,7 @@
 //jshint esversion:8
 import { ocrSpace } from "ocr-space-api-wrapper";
 import { Client, Message, MessageMedia } from "whatsapp-web.js";
-import config from "../config";
+import config from "../config.js";
 
 async function readImage(attachmentData: MessageMedia) {
   try {
@@ -46,7 +46,7 @@ const execute = async (client: Client, msg: Message) => {
   }
 };
 
-module.exports = {
+export default {
   name: "OCR",
   description: "Extracts text content from given image",
   command: "!ocr",

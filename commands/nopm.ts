@@ -1,7 +1,7 @@
 //jshint esversion:8
 import { Client, Message } from "whatsapp-web.js";
-import config from "../config";
-import pmpermit from "../helpers/pmpermit";
+import config from "../config.js";
+import pmpermit from "../helpers/pmpermit.js";
 
 const execute = async (client: Client, msg: Message) => {
   if (config.pmpermit_enabled == "true" && !msg.to.includes("-")) {
@@ -12,7 +12,7 @@ const execute = async (client: Client, msg: Message) => {
   }
 };
 
-module.exports = {
+export default {
   name: "Disallow PM", //name of the module
   description: "Disallow an allowed user for Personal messaging", // short description of what this command does
   command: "!nopm", //command with prefix. Ex command: '!test'

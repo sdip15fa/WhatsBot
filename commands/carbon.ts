@@ -1,11 +1,13 @@
 //jshint esversion:8
 
 //TODO: fix it
-import { Client, Message, MessageMedia } from "whatsapp-web.js";
+import whatsapp, { Client, Message } from "whatsapp-web.js";
+const { MessageMedia } = whatsapp;
 import axios from "axios";
+const { Axios } = axios;
 
 async function carbon(text: string) {
-  const respoimage = await axios
+  const respoimage = await new Axios()
     .get<ArrayBuffer>(
       `https://carbonnowsh.herokuapp.com/?code=${text.replace(
         / /gi,
@@ -57,7 +59,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   }
 };
 
-module.exports = {
+export default {
   name: "Carbon",
   description: "Creates a carbon.now.sh image from text",
   command: "!carbon",

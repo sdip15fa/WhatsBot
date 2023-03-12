@@ -6,12 +6,13 @@ import {
   createDecryptStream,
 } from "aes-encrypt-stream";
 import crypto from "crypto";
-import config from "../config";
+import config from "../config.js";
 import axios from "axios";
+const { Axios } = axios;
 import dotenv from "dotenv";
 dotenv.config();
 
-const base = `${__dirname}/../.wwebjs_auth/`;
+const base = `.wwebjs_auth/`;
 
 const excludedDir = [
   "session-whatsbot/Default/Cache",
@@ -24,8 +25,8 @@ const excludedDir = [
 export function clean() {
   try {
     // delete dir if exists
-    if (fs.existsSync(`${__dirname}/../.wwebjs_auth`)) {
-      fs.rmSync(`${__dirname}/../.wwebjs_auth`, { recursive: true });
+    if (fs.existsSync(`.wwebjs_auth`)) {
+      fs.rmSync(`.wwebjs_auth`, { recursive: true });
       console.log("Session directory cleaned");
     }
   } catch (_) {}
@@ -38,27 +39,25 @@ export async function write(password: string) {
   });
   const zip = new AdmZip();
   zip.addLocalFolder(base);
-  await zip.writeZipPromise(`${__dirname}/temp.zip`);
+  await zip.writeZipPromise(`temp.zip`);
   setPassword(getCipherKey(password));
   await new Promise((resolve) => {
-    createEncryptStream(fs.createReadStream(`${__dirname}/temp.zip`))
-      .pipe(fs.createWriteStream(`${__dirname}/../session.secure`))
+    createEncryptStream(fs.createReadStream(`temp.zip`))
+      .pipe(fs.createWriteStream(`session.secure`))
       .on("finish", resolve);
   });
-  fs.unlinkSync(`${__dirname}/temp.zip`);
+  fs.unlinkSync(`temp.zip`);
 }
 export async function replicate() {
   try {
     setPassword(getCipherKey(config.session_key));
     await new Promise((resolve) => {
-      fs.createReadStream(`${__dirname}/../session.secure`)
-        .pipe(
-          createDecryptStream(fs.createWriteStream(`${__dirname}/temp.zip`))
-        )
+      fs.createReadStream(`session.secure`)
+        .pipe(createDecryptStream(fs.createWriteStream(`temp.zip`)))
         .on("finish", resolve);
     });
 
-    const unzip = new AdmZip(fs.readFileSync(`${__dirname}/temp.zip`));
+    const unzip = new AdmZip(fs.readFileSync(`temp.zip`));
     unzip.extractAllToAsync(base, true);
     console.log("Session files replicated");
   } catch (error) {
@@ -67,17 +66,17 @@ export async function replicate() {
     );
   } finally {
     try {
-      fs.unlinkSync(`${__dirname}/temp.zip`);
+      fs.unlinkSync(`temp.zip`);
     } catch (_) {}
   }
 }
 export async function fetchSession() {
   try {
     if (process.env.SESSION_URL) {
-      const response = await axios.get(process.env.SESSION_URL, {
+      const response = await new Axios().get(process.env.SESSION_URL, {
         responseType: "arraybuffer",
       });
-      fs.writeFileSync(`${__dirname}/../session.secure`, response.data, {
+      fs.writeFileSync(`session.secure`, response.data, {
         encoding: "binary",
       });
       console.log("Session file fetched from", process.env.SESSION_URL);

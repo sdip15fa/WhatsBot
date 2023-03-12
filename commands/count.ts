@@ -1,8 +1,8 @@
 //jshint esversion:8
 import { Client, Message } from "whatsapp-web.js";
-import { agenda } from "../helpers/agenda";
-import { countMessage } from "../helpers/count";
-import { getDate } from "../helpers/date";
+import { agenda } from "../helpers/agenda.js";
+import { countMessage } from "../helpers/count.js";
+import { getDate } from "../helpers/date.js";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const chat = await msg.getChat();
@@ -64,7 +64,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   );
 };
 
-module.exports = {
+export default {
   name: "Count",
   description: "Get count of messages in the chat",
   command: "!count",

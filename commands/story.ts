@@ -1,7 +1,7 @@
 //jshint esversion:8
 import { Client, Message } from "whatsapp-web.js";
-import db from "../db";
-import Story from "../models/story";
+import db from "../db/index.js";
+import Story from "../models/story.js";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
@@ -233,7 +233,7 @@ Content: ${story.story.filter((_v, i) => i < 10).join(" ")}${
   }
 };
 
-module.exports = {
+export default {
   name: "Story",
   description: "One word story",
   command: "!story",

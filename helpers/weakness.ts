@@ -1,4 +1,5 @@
-import { Dex } from "@wcyat/pokemon-showdown";
+import pokemon from "@wcyat/pokemon-showdown";
+const { Dex } = pokemon;
 
 export function weakness(target: string) {
   const species = Dex.species.get(target);

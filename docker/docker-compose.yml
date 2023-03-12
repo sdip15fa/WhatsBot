@@ -5,6 +5,9 @@ services:
     image: registry.gitlab.com/wcyat/whatsapp-to-discord
     container_name: wtstodis
     restart: unless-stopped
+    build:
+      context: ..
+      dockerfile: Dockerfile
     volumes:
      - ./session.secure:/app/session.secure
      - ./.wwebjs_auth:/app/.wwebjs_auth

@@ -1,13 +1,15 @@
 //jshint esversion:8
-import { Client, Message, MessageMedia } from "whatsapp-web.js";
+import whatsapp, { Client, Message } from "whatsapp-web.js";
+const { MessageMedia } = whatsapp;
 import axios from "axios";
-import formatNum from "../helpers/formatNum";
-import processImage from "../helpers/processImage";
+const { Axios } = axios;
+import formatNum from "../helpers/formatNum.js";
+import processImage from "../helpers/processImage.js";
 
 async function youtube(url: string) {
   try {
     const data = (
-      await axios.get(`https://yoothoob.vercel.app/fromLink?link=${url}`)
+      await new Axios().get(`https://yoothoob.vercel.app/fromLink?link=${url}`)
     )?.data;
     if (!data) return "error";
     return {
@@ -69,7 +71,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   }
 };
 
-module.exports = {
+export default {
   name: "YouTube",
   description: "Get youtube video info",
   command: "!yt",

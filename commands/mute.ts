@@ -13,7 +13,7 @@ const execute = async (client: Client, msg: Message) => {
   }
 };
 
-module.exports = {
+export default {
   name: "Mute", //name of the module
   description: "mute the current chat", // short description of what this command does
   command: "!mute", //command with prefix. Ex command: '!test'

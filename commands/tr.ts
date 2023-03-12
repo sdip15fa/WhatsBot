@@ -1,8 +1,8 @@
 //jshint esversion:8
 import translate from "@iamtraction/google-translate";
 import { Client, Message } from "whatsapp-web.js";
-import config from "../config";
-import tr_languages from "../helpers/tr_languages";
+import config from "../config.js";
+import tr_languages from "../helpers/tr_languages.js";
 
 async function translator(langReq: string, text: string) {
   let lang: string;
@@ -91,7 +91,7 @@ function getLanguageandText(args: string[]) {
   return { lang, text };
 }
 
-module.exports = {
+export default {
   name: "Translator",
   description: "Translates given text to requested language",
   command: "!tr",

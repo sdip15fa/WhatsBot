@@ -1,5 +1,6 @@
 //jshint esversion:8
-import { Client, Message, MessageMedia } from "whatsapp-web.js";
+import whatsapp, { Client, Message } from "whatsapp-web.js";
+const { MessageMedia } = whatsapp;
 
 const execute = async (client: Client, msg: Message) => {
   const chatId = (await msg.getChat()).id._serialized;
@@ -25,7 +26,7 @@ const execute = async (client: Client, msg: Message) => {
   }
 };
 
-module.exports = {
+export default {
   name: "Get media",
   description: "Get media from message",
   command: "!media",

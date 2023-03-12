@@ -1,5 +1,5 @@
 import { Client, Message } from "whatsapp-web.js";
-import { weakness } from "../helpers/weakness";
+import { weakness } from "../helpers/weakness.js";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
@@ -9,7 +9,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   await client.sendMessage(chatId, weakness(args[0]));
 };
 
-module.exports = {
+export default {
   name: "Weakness",
   description: "Get pokemon weakness",
   command: "!weakness",

@@ -1,11 +1,11 @@
 //jshint esversion:8
 import download from "download";
-import { Client as WTSClient, LocalAuth, MessageMedia } from "whatsapp-web.js";
-import pmpermit from "./helpers/pmpermit";
-import config from "./config";
-import fs from "fs";
-import logger from "./logger";
-import { afkStatus } from "./helpers/afkWrapper";
+import whatsapp, { Client as WTSClient } from "whatsapp-web.js";
+const { MessageMedia } = whatsapp;
+import pmpermit from "./helpers/pmpermit.js";
+import config from "./config.js";
+import logger from "./logger/index.js";
+import { afkStatus } from "./helpers/afkWrapper.js";
 import {
   Client as DCClient,
   GatewayIntentBits,
@@ -14,14 +14,15 @@ import {
   TextChannel,
   Message,
 } from "discord.js";
-import db, { client } from "./db";
-import { agenda } from "./helpers/agenda";
-import { getDate } from "./helpers/date";
-import { Count } from "./models/count";
-import { Media } from "./models/media";
-import { timeToWord } from "./helpers/timeToWord";
-import { getName } from "./helpers/getName";
-import { suicideWordList } from "./helpers/suicide-wordlist";
+import db, { client } from "./db/index.js";
+import { agenda } from "./helpers/agenda.js";
+import { getDate } from "./helpers/date.js";
+import { Count } from "./models/count.js";
+import { Media } from "./models/media.js";
+import { timeToWord } from "./helpers/timeToWord.js";
+import { getName } from "./helpers/getName.js";
+import { suicideWordList } from "./helpers/suicide-wordlist.js";
+import { commands } from "./commands/index.js";
 
 export const dcClient = new DCClient({
   intents: [
@@ -33,10 +34,8 @@ export const dcClient = new DCClient({
 
 export const wtsClient = new WTSClient({
   puppeteer: { headless: true, args: ["--no-sandbox"] },
-  authStrategy: new LocalAuth({ clientId: "whatsbot" }),
+  authStrategy: new whatsapp.LocalAuth({ clientId: "whatsbot" }),
 });
-
-export const commands = new Map();
 
 export default async function main() {
   await client.connect();
@@ -60,18 +59,6 @@ export default async function main() {
       }
     );
   }
-
-  fs.readdir("./commands", (err, files) => {
-    if (err) return console.error(err);
-    files.forEach((commandFile) => {
-      if (commandFile.endsWith(".js")) {
-        const commandName = commandFile.replace(".js", "");
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const command = require(`./commands/${commandName}`);
-        commands.set(commandName, command);
-      }
-    });
-  });
 
   wtsClient.on("auth_failure", () => {
     console.error(
@@ -512,7 +499,10 @@ https://faq.whatsapp.com/1417269125743673
       }
     } catch (ignore) {}
 
-    if (msg.body?.startsWith?.("!") && (await msg.getContact())?.isMyContact) {
+    if (
+      msg.body?.startsWith?.("!") &&
+      ((await msg.getContact())?.isMyContact || msg.fromMe)
+    ) {
       const args = msg.body?.slice?.(1)?.trim?.()?.split?.(/ +/g);
       const command = args.shift().toLowerCase();
 
@@ -549,7 +539,8 @@ https://faq.whatsapp.com/1417269125743673
     try {
       if (before) {
         if (config.enable_delete_alert == "true") {
-          const media: false | MessageMedia =
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const media: any =
             before.hasMedia &&
             (await before
               .downloadMedia()

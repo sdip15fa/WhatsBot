@@ -1,6 +1,6 @@
-import db from "../db";
-import { wtsClient } from "../main";
-import { Nickname } from "../models/nickname";
+import db from "../db/index.js";
+import { wtsClient } from "../main.js";
+import { Nickname } from "../models/nickname.js";
 
 export async function getName(id: string) {
   try {

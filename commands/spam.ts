@@ -1,5 +1,6 @@
 //jshint esversion:8
-import { Client, Message, MessageMedia } from "whatsapp-web.js";
+import whatsapp, { Client, Message } from "whatsapp-web.js";
+const { MessageMedia } = whatsapp;
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const count = Number(args.shift());
@@ -49,7 +50,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   }
 };
 
-module.exports = {
+export default {
   name: "Spam",
   description: "spams a certain message for given number of times",
   command: "!spam",

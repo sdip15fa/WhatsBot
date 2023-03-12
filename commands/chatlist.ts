@@ -18,7 +18,7 @@ ${chats
   );
 };
 
-module.exports = {
+export default {
   name: "Chat list",
   description: "Get a list of chats",
   command: "!chatlist",

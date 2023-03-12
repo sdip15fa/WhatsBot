@@ -2,6 +2,7 @@
 // Coded by Sumanjay (https://github.com/cyberboysumanjay)
 import { Client, Message } from "whatsapp-web.js";
 import axios from "axios";
+const { Axios } = axios;
 
 async function getTrackingDetails(
   trackingService: string,
@@ -9,7 +10,7 @@ async function getTrackingDetails(
 ) {
   let statusString =
     "Unable to get information for your shipment. Please check the tracking id or try again later!";
-  return axios
+  return new Axios()
     .get(`https://sjcourierapi.deta.dev/${trackingService}/${trackingNumber}`)
     .then(async function (response) {
       const data = response.data;
@@ -61,7 +62,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   }
 };
 
-module.exports = {
+export default {
   name: "Courier",
   description:
     "Get courier details from multiple providers. Currently supports: Gati Express and Ekart",

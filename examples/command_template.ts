@@ -3,7 +3,7 @@ import { Client, Message } from "whatsapp-web.js";
 //jshint esversion:8
 const execute = async (client: Client, msg: Message /*,args*/) => {};
 
-module.exports = {
+export default {
   name: "", //name of the module
   description: "", // short description of what this command does
   command: "", //command with prefix. Ex command: '!test'

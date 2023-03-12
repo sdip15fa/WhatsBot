@@ -1,7 +1,7 @@
 //jshint esversion:8
 import { randomBytes } from "crypto";
 import { Client, Message, MessageMedia } from "whatsapp-web.js";
-import { agenda } from "../helpers/agenda";
+import { agenda } from "../helpers/agenda.js";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   if (!msg.hasQuotedMsg) {
@@ -58,7 +58,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     });
 };
 
-module.exports = {
+export default {
   name: "Schedule message",
   description: "Schedule a message to be sent at a specific time",
   command: "!schedule",

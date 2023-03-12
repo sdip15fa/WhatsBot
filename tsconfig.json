@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "NodeNext",
     "lib": ["ES2019", "ESNext", "DOM"],
     "outDir": "dist",
     "esModuleInterop": true,
@@ -9,7 +9,7 @@
     "noImplicitUseStrict": true,
     "experimentalDecorators": true,
     "allowJs": true,
-    "moduleResolution": "node",
+    "moduleResolution": "nodenext",
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "sourceMap": true,

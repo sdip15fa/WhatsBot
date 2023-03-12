@@ -15,7 +15,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   });
 };
 
-module.exports = {
+export default {
   name: "Terminal",
   description: "Use teminal remotely",
   command: "!term",

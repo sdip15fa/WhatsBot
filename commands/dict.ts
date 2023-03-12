@@ -1,5 +1,5 @@
 import { Client, Message } from "whatsapp-web.js";
-import dictionary from "../helpers/dict";
+import dictionary from "../helpers/dict.js";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
@@ -73,7 +73,7 @@ ${definition?.origin}`
   }
 };
 
-module.exports = {
+export default {
   name: "Dictionary",
   description: "Get word definition",
   command: "!dict",

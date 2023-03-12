@@ -1,16 +1,19 @@
 //jshint esversion:8
 import { Client, Message } from "whatsapp-web.js";
-import db from "../db";
+import db from "../db/index.js";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
-  const userId = msg.fromMe ? process.env.WTS_OWNER_ID : (msg.author || msg.from);
+  const userId = msg.fromMe ? process.env.WTS_OWNER_ID : msg.author || msg.from;
   const nickname = args.join(" ");
   if (!nickname) {
     return await client.sendMessage(chatId, "Please enter a nickname!");
   }
   if (nickname.length > 20) {
-      return await client.sendMessage(chatId, "Nickname too long (maximum is 20 characters).")
+    return await client.sendMessage(
+      chatId,
+      "Nickname too long (maximum is 20 characters)."
+    );
   }
   if (
     !(
@@ -28,7 +31,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   return await client.sendMessage(chatId, "Nickname set!");
 };
 
-module.exports = {
+export default {
   name: "Nickname",
   description: "Set your nickname.",
   command: "!nick",

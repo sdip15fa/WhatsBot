@@ -4,7 +4,7 @@ import { Client, Message } from "whatsapp-web.js";
 
 const execute = (client: Client, msg: Message) => msg.reply("pong");
 
-module.exports = {
+export default {
   name: "Ping",
   description: "responds with pong",
   command: "!ping",

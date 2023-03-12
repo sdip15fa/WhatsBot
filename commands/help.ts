@@ -1,6 +1,6 @@
 import { Client, Message } from "whatsapp-web.js";
-import { commands } from "../main";
-import { Command } from "../types/command";
+import { commands } from "./index.js";
+import { Command } from "../types/command.js";
 
 //jshint esversion:8
 const execute = async (client: Client, msg: Message, args: string[]) => {
@@ -44,7 +44,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   }
 };
 
-module.exports = {
+export default {
   name: "help",
   description: "get information about available commands",
   command: "!help",

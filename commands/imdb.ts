@@ -1,19 +1,21 @@
 import axios from "axios";
-import { MessageMedia, Client, Message } from "whatsapp-web.js";
-import formatNum from "../helpers/formatNum";
-import processImage from "../helpers/processImage";
+const { Axios } = axios;
+import whatsapp, { Client, Message } from "whatsapp-web.js";
+import formatNum from "../helpers/formatNum.js";
+import processImage from "../helpers/processImage.js";
+const { MessageMedia } = whatsapp;
 const imdb_host = `https://imdb-api.tprojects.workers.dev`; // no slash at the end
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
   try {
     const query = args.join(" ");
-    const res = await axios.get(`${imdb_host}/search?query=${query}`);
+    const res = await new Axios().get(`${imdb_host}/search?query=${query}`);
     const data = res.data;
     if (data.results.length == 0) throw new Error("No results found.");
     let result = data.results[0];
 
-    result = await axios.get(`${imdb_host}${result.api_path}`);
+    result = await new Axios().get(`${imdb_host}${result.api_path}`);
     result = result.data;
     const image = await processImage(result.image);
     const text = `*${result.title}*\n_${
@@ -42,7 +44,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   }
 };
 
-module.exports = {
+export default {
   name: "IMDB", //name of the module
   description: "Find content details from IMDB", // short description of what this command does
   command: "!imdb", //command with prefix. Ex command: '!test'

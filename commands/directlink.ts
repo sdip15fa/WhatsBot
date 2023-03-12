@@ -1,9 +1,10 @@
 //jshint esversion:8
 import axios from "axios";
+const { Axios } = axios;
 import FormData from "form-data";
 import { Client, Message, MessageMedia } from "whatsapp-web.js";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const mime = require("mime-to-extensions");
+import mime from "mime-to-extensions";
 
 async function telegraph(attachmentData: MessageMedia) {
   const form = new FormData();
@@ -11,10 +12,9 @@ async function telegraph(attachmentData: MessageMedia) {
     filename: `telegraph.${mime.extension(attachmentData.mimetype)}`,
   });
 
-  return axios
-    .create({
-      headers: form.getHeaders(),
-    })
+  return new Axios({
+    headers: form.getHeaders(),
+  })
     .post("https://telegra.ph/upload", form)
     .then((response) => {
       return "https://telegra.ph" + response.data[0].src;
@@ -49,7 +49,7 @@ const execute = async (client: Client, msg: Message) => {
   }
 };
 
-module.exports = {
+export default {
   name: "Direct Link",
   description:
     "uploads media toh telegra.ph and creates a direct download link",

@@ -1,20 +1,16 @@
 //jshint esversion:8
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const weatherjs = require("weather-js");
+import weatherjs, { WeatherData } from "weather-js";
 import { Client, Message } from "whatsapp-web.js";
 
-async function fetchweather(query: string) {
-  const weatherfind = new Promise((resolve) => {
-    weatherjs.find(
-      { search: query, degreeType: "C" },
-      function (err: Error, result: unknown) {
-        if (err) {
-          resolve("error");
-        } else {
-          resolve(result);
-        }
+async function fetchweather(query: string): Promise<WeatherData[] | "error"> {
+  const weatherfind = new Promise<WeatherData[] | "error">((resolve) => {
+    weatherjs.find({ search: query, degreeType: "C" }, function (err, result) {
+      if (err) {
+        resolve("error");
+      } else {
+        resolve(result);
       }
-    );
+    });
   });
   return weatherfind;
 }
@@ -47,7 +43,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   }
 };
 
-module.exports = {
+export default {
   name: "Weather",
   description: "Gets weather info for given location",
   command: "!weather",

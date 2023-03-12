@@ -1,6 +1,6 @@
 //jshint esversion:8
 import { Client, Message } from "whatsapp-web.js";
-import { agenda } from "../helpers/agenda";
+import { agenda } from "../helpers/agenda.js";
 
 const execute = async (_client: Client, msg: Message, args: string[]) => {
   const id = args[0];
@@ -17,7 +17,7 @@ const execute = async (_client: Client, msg: Message, args: string[]) => {
   await msg.reply(`Unscheduled job id \`\`\`${id}\`\`\`.`);
 };
 
-module.exports = {
+export default {
   name: "Unschedule message",
   description: "Unschedule a message previously scheduled.",
   command: "!unschedule",

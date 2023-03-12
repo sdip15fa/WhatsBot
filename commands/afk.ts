@@ -1,5 +1,5 @@
 import { Client, Message } from "whatsapp-web.js";
-import { startAfk, afkStatus, stopAfk } from "../helpers/afkWrapper";
+import { startAfk, afkStatus, stopAfk } from "../helpers/afkWrapper.js";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   try {
@@ -45,7 +45,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   }
 };
 
-module.exports = {
+export default {
   name: "afk", //name of the module
   description: "Turn on or off afk mode", // short description of what this command does
   command: "!afk", //command with prefix. Ex command: '!test'
@@ -55,3 +55,5 @@ module.exports = {
   public: false,
   execute,
 };
+
+// switch to es6 syntax

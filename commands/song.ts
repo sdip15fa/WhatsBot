@@ -3,7 +3,7 @@ import { Client, Message } from "whatsapp-web.js";
 //jshint esversion:8
 import fs from "fs";
 import path from "path";
-import { search } from "../helpers/song";
+import { search } from "../helpers/song.js";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const getdata = await search(args.join(" "));
@@ -21,7 +21,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   }
 };
 
-module.exports = {
+export default {
   name: "Search Song",
   description: "Search songs on jiosaavn",
   command: "!song",

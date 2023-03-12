@@ -1,4 +1,5 @@
 import axios, { AxiosError } from "axios";
+const { Axios } = axios;
 
 interface definition {
   word?: string;
@@ -29,7 +30,7 @@ export default async function dictionary(word: string): Promise<
       resolution: string | null;
     }
 > {
-  return await axios
+  return await new Axios()
     .get<definition[]>(
       `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
     )

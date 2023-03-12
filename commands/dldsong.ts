@@ -1,6 +1,7 @@
 //jshint esversion:8
-import { Client, Message, MessageMedia } from "whatsapp-web.js";
-import { download } from "../helpers/song";
+import whatsapp, { Client, Message } from "whatsapp-web.js";
+const { MessageMedia } = whatsapp;
+import { download } from "../helpers/song.js";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
@@ -28,7 +29,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   }
 };
 
-module.exports = {
+export default {
   name: "Download Song",
   description: "Download selected song from the list",
   command: "!dldsong",

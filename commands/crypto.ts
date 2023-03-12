@@ -1,11 +1,12 @@
 //jshint esversion:8
 //Coded by Sumanjay (https://github.com/cyberboysumanjay)
 import axios from "axios";
+const { Axios } = axios;
 import { Client, Message } from "whatsapp-web.js";
 
 async function getPrice(cryptoCode: string) {
   cryptoCode = cryptoCode.toUpperCase();
-  return axios
+  return new Axios()
     .get("https://public.coindcx.com/market_data/current_prices")
     .then(async function (response) {
       const data = response.data;
@@ -52,7 +53,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   }
 };
 
-module.exports = {
+export default {
   name: "Crypto Currency",
   description: "Gets price info for requested crypto currency",
   command: "!crypto",

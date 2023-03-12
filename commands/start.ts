@@ -1,14 +1,14 @@
 //jshint esversion:8
-import config from "../config";
+import config from "../config.js";
 import axios from "axios";
-import {
+const { Axios } = axios;
+import whatsapp, {
   BatteryInfo,
   Client,
   ClientInfoPhone,
   Message,
-  MessageMedia,
 } from "whatsapp-web.js";
-import packageJson from "../package.json";
+import packageJson from "../package.json" assert { type: "json" };
 
 async function get(battery: BatteryInfo, phn_info: ClientInfoPhone) {
   let batttxt;
@@ -26,9 +26,12 @@ async function get(battery: BatteryInfo, phn_info: ClientInfoPhone) {
     mimetype: "image/jpeg",
     data: Buffer.from(
       (
-        await axios.get("https://telegra.ph/file/ecbc27f276890bf2f65a2.jpg", {
-          responseType: "arraybuffer",
-        })
+        await new Axios().get(
+          "https://telegra.ph/file/ecbc27f276890bf2f65a2.jpg",
+          {
+            responseType: "arraybuffer",
+          }
+        )
       ).data
     ).toString("base64"),
     filename: "start.jpg",
@@ -42,12 +45,16 @@ const execute = async (client: Client, msg: Message) => {
   );
   await client.sendMessage(
     msg.to,
-    new MessageMedia(startdata.mimetype, startdata.data, startdata.filename),
+    new whatsapp.MessageMedia(
+      startdata.mimetype,
+      startdata.data,
+      startdata.filename
+    ),
     { caption: startdata.msg }
   );
 };
 
-module.exports = {
+export default {
   name: "Start",
   description: "Get device, client and bot info",
   command: "!start",

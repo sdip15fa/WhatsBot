@@ -1,6 +1,6 @@
 import { Client, LocalAuth } from "whatsapp-web.js";
 import qrcode from "qrcode-terminal";
-import { write, clean } from "./manage";
+import { write, clean } from "./manage.js";
 import readline from "readline";
 import dotenv from "dotenv";
 
@@ -31,7 +31,7 @@ rl.question(
   }
 );
 
-client.on("qr", (qr: any) => {
+client.on("qr", (qr) => {
   console.log(`Scan this QR Code and copy the JSON\n`);
   qrcode.generate(qr, { small: true });
 });

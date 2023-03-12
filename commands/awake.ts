@@ -6,7 +6,7 @@ const execute = async (client: Client, msg: Message) => {
   msg.reply("```" + "I will be online from now." + "```");
 };
 
-module.exports = {
+export default {
   name: "Awake",
   description: "Stay online always !",
   command: "!awake",

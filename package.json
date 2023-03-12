@@ -3,6 +3,7 @@
   "version": "3.0.0",
   "description": "Plugable UserBot for WhatsApp",
   "main": "main.js",
+  "type": "module",
   "scripts": {
     "start": "cd dist && node startProcess.js",
     "start:ts": "ts-node startProcess.ts",

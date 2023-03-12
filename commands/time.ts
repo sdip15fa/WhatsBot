@@ -40,7 +40,7 @@ ISO:
   }
 };
 
-module.exports = {
+export default {
   name: "Time",
   description: "Query time in specific time zone",
   command: "!time",

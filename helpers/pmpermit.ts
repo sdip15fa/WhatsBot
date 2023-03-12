@@ -2,8 +2,8 @@
 //jshint -W033
 import fs from "fs";
 import path from "path";
-import database from "../db";
-import { Permit } from "../types/pmpermit";
+import database from "../db/index.js";
+import { Permit } from "../types/pmpermit.js";
 
 export async function insert(id: string) {
   try {

@@ -19,7 +19,7 @@ const execute = async (client: Client, msg: Message) => {
   }
 };
 
-module.exports = {
+export default {
   name: "Delete",
   description: "Delete a message for everyone",
   command: "!delete",

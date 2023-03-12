@@ -1,7 +1,7 @@
 //jshint esversion:8
 import { Client, Message } from "whatsapp-web.js";
-import config from "../config";
-import pmpermit from "../helpers/pmpermit";
+import config from "../config.js";
+import pmpermit from "../helpers/pmpermit.js";
 
 const execute = async (client: Client, msg: Message) => {
   msg.delete(true);
@@ -13,7 +13,7 @@ const execute = async (client: Client, msg: Message) => {
   }
 };
 
-module.exports = {
+export default {
   name: "Allow for PM",
   description: "Allow personal messaging for a conatct",
   command: "!allow",

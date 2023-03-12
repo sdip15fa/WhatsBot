@@ -1,5 +1,5 @@
-import db from "../db";
-import { Count } from "../models/count";
+import db from "../db/index.js";
+import { Count } from "../models/count.js";
 
 async function getCount(groupId: string, date: string) {
   const count = (await db("count").coll.findOne({ groupId, date })) as Count;

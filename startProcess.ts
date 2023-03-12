@@ -1,5 +1,5 @@
-import { replicate, clean, fetchSession } from "./session/manage";
-import main from "./main";
+import { replicate, clean, fetchSession } from "./session/manage.js";
+import main from "./main.js";
 
 async function start() {
   try {

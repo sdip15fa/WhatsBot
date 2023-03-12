@@ -1,10 +1,11 @@
 //jshint esversion:8
 // Coded by Sumanjay (https://github.com/cyberboysumanjay)
 import axios from "axios";
+const { Axios } = axios;
 import { Client, Message } from "whatsapp-web.js";
 
 export async function getShortURL(input: string) {
-  return axios
+  return new Axios()
     .post<{
       references: unknown;
       link: string;
@@ -73,7 +74,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   }
 };
 
-module.exports = {
+export default {
   name: "Shorten Link",
   description: "get shortend link for the given url",
   command: "!shorten",

@@ -1,5 +1,5 @@
 import { Client, Message } from "whatsapp-web.js";
-import db from "../db";
+import db from "../db/index.js";
 
 //jshint esversion:8
 const execute = async (client: Client, msg: Message) => {
@@ -14,7 +14,7 @@ const execute = async (client: Client, msg: Message) => {
   return client.sendMessage(chatId, "Bot disabled.");
 };
 
-module.exports = {
+export default {
   name: "Disable", //name of the module
   description: "Disable the bot in this chat", // short description of what this command does
   command: "!disable", //command with prefix. Ex command: '!test'

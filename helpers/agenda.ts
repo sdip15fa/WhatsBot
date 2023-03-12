@@ -1,9 +1,10 @@
 import { Agenda, Job } from "agenda";
-import { MessageMedia } from "whatsapp-web.js";
-import { client } from "../db";
-import { wtsClient } from "../main";
-import { countMessage } from "./count";
-import { getDate } from "./date";
+import whatsapp from "whatsapp-web.js";
+import { client } from "../db/index.js";
+import { wtsClient } from "../main.js";
+import { countMessage } from "./count.js";
+import { getDate } from "./date.js";
+const { MessageMedia } = whatsapp;
 
 export const agenda = new Agenda({ mongo: client.db("agenda") });
 

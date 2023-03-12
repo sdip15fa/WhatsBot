@@ -5,25 +5,22 @@ import { Client, Message } from "whatsapp-web.js";
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
 
-  const quotedMsg = msg.hasQuotedMsg && await msg.getQuotedMessage();
+  const quotedMsg = msg.hasQuotedMsg && (await msg.getQuotedMessage());
 
   if (!args.length && !quotedMsg.body) {
-    return client.sendMessage(
-      chatId,
-      "Please provide text to transform!"
-    );
+    return client.sendMessage(chatId, "Please provide text to transform!");
   }
 
   const text = args.join(" ") || quotedMsg.body;
 
   if (text.length > 50) {
-    return client.sendMessage(chatId, "Text too long.")
+    return client.sendMessage(chatId, "Text too long.");
   }
 
   await client.sendMessage(chatId, natoPad(args.join(" ") || quotedMsg.body));
 };
 
-module.exports = {
+export default {
   name: "Nato",
   description: "Transform text to nato alphabets",
   command: "!nato",
