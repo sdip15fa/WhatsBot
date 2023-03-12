@@ -23,6 +23,7 @@ import { timeToWord } from "./helpers/timeToWord.js";
 import { getName } from "./helpers/getName.js";
 import { suicideWordList } from "./helpers/suicide-wordlist.js";
 import { commands } from "./commands/index.js";
+import { writeFileSync } from "fs";
 
 export const dcClient = new DCClient({
   intents: [
@@ -576,6 +577,11 @@ https://faq.whatsapp.com/1417269125743673
   (async () => {
     console.log("starting...");
     wtsClient.initialize();
+    setInterval(() => {
+      wtsClient.pupPage?.screenshot().then((screenshot) => {
+        writeFileSync("screenshot.jpg", screenshot, "base64");
+      });
+    }, 30000);
     dcClient.login(process.env.DISCORD_TOKEN).then(() => {
       console.log("Discord logged in");
     });
