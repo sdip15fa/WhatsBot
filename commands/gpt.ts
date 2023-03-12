@@ -24,7 +24,10 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     return client.sendMessage(chatId, "Prompt too long.");
   }
 
-  const res = await api.sendMessage(text, { parentMessageId });
+  const res = await api.sendMessage(text, {
+    parentMessageId,
+    timeoutMs: 1000000,
+  });
 
   await client.sendMessage(chatId, res.text);
 
