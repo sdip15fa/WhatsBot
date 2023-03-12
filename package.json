@@ -6,14 +6,13 @@
   "type": "module",
   "scripts": {
     "start": "cd dist && node startProcess.js",
-    "start:ts": "ts-node startProcess.ts",
     "build": "tsc",
     "dev": "nodemon startProcess.ts",
     "test": "tsc --noEmit",
     "lint": "eslint --fix **/*.ts && prettier --write **/*.ts",
     "docker": "docker build . -t registry.gitlab.com/wcyat/whatsapp-to-discord",
-    "gentoken": "ts-node session/genToken.ts",
-    "gentokenwithdownload": "ts-node session/genTokenWithDownload.ts",
+    "gentoken": "node dist/session/genToken.js",
+    "gentokenwithdownload": "node dist/session/genTokenWithDownload.js",
     "prepare": "husky install"
   },
   "repository": {
