@@ -2,11 +2,13 @@ FROM ghcr.io/puppeteer/puppeteer:latest as build
 
 USER root
 
-COPY . /app
-
 WORKDIR /app
 
+COPY ./package.json ./yarn.lock ./
+
 RUN yarn install
+
+COPY . ./
 
 RUN yarn build
 
