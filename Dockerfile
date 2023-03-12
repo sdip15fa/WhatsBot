@@ -1,26 +1,20 @@
-FROM node:alpine as puppeteer
+FROM ghcr.io/puppeteer/puppeteer:latest as build
 
-# prepare
-RUN apk add --no-cache \
-  chromium \
-  ca-certificates \
-  ffmpeg
-
-# skip installing chrome
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-  PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
-
-WORKDIR /app
-
-FROM puppeteer as build
+USER root
 
 COPY . /app
+
+WORKDIR /app
 
 RUN yarn install
 
 RUN yarn build
 
-FROM puppeteer
+FROM ghcr.io/puppeteer/puppeteer:latest
+
+USER root
+
+WORKDIR /app
 
 COPY --from=build /app/dist ./
 COPY ./yarn.lock ./yarn.lock
