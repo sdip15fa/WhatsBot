@@ -10,6 +10,19 @@ const api = new ChatGPTAPI({
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
 
+  // Check if this chatgpt plugin was executed less than a minute ago
+  const lastExecution = await db("gpt").coll.findOne({ id: chatId });
+  const now = Date.now();
+  if (lastExecution && lastExecution.lastExecutedAt + 60 * 1000 > now) {
+    const remainingTime = Math.ceil(
+      (lastExecution.lastExecutedAt + 60 * 1000 - now) / 1000
+    );
+    return client.sendMessage(
+      chatId,
+      `Please wait ${remainingTime} seconds before executing chatgpt again!`
+    );
+  }
+
   const quotedMsg = msg.hasQuotedMsg && (await msg.getQuotedMessage());
 
   if (!args.length && !quotedMsg.body) {
@@ -32,11 +45,20 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   await client.sendMessage(chatId, res.text);
 
   if (!parentMessageId) {
-    await db("gpt").coll.insertOne({ id: chatId, parentMessageId: res.id });
+    await db("gpt").coll.insertOne({
+      id: chatId,
+      parentMessageId: res.id,
+      lastExecutedAt: now,
+    });
   } else {
     await db("gpt").coll.updateOne(
       { id: chatId },
-      { $set: { parentMessageId: res.id } }
+      {
+        $set: {
+          parentMessageId: res.id,
+          lastExecutedAt: now,
+        },
+      }
     );
   }
 };
