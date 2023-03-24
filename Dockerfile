@@ -18,6 +18,8 @@ USER root
 
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y ffmpeg
+
 COPY --from=build /app/dist ./
 COPY ./yarn.lock ./yarn.lock
 
