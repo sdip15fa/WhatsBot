@@ -1,13 +1,12 @@
 //jshint esversion:8
-import axios from "axios";
-const { Axios } = axios;
 import { Client, Message } from "whatsapp-web.js";
 import { parse } from "node-html-parser";
 import parseMETAR from "metar";
+import axios from "../helpers/axios.js";
 
 async function fetchmetar(airport = "VHHH") {
   try {
-    const { data } = await new Axios().get(
+    const { data } = await axios.get(
       `https://en.allmetsat.com/metar-taf/asia.php?icao=${airport}`
     );
     const parsed = parse(data);
@@ -22,7 +21,8 @@ async function fetchmetar(airport = "VHHH") {
       original: metar,
       special_weather_conditions: metar.split(" ").pop(),
     };
-  } catch {
+  } catch (err) {
+    console.error(err);
     return null;
   }
 }

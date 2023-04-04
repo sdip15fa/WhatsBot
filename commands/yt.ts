@@ -1,15 +1,14 @@
 //jshint esversion:8
 import whatsapp, { Client, Message } from "whatsapp-web.js";
 const { MessageMedia } = whatsapp;
-import axios from "axios";
-const { Axios } = axios;
+import axios from "../helpers/axios.js";
 import formatNum from "../helpers/formatNum.js";
 import processImage from "../helpers/processImage.js";
 
 async function youtube(url: string) {
   try {
     const data = (
-      await new Axios().get(`https://yoothoob.vercel.app/fromLink?link=${url}`)
+      await axios.get(`https://yoothoob.vercel.app/fromLink?link=${url}`)
     )?.data;
     if (!data) return "error";
     return {

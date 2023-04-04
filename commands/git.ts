@@ -1,15 +1,14 @@
 //jshint esversion:8
 import whatsapp, { Client, Message } from "whatsapp-web.js";
 const { MessageMedia } = whatsapp;
-import axios from "axios";
-const { Axios } = axios;
+import axios from "../helpers/axios.js";
 
 async function downloadzip(url: string, name: string) {
   try {
     return {
       status: true,
       data: Buffer.from(
-        (await new Axios().get(url, { responseType: "arraybuffer" })).data
+        (await axios.get(url, { responseType: "arraybuffer" })).data
       ).toString("base64"),
       filename: `${name}.zip`,
       mimetype: "application/zip",
@@ -39,9 +38,7 @@ async function gitinfo(url: string) {
 
   try {
     const repodata = (
-      await new Axios().get(
-        `https://api.github.com/repos/${repo.user}/${repo.repo}`
-      )
+      await axios.get(`https://api.github.com/repos/${repo.user}/${repo.repo}`)
     ).data;
 
     return {

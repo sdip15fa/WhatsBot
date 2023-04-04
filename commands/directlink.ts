@@ -1,10 +1,9 @@
 //jshint esversion:8
-import axios from "axios";
-const { Axios } = axios;
 import FormData from "form-data";
 import { Client, Message, MessageMedia } from "whatsapp-web.js";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 import mime from "mime-to-extensions";
+import { Axios } from "axios";
 
 async function telegraph(attachmentData: MessageMedia) {
   const form = new FormData();

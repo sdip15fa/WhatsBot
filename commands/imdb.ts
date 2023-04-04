@@ -1,5 +1,4 @@
-import axios from "axios";
-const { Axios } = axios;
+import axios from "../helpers/axios.js";
 import whatsapp, { Client, Message } from "whatsapp-web.js";
 import formatNum from "../helpers/formatNum.js";
 import processImage from "../helpers/processImage.js";
@@ -10,12 +9,12 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
   try {
     const query = args.join(" ");
-    const res = await new Axios().get(`${imdb_host}/search?query=${query}`);
+    const res = await axios.get(`${imdb_host}/search?query=${query}`);
     const data = res.data;
     if (data.results.length == 0) throw new Error("No results found.");
     let result = data.results[0];
 
-    result = await new Axios().get(`${imdb_host}${result.api_path}`);
+    result = await axios.get(`${imdb_host}${result.api_path}`);
     result = result.data;
     const image = await processImage(result.image);
     const text = `*${result.title}*\n_${

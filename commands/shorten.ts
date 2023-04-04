@@ -1,11 +1,10 @@
 //jshint esversion:8
 // Coded by Sumanjay (https://github.com/cyberboysumanjay)
-import axios from "axios";
-const { Axios } = axios;
+import axios from "../helpers/axios.js";
 import { Client, Message } from "whatsapp-web.js";
 
 export async function getShortURL(input: string) {
-  return new Axios()
+  return axios
     .post<{
       references: unknown;
       link: string;

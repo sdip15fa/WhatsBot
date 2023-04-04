@@ -1,10 +1,9 @@
-import axios from "axios";
-const { Axios } = axios;
+import axios from "../helpers/axios.js";
 
 export default async function processImage(link: string) {
   if (!link) throw new Error("No link provided");
   try {
-    const image = await new Axios().get(link, { responseType: "arraybuffer" });
+    const image = await axios.get(link, { responseType: "arraybuffer" });
 
     return {
       mimetype: "image/jpeg",

@@ -1,8 +1,7 @@
 //jshint esversion:8
 // Coded by Sumanjay (https://github.com/cyberboysumanjay)
 import { Client, Message } from "whatsapp-web.js";
-import axios from "axios";
-const { Axios } = axios;
+import axios from "../helpers/axios.js";
 
 async function getTrackingDetails(
   trackingService: string,
@@ -10,7 +9,7 @@ async function getTrackingDetails(
 ) {
   let statusString =
     "Unable to get information for your shipment. Please check the tracking id or try again later!";
-  return new Axios()
+  return axios
     .get(`https://sjcourierapi.deta.dev/${trackingService}/${trackingNumber}`)
     .then(async function (response) {
       const data = response.data;

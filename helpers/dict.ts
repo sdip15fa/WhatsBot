@@ -1,5 +1,5 @@
-import axios, { AxiosError } from "axios";
-const { Axios } = axios;
+import { AxiosError } from "axios";
+import axios from "./axios.js";
 
 interface definition {
   word?: string;
@@ -30,7 +30,7 @@ export default async function dictionary(word: string): Promise<
       resolution: string | null;
     }
 > {
-  return await new Axios()
+  return await axios
     .get<definition[]>(
       `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
     )

@@ -3,11 +3,10 @@
 //TODO: fix it
 import whatsapp, { Client, Message } from "whatsapp-web.js";
 const { MessageMedia } = whatsapp;
-import axios from "axios";
-const { Axios } = axios;
+import axios from "../helpers/axios.js";
 
 async function carbon(text: string) {
-  const respoimage = await new Axios()
+  const respoimage = await axios
     .get<ArrayBuffer>(
       `https://carbonnowsh.herokuapp.com/?code=${text.replace(
         / /gi,

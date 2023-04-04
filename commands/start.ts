@@ -1,7 +1,6 @@
 //jshint esversion:8
 import config from "../config.js";
-import axios from "axios";
-const { Axios } = axios;
+import axios from "../helpers/axios.js";
 import whatsapp, {
   BatteryInfo,
   Client,
@@ -26,12 +25,9 @@ async function get(battery: BatteryInfo, phn_info: ClientInfoPhone) {
     mimetype: "image/jpeg",
     data: Buffer.from(
       (
-        await new Axios().get(
-          "https://telegra.ph/file/ecbc27f276890bf2f65a2.jpg",
-          {
-            responseType: "arraybuffer",
-          }
-        )
+        await axios.get("https://telegra.ph/file/ecbc27f276890bf2f65a2.jpg", {
+          responseType: "arraybuffer",
+        })
       ).data
     ).toString("base64"),
     filename: "start.jpg",

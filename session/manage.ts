@@ -7,8 +7,7 @@ import {
 } from "aes-encrypt-stream";
 import crypto from "crypto";
 import config from "../config.js";
-import axios from "axios";
-const { Axios } = axios;
+import axios from "../helpers/axios.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -73,7 +72,7 @@ export async function replicate() {
 export async function fetchSession() {
   try {
     if (process.env.SESSION_URL) {
-      const response = await new Axios().get(process.env.SESSION_URL, {
+      const response = await axios.get(process.env.SESSION_URL, {
         responseType: "arraybuffer",
       });
       fs.writeFileSync(`session.secure`, response.data, {

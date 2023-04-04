@@ -1,15 +1,12 @@
 //jshint esversion:8
-import axios from "axios";
-const { Axios } = axios;
+import axios from "../helpers/axios.js";
 import fs from "fs";
 import path from "path";
 
 export async function search(query: string) {
   try {
     const response = (
-      await new Axios().get(
-        `https://jiosaavn-api.vercel.app/search?query=${query}`
-      )
+      await axios.get(`https://jiosaavn-api.vercel.app/search?query=${query}`)
     ).data;
 
     if (response.result === "false") {
@@ -50,9 +47,7 @@ export async function download(songkey: string, id: string) {
     if (song) {
       try {
         const data = (
-          await new Axios().get(
-            `https://jiosaavn-api.vercel.app/song?id=${song.id}`
-          )
+          await axios.get(`https://jiosaavn-api.vercel.app/song?id=${song.id}`)
         ).data;
 
         return {
@@ -98,7 +93,7 @@ export async function download(songkey: string, id: string) {
 
 export async function image(link: string) {
   try {
-    const respoimage = await new Axios().get(link, {
+    const respoimage = await axios.get(link, {
       responseType: "arraybuffer",
     });
 
