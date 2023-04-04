@@ -3,7 +3,7 @@ import FormData from "form-data";
 import { Client, Message, MessageMedia } from "whatsapp-web.js";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 import mime from "mime-to-extensions";
-import { Axios } from "axios";
+import axios from "../helpers/axios.js";
 
 async function telegraph(attachmentData: MessageMedia) {
   const form = new FormData();
@@ -11,10 +11,8 @@ async function telegraph(attachmentData: MessageMedia) {
     filename: `telegraph.${mime.extension(attachmentData.mimetype)}`,
   });
 
-  return new Axios({
-    headers: form.getHeaders(),
-  })
-    .post("https://telegra.ph/upload", form)
+  return await axios
+    .post("https://telegra.ph/upload", form, { headers: form.getHeaders() })
     .then((response) => {
       return "https://telegra.ph" + response.data[0].src;
     })
