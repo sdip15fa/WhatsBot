@@ -37,16 +37,15 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     return client.sendMessage(chatId, "Prompt too long.");
   }
 
-  const res = await api.sendMessage(
-    `ChatGPT:
-${text}`,
+  const res = await api.sendMessage(text,
     {
       parentMessageId,
       timeoutMs: 1000000,
     }
   );
 
-  await client.sendMessage(chatId, res.text);
+  await client.sendMessage(chatId, `ChatGPT:
+${res.text}`);
 
   if (!parentMessageId) {
     await db("gpt").coll.insertOne({
