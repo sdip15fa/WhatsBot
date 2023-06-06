@@ -13,7 +13,11 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   // Check if this chatgpt plugin was executed less than a minute ago
   const lastExecution = await db("gpt").coll.findOne({ id: chatId });
   const now = Date.now();
-  if (lastExecution && lastExecution.lastExecutedAt + 60 * 1000 > now) {
+  if (
+    lastExecution &&
+    lastExecution.lastExecutedAt + 60 * 1000 > now &&
+    !(await db("chats").coll.findOne({ chatId, ratelimit: false }))
+  ) {
     const remainingTime = Math.ceil(
       (lastExecution.lastExecutedAt + 60 * 1000 - now) / 1000
     );
@@ -37,15 +41,16 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     return client.sendMessage(chatId, "Prompt too long.");
   }
 
-  const res = await api.sendMessage(text,
-    {
-      parentMessageId,
-      timeoutMs: 1000000,
-    }
-  );
+  const res = await api.sendMessage(text, {
+    parentMessageId,
+    timeoutMs: 1000000,
+  });
 
-  await client.sendMessage(chatId, `ChatGPT:
-${res.text}`);
+  await client.sendMessage(
+    chatId,
+    `ChatGPT:
+${res.text}`
+  );
 
   if (!parentMessageId) {
     await db("gpt").coll.insertOne({

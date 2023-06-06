@@ -6,7 +6,10 @@ const execute = async (client: Client, msg: Message) => {
   const chatId = (await msg.getChat())?.id._serialized;
   if (
     !(
-      await db("chats").coll.updateOne({ chatId }, { $set: { disabled: true } })
+      await db("chats").coll.updateOne(
+        { chatId, disabled: { $ne: true } },
+        { $set: { disabled: true } }
+      )
     ).matchedCount
   ) {
     await db("chats").coll.insertOne({ chatId, disabled: true });

@@ -7,7 +7,7 @@ const execute = async (client: Client, msg: Message) => {
   if (
     !(
       await db("chats").coll.updateOne(
-        { chatId },
+        { chatId, disabled: true },
         { $set: { disabled: false } }
       )
     ).matchedCount
