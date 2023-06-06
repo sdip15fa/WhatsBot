@@ -46,6 +46,7 @@ import ping from "./ping.js";
 import start from "./start.js";
 import ud from "./ud.js";
 import gif from "./gif.js";
+import ratelmit from "./rateelimit.js";
 
 export const commands = new Map();
 
@@ -97,3 +98,4 @@ commands.set(ping.command.slice(1), ping);
 commands.set(start.command.slice(1), start);
 commands.set(ud.command.slice(1), ud);
 commands.set(gif.command.slice(1), gif);
+commands.set(ratelimit.command.slice(1), ratelimit);
