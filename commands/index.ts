@@ -45,6 +45,7 @@ import metar from "./metar.js";
 import ping from "./ping.js";
 import start from "./start.js";
 import ud from "./ud.js";
+import gif from "./gif.js";
 
 export const commands = new Map();
 
@@ -95,3 +96,4 @@ commands.set(metar.command.slice(1), metar);
 commands.set(ping.command.slice(1), ping);
 commands.set(start.command.slice(1), start);
 commands.set(ud.command.slice(1), ud);
+commands.set(gif.command.slice(1), gif);
