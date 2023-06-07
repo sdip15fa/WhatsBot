@@ -42,7 +42,7 @@ export default {
   command: "!ratelimit", //command with prefix. Ex command: '!test'
   commandType: "admin", //
   isDependent: false, //whether this command is related/dependent to some other command
-  help: "!ratelimit [true|false]", // a string descring how to use this command Ex = help : 'To use this command type !test arguments'
+  help: "*Rate limit*\n\nEnable/disable rate limit\n\n!ratelimit [true|false]", // a string descring how to use this command Ex = help : 'To use this command type !test arguments'
   public: false,
   execute,
 };
