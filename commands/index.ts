@@ -46,7 +46,7 @@ import ping from "./ping.js";
 import start from "./start.js";
 import ud from "./ud.js";
 import gif from "./gif.js";
-import ratelmit from "./rateelimit.js";
+import ratelimit from "./ratelimit.js";
 
 export const commands = new Map();
 
