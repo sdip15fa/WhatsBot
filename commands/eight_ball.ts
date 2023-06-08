@@ -50,7 +50,7 @@ const execute = async (_client: Client, msg: Message, args: string[]) => {
     ? (await msg.getQuotedMessage()).body
     : args.join();
   if (!question) {
-    msg.reply("Please ask a question!");
+    return msg.reply("Please ask a question!");
   }
   msg.reply(`8ball says:
 ${responses[Math.floor(Math.random() * responses.length)]}`);
