@@ -47,6 +47,9 @@ import start from "./start.js";
 import ud from "./ud.js";
 import gif from "./gif.js";
 import ratelimit from "./ratelimit.js";
+import flip from "./flip.js";
+import eight_ball from "./eight_ball.js";
+import dice from "./dice.js";
 
 export const commands = new Map();
 
@@ -99,3 +102,6 @@ commands.set(start.command.slice(1), start);
 commands.set(ud.command.slice(1), ud);
 commands.set(gif.command.slice(1), gif);
 commands.set(ratelimit.command.slice(1), ratelimit);
+commands.set(flip.command.slice(1), flip);
+commands.set(eight_ball.command.slice(1), eight_ball);
+commands.set(dice.command.slice(1), dice);
