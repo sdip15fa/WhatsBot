@@ -12,10 +12,10 @@ let wordlist: string[] = [];
 
 const downloadWordlist = async () => {
   const response = await axios.get(
-    "https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt"
+    "https://raw.githubusercontent.com/Tom25/Hangman/master/wordlist.txt"
   );
-  const words = response.data.split("\r\n");
-  wordlist = words.filter((word: string) => /^[a-z]{3,}$/i.test(word));
+  const words = response.data.split("\n");
+  wordlist = words.filter((word: string) => /^[a-z]{5,20}$/i.test(word));
   fs.writeFileSync(WORDLIST_FILE_PATH, wordlist.join("\n"));
 };
 
