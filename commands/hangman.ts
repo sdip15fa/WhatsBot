@@ -153,7 +153,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       return await client.sendMessage(chatId, "No games ongoing!");
     }
     default: {
-      for (const arg of args) {
+      for (const arg of args.slice(0, 2)) {
         const gameDoc = (await hangmanCollection.findOne({
           chatId,
         })) as GameDocument;
