@@ -167,6 +167,21 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       const { word, guessedLetters, guessesLeft } = gameState;
       let { hiddenWord } = gameState;
       const letter = args[0].toLowerCase();
+      if (new RegExp(`/^[a-z]{${gameState.word.length}}$/`).test(letter)) {
+        if (letter === word) {
+          await client.sendMessage(
+            chatId,
+            `Congratulations! You won! The word was "${word}".`
+          );
+          await hangmanCollection.deleteOne({ chatId });
+          return;
+        } else {
+          return await client.sendMessage(
+            chatId,
+            "Word guessing is incorrect. Guessing the whole word does not count against your remaining chances."
+          );
+        }
+      }
       if (!letter || !/^[a-z]$/.test(letter)) {
         await client.sendMessage(chatId, "Please enter a valid letter.");
         return;
