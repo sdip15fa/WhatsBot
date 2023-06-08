@@ -168,6 +168,12 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       let { hiddenWord } = gameState;
       const letter = args[0].toLowerCase();
       if (new RegExp(`^[a-z]{${gameState.word.length}}$`).test(letter)) {
+        if (hiddenWord.split("").filter((i) => i === "_").length <= 1) {
+          return await client.sendMessage(
+            chatId,
+            "You can't guess the whole word when only one character is remaining!"
+          );
+        }
         if (letter === word) {
           await client.sendMessage(
             chatId,
@@ -178,7 +184,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         } else {
           return await client.sendMessage(
             chatId,
-            "Word guessing is incorrect. Guessing the whole word does not count against your remaining chances."
+            `The word ${letter} is incorrect. Guessing the whole word does not count against your remaining chances.`
           );
         }
       }
