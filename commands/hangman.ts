@@ -167,7 +167,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       const { word, guessedLetters, guessesLeft } = gameState;
       let { hiddenWord } = gameState;
       const letter = args[0].toLowerCase();
-      if (new RegExp(`/^[a-z]{${gameState.word.length}}$/`).test(letter)) {
+      if (new RegExp(`^[a-z]{${gameState.word.length}}$`).test(letter)) {
         if (letter === word) {
           await client.sendMessage(
             chatId,
