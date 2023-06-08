@@ -25,4 +25,6 @@ COPY ./yarn.lock ./yarn.lock
 
 RUN yarn install --production
 
+VOLUME ["/app/data"]
+
 CMD ["node", "startProcess.js"]

@@ -11,6 +11,7 @@ services:
     volumes:
      - ./session.secure:/app/session.secure
      - ./.wwebjs_auth:/app/.wwebjs_auth
+     - ./wtstodis-data:/app/data
     environment:
       SESSION_KEY: ${SESSION_KEY}
       PMPERMIT_ENABLED: ${PMPERMIT_ENABLED}

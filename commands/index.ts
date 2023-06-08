@@ -50,6 +50,7 @@ import ratelimit from "./ratelimit.js";
 import flip from "./flip.js";
 import eight_ball from "./eight_ball.js";
 import dice from "./dice.js";
+import hangman from "./hangman.js";
 
 export const commands = new Map();
 
@@ -105,3 +106,4 @@ commands.set(ratelimit.command.slice(1), ratelimit);
 commands.set(flip.command.slice(1), flip);
 commands.set(eight_ball.command.slice(1), eight_ball);
 commands.set(dice.command.slice(1), dice);
+commands.set(hangman.command.slice(1), hangman);
