@@ -51,6 +51,7 @@ import flip from "./flip.js";
 import eight_ball from "./eight_ball.js";
 import dice from "./dice.js";
 import hangman from "./hangman.js";
+import ttt from "./ttt.js";
 
 export const commands = new Map();
 
@@ -107,3 +108,4 @@ commands.set(flip.command.slice(1), flip);
 commands.set(eight_ball.command.slice(1), eight_ball);
 commands.set(dice.command.slice(1), dice);
 commands.set(hangman.command.slice(1), hangman);
+commands.set(ttt.command.slice(1), ttt);
