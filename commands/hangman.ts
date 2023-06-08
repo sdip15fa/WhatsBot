@@ -153,93 +153,102 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       return await client.sendMessage(chatId, "No games ongoing!");
     }
     default: {
-      const gameDoc = (await hangmanCollection.findOne({
-        chatId,
-      })) as GameDocument;
-      if (!gameDoc) {
-        await client.sendMessage(
+      for (const arg of args) {
+        const gameDoc = (await hangmanCollection.findOne({
           chatId,
-          `Use \`\`\`!hangman start\`\`\` to start a new game.`
-        );
-        return;
-      }
-      const gameState = gameDoc.gameState;
-      const { word, guessedLetters, guessesLeft } = gameState;
-      let { hiddenWord } = gameState;
-      const letter = args[0].toLowerCase();
-      if (new RegExp(`^[a-z]{${gameState.word.length}}$`).test(letter)) {
-        if (hiddenWord.split("").filter((i) => i === "_").length <= 1) {
-          return await client.sendMessage(
-            chatId,
-            "You can't guess the whole word when only one character is remaining!"
-          );
-        }
-        if (letter === word) {
+        })) as GameDocument;
+        if (!gameDoc) {
           await client.sendMessage(
             chatId,
-            `Congratulations! You won! The word was "${word}".`
+            `Use \`\`\`!hangman start\`\`\` to start a new game.`
           );
-          await hangmanCollection.deleteOne({ chatId });
           return;
-        } else {
-          return await client.sendMessage(
-            chatId,
-            `The word ${letter} is incorrect. Guessing the whole word does not count against your remaining chances.`
-          );
         }
-      }
-      if (!letter || !/^[a-z]$/.test(letter)) {
-        await client.sendMessage(chatId, "Please enter a valid letter.");
-        return;
-      }
-      if (guessedLetters.includes(letter)) {
-        await client.sendMessage(
-          chatId,
-          `You already guessed "${letter}". Try another letter.`
-        );
-        return;
-      }
-      guessedLetters.push(letter);
-      if (word.includes(letter)) {
-        for (let i = 0; i < word.length; i++) {
-          if (word[i] === letter) {
-            const hiddenWordArr = hiddenWord.split("");
-            hiddenWordArr[i] = letter;
-            hiddenWord = hiddenWordArr.join("");
+        const gameState = gameDoc.gameState;
+        const { word, guessedLetters, guessesLeft } = gameState;
+        let { hiddenWord } = gameState;
+        const letter = arg.toLowerCase();
+        if (new RegExp(`^[a-z]{${gameState.word.length}}$`).test(letter)) {
+          if (hiddenWord.split("").filter((i) => i === "_").length <= 1) {
+            return await client.sendMessage(
+              chatId,
+              "You can't guess the whole word when only one character is remaining!"
+            );
+          }
+          if (letter === word) {
+            await client.sendMessage(
+              chatId,
+              `Congratulations! You won! The word was "${word}".`
+            );
+            await hangmanCollection.deleteOne({ chatId });
+            return;
+          } else {
+            await client.sendMessage(
+              chatId,
+              `Wrong guess! The word ${letter} is incorrect! Guessing the whole word does not count against your remaining chances.`
+            );
+            continue;
           }
         }
-        if (hiddenWord === word) {
+        if (!letter || !/^[a-z]$/.test(letter)) {
+          await client.sendMessage(chatId, `Please enter a valid letter.`);
+          continue;
+        }
+        if (guessedLetters.includes(letter)) {
           await client.sendMessage(
             chatId,
-            `Congratulations! You won! The word was "${word}".`
+            `You already guessed "${letter}". Try another letter.`
           );
-          await hangmanCollection.deleteOne({ chatId });
-          return;
+          continue;
         }
-        gameState.hiddenWord = hiddenWord;
-        await hangmanCollection.updateOne({ chatId }, { $set: { gameState } });
-        await client.sendMessage(
-          chatId,
-          `Good guess! Here's the updated hidden word:\n\n\`\`\`${hiddenWord}\`\`\`\n\nSend !hangman [letter] to guess.`
-        );
-      } else {
-        if (guessesLeft <= 1) {
+        guessedLetters.push(letter);
+        if (word.includes(letter)) {
+          for (let i = 0; i < word.length; i++) {
+            if (word[i] === letter) {
+              const hiddenWordArr = hiddenWord.split("");
+              hiddenWordArr[i] = letter;
+              hiddenWord = hiddenWordArr.join("");
+            }
+          }
+          if (hiddenWord === word) {
+            await client.sendMessage(
+              chatId,
+              `Congratulations! You won! The word was "${word}".`
+            );
+            await hangmanCollection.deleteOne({ chatId });
+            return;
+          }
+          gameState.hiddenWord = hiddenWord;
+          await hangmanCollection.updateOne(
+            { chatId },
+            { $set: { gameState } }
+          );
           await client.sendMessage(
             chatId,
-            `You lose! The word was "${word}".\n\n${HANGMAN_STAGES[6]}\n\nTry again with !hangman start.`
+            `Good guess! ${letter} is correct! Here's the updated hidden word:\n\n\`\`\`${hiddenWord}\`\`\`\n\nSend !hangman [letter] to guess.`
           );
-          await hangmanCollection.deleteOne({ chatId });
-          return;
+        } else {
+          if (guessesLeft <= 1) {
+            await client.sendMessage(
+              chatId,
+              `You lose! The word was "${word}".\n\n${HANGMAN_STAGES[6]}\n\nTry again with !hangman start.`
+            );
+            await hangmanCollection.deleteOne({ chatId });
+            return;
+          }
+          gameState.guessesLeft = guessesLeft - 1;
+          const remainingGuesses = gameState.guessesLeft;
+          gameState.guessedLetters = guessedLetters;
+          await hangmanCollection.updateOne(
+            { chatId },
+            { $set: { gameState } }
+          );
+          const hangmanStage = HANGMAN_STAGES[6 - remainingGuesses];
+          await client.sendMessage(
+            chatId,
+            `Wrong guess! "${letter}" is not in the word. You have ${remainingGuesses} guesses left.\n\n${hangmanStage}\n\n\`\`\`${hiddenWord}\`\`\`\n\nSend !hangman [letter] to guess.`
+          );
         }
-        gameState.guessesLeft = guessesLeft - 1;
-        const remainingGuesses = gameState.guessesLeft;
-        gameState.guessedLetters = guessedLetters;
-        await hangmanCollection.updateOne({ chatId }, { $set: { gameState } });
-        const hangmanStage = HANGMAN_STAGES[6 - remainingGuesses];
-        await client.sendMessage(
-          chatId,
-          `Wrong guess! "${letter}" is not in the word. You have ${remainingGuesses} guesses left.\n\n${hangmanStage}\n\n\`\`\`${hiddenWord}\`\`\`\n\nSend !hangman [letter] to guess.`
-        );
       }
       break;
     }
