@@ -210,8 +210,8 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       const scoreMsg = `Hangman scores in ${(await msg.getChat()).name}:
 ${(
   await Promise.all(
-    scores.map(async (v) => {
-      return `${await getName(v.authorId)}: ${v.score} points`;
+    scores.map(async (v, i) => {
+      return `${i + 1}. ${await getName(v.authorId)}: ${v.score} points`;
     })
   )
 ).join("\n")}`;
