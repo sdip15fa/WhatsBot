@@ -195,6 +195,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
           { $set: { hangman: { perPerson: !perPerson } } },
           { upsert: true }
         );
+        await hangmanCollection.deleteMany({ chatId });
         return await client.sendMessage(
           chatId,
           // per-person mode is changed to the opposite
