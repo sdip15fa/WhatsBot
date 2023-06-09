@@ -321,7 +321,15 @@ ${(
           }
         }
         if (!letter || !/^[a-z]$/.test(letter)) {
-          await client.sendMessage(chatId, `Please enter a valid letter.`);
+          await client.sendMessage(
+            chatId,
+            `${
+              perPerson ? `@${contact.id.user} ` : ""
+            }Please enter a valid letter.`,
+            {
+              mentions: [contact],
+            }
+          );
           continue;
         }
         if (guessedLetters.includes(letter)) {
