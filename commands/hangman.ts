@@ -129,7 +129,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   const hangmanScoreCollection = db("hangman-score").coll;
   const chatsCollection = db("chats").coll;
   const perPerson =
-    (await chatsCollection.findOne({ chatId }))?.hangman.perPerson || false;
+    (await chatsCollection.findOne({ chatId }))?.hangman?.perPerson || false;
 
   const query = {
     chatId,
@@ -139,7 +139,8 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   switch (args[0]) {
     case "start": {
       if (await hangmanCollection.findOne(query)) {
-        return await msg.reply(
+        return await client.sendMessage(
+          chatId,
           "A game is already in progress. Type !hangman delete to delete the current game."
         );
       }
@@ -153,7 +154,8 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       };
       const gameDoc: GameDocument = { ...query, gameState };
       await hangmanCollection.insertOne(gameDoc);
-      await msg.reply(
+      await client.sendMessage(
+        chatId,
         `The word has ${word.length} letters. Here's the hidden word:\n\n\`\`\`${hiddenWord}\`\`\`\n\nSend \`\`\`!hangman [letter]\`\`\` to guess.`
       );
       break;
@@ -162,11 +164,12 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       const game = (await hangmanCollection.findOne(query)) as GameDocument;
       if (game) {
         await hangmanCollection.deleteOne(query);
-        return await msg.reply(
+        return await client.sendMessage(
+          chatId,
           `Game deleted. The word was ${game.gameState.word}.`
         );
       }
-      return await msg.reply("No games ongoing!");
+      return await client.sendMessage(chatId, "No games ongoing!");
     }
     case "config": {
       if (args[1] === "per-person") {
@@ -175,19 +178,24 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
           { $set: { hangman: { perPerson: !perPerson } } },
           { upsert: true }
         );
-        return await msg.reply(
+        return await client.sendMessage(
+          chatId,
           // per-person mode is changed to the opposite
           `Per-person mode ${!perPerson ? "enabled" : "disabled"}.`
         );
       } else {
-        await msg.reply(`Available configs:
-- per-person: enable per-person mode, and thus the score counting`);
+        await client.sendMessage(
+          chatId,
+          `Available configs:
+- per-person: enable per-person mode, and thus the score counting`
+        );
       }
       break;
     }
     case "score": {
       if (!perPerson) {
-        return await msg.reply(
+        return await client.sendMessage(
+          chatId,
           "Please enable per-person mode with ```!hangman config per-person``` first."
         );
       }
@@ -197,7 +205,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         .limit(10)
         .toArray()) as ScoreDocument[];
       if (scores.length === 0) {
-        return await msg.reply("No scores yet.");
+        return await client.sendMessage(chatId, "No scores yet.");
       }
       const scoreMsg = `Hangman scores in ${(await msg.getChat()).name}:
 ${(
@@ -208,7 +216,7 @@ ${(
   )
 ).join("\n")}`;
 
-      await msg.reply(scoreMsg);
+      await client.sendMessage(chatId, scoreMsg);
       break;
     }
     default: {
@@ -217,7 +225,8 @@ ${(
           query
         )) as GameDocument;
         if (!gameDoc) {
-          await msg.reply(
+          await client.sendMessage(
+            chatId,
             `Use \`\`\`!hangman start\`\`\` to start a new game.`
           );
           return;
@@ -228,7 +237,8 @@ ${(
         const letter = arg.toLowerCase();
         if (new RegExp(`^[a-z]{${gameState.word.length}}$`).test(letter)) {
           if (hiddenWord.split("").filter((i) => i === "_").length <= 1) {
-            return await msg.reply(
+            return await client.sendMessage(
+              chatId,
               "You can't guess the whole word when only one character is remaining!"
             );
           }
@@ -240,7 +250,8 @@ ${(
                 { upsert: true }
               );
             }
-            await msg.reply(
+            await client.sendMessage(
+              chatId,
               `Congratulations! You won! The word was "${word}".${
                 perPerson
                   ? ` You now have ${
@@ -257,18 +268,20 @@ ${(
             await hangmanCollection.deleteOne(query);
             return;
           } else {
-            await msg.reply(
+            await client.sendMessage(
+              chatId,
               `Wrong guess! The word ${letter} is incorrect! Guessing the whole word does not count against your remaining chances.`
             );
             continue;
           }
         }
         if (!letter || !/^[a-z]$/.test(letter)) {
-          await msg.reply(`Please enter a valid letter.`);
+          await client.sendMessage(chatId, `Please enter a valid letter.`);
           continue;
         }
         if (guessedLetters.includes(letter)) {
-          await msg.reply(
+          await client.sendMessage(
+            chatId,
             `You already guessed "${letter}". Try another letter.`
           );
           continue;
@@ -290,7 +303,8 @@ ${(
                 { upsert: true }
               );
             }
-            await msg.reply(
+            await client.sendMessage(
+              chatId,
               `Congratulations! You won! The word was "${word}".${
                 perPerson
                   ? ` You now have ${
@@ -309,12 +323,14 @@ ${(
           }
           gameState.hiddenWord = hiddenWord;
           await hangmanCollection.updateOne(query, { $set: { gameState } });
-          await msg.reply(
+          await client.sendMessage(
+            chatId,
             `Good guess! ${letter} is correct! Here's the updated hidden word:\n\n\`\`\`${hiddenWord}\`\`\`\n\nSend !hangman [letter] to guess.`
           );
         } else {
           if (guessesLeft <= 1) {
-            await msg.reply(
+            await client.sendMessage(
+              chatId,
               `You lose! The word was "${word}".\n\n${HANGMAN_STAGES[6]}\n\nTry again with !hangman start.`
             );
             await hangmanCollection.deleteOne(query);
@@ -325,7 +341,8 @@ ${(
           gameState.guessedLetters = guessedLetters;
           await hangmanCollection.updateOne(query, { $set: { gameState } });
           const hangmanStage = HANGMAN_STAGES[6 - remainingGuesses];
-          await msg.reply(
+          await client.sendMessage(
+            chatId,
             `Wrong guess! "${letter}" is not in the word. You have ${remainingGuesses} guesses left.\n\n${hangmanStage}\n\n\`\`\`${hiddenWord}\`\`\`\n\nSend !hangman [letter] to guess.`
           );
         }
