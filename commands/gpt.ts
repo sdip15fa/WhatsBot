@@ -3,12 +3,16 @@ import { ChatGPTAPI } from "chatgpt";
 import { Client, Message } from "whatsapp-web.js";
 import db from "../db/index.js";
 
-const api = new ChatGPTAPI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
+
+  if (!process.env.OPENAI_API_KEY) {
+    return client.sendText(
+      chatId,
+      "Sorry, chatgpt not / no longer available."
+    )
+  }
 
   // Check if this chatgpt plugin was executed less than a minute ago
   const lastExecution = await db("gpt").coll.findOne({ id: chatId });
@@ -40,6 +44,10 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   if (text.length > 4000) {
     return client.sendMessage(chatId, "Prompt too long.");
   }
+
+  const api = new ChatGPTAPI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
 
   const res = await api.sendMessage(text, {
     parentMessageId,
