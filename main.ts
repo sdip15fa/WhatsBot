@@ -449,7 +449,7 @@ ${msg.body || msg.type}`,
     if (
       chatId &&
       !(await db("chats").coll.findOne({ chatId, disabled: true })) &&
-      (await msg.getContact())?.isMyContact &&
+      (await msg.getContact())?.name &&
       msg.body
     ) {
       const triggers = suicideWordList.map((x) => x.replace(/\|/g, " *"));
@@ -502,7 +502,7 @@ https://faq.whatsapp.com/1417269125743673
 
     if (
       msg.body?.startsWith?.("!") &&
-      ((await msg.getContact())?.isMyContact || msg.fromMe)
+      ((await msg.getContact())?.name || msg.fromMe)
     ) {
       const args = msg.body?.slice?.(1)?.trim?.()?.split?.(/ +/g);
       const command = args.shift().toLowerCase();
