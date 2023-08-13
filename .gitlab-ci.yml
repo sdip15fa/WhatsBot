@@ -41,7 +41,7 @@ docker-build:
         - Dockerfile
 
 update-dependencies:
-  image: node:18-alpine
+  image: node:18
   before_script:
     - apk add git python3 make gcc pkgconfig
     - git config --global user.email "bot@wcyat.me"
