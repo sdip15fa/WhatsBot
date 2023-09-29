@@ -1,14 +1,13 @@
 // Import necessary modules and dependencies
 import { LLM } from "llama-node";
 import { LLamaCpp } from "llama-node/dist/llm/llama-cpp.js";
-import path from "path";
 import { Client, Message } from "whatsapp-web.js";
 import config from "../config.js";
 
 const modelPath = config.llama_model_path; // Retrieve model path from environment variable
 const llama = new LLM(LLamaCpp);
 const llama_config = {
-  modelPath: path.resolve(__dirname, modelPath), // Resolve model path based on the environment variable
+  modelPath, // Resolve model path based on the environment variable
   enableLogging: true,
   nCtx: 1024,
   seed: 0,
