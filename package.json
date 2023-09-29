@@ -49,6 +49,7 @@
     "gifencoder": "^2.0.1",
     "gify": "^0.2.0",
     "humanize-duration": "^3.27.3",
+    "llama-node": "^0.1.6",
     "metar": "^1.0.0",
     "mime-to-extensions": "^1.0.2",
     "mongodb": "^4.12.1",

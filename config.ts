@@ -1,5 +1,4 @@
 // Add values if you are not using env vars
-import fs from "fs";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -11,6 +10,7 @@ const config = {
   default_tr_lang: process.env.DEFAULT_TR_LANG || "en",
   enable_delete_alert: process.env.ENABLE_DELETE_ALERT || "true",
   ocr_space_api_key: process.env.OCR_SPACE_API_KEY || "",
+  llama_model_path: process.env.LLAMA_MODEL_PATH || "",
 };
 
 export default config;

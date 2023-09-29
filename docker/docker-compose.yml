@@ -12,6 +12,7 @@ services:
      - ./session.secure:/app/session.secure
      - ./.wwebjs_auth:/app/.wwebjs_auth
      - ./wtstodis-data:/app/data
+     - ./llama:/app/llama
     environment:
       SESSION_KEY: ${SESSION_KEY}
       PMPERMIT_ENABLED: ${PMPERMIT_ENABLED}
@@ -32,6 +33,7 @@ services:
       BITLY_API_KEY: ${BITLY_API_KEY}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       TZ: ${TZ:-Asia/Hong_Kong}
+      LLAMA_MODEL_PATH: ${LLAMA_MODEL_PATH}
     networks:
       - whatsbot-network
   wtstodis-mongo:

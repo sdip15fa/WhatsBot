@@ -53,6 +53,7 @@ import dice from "./dice.js";
 import hangman from "./hangman.js";
 import ttt from "./ttt.js";
 import hm from "./hm.js";
+import llama from "./llama.js";
 
 export const commands = new Map();
 
@@ -111,3 +112,4 @@ commands.set(dice.command.slice(1), dice);
 commands.set(hangman.command.slice(1), hangman);
 commands.set(hm.command.slice(1), hm);
 commands.set(ttt.command.slice(1), ttt);
+commands.set(llama.command.slice(1), llama);
