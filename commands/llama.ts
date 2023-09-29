@@ -31,7 +31,13 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   }
 
   // Extract the text from the user's message
-  const text = args.join(" ");
+  const quotedMsg = msg.hasQuotedMsg && (await msg.getQuotedMessage());
+
+  if (!args.length && !quotedMsg.body) {
+    return client.sendMessage(chatId, "Please provide prompt to llama!");
+  }
+
+  const text = args.join(" ") || quotedMsg.body;
 
   // Call Llama model with the obtained text
   const response = await llamaChat(text);
