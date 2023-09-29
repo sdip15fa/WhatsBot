@@ -52,7 +52,7 @@
     "llama-node": "^0.1.6",
     "metar": "^1.0.0",
     "mime-to-extensions": "^1.0.2",
-    "mongodb": "^4.12.1",
+    "mongodb": "^4.17.0",
     "nato-pad": "^0.0.4",
     "node-cron": "^3.0.0",
     "node-html-parser": "^6.1.4",
