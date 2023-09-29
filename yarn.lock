@@ -983,7 +983,7 @@
   resolved "https://registry.yarnpkg.com/@llama-node/core/-/core-0.1.6.tgz#e7f2a5c22bccf5bf5b4d3e64af755e4e6ce06002"
   integrity sha512-Mg6lZ0jjOhK2AhvUOPZ4WDb0Rap02gwUbcm4Q4gIV1WsLpB/bGlgxq0z7uXF+3NExAvkcv3/bb1MujrE6re34g==
 
-"@llama-node/llama-cpp@0.1.6":
+"@llama-node/llama-cpp@0.1.6", "@llama-node/llama-cpp@^0.1.6":
   version "0.1.6"
   resolved "https://registry.yarnpkg.com/@llama-node/llama-cpp/-/llama-cpp-0.1.6.tgz#206d515d5b93f9908657039b94f5540b50b689f9"
   integrity sha512-AzU2Gc5bX5V74SnO9E17IA5N/Rbd8trd7qkzp/H4zmmz/Chh7MmaiUhAewUt7kPuk3/LahGiDxxAOjiKtMJiNQ==
