@@ -28,16 +28,8 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
 
   const text = args.join(" ") || quotedMsg.body;
 
-  const prompt = `Below is an instruction that describes a task. Write a response that appropriately completes the request.
-
-### Instruction:
-
-${text}
-
-### Response:`;
-
   // Call Llama model with the obtained text
-  const response = await session.prompt(prompt);
+  const response = await session.prompt(text);
 
   // Send the response back to the user
   await client.sendMessage(chatId, `Llama: ${response}`);
