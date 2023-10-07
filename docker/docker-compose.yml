@@ -33,7 +33,9 @@ services:
       BITLY_API_KEY: ${BITLY_API_KEY}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       TZ: ${TZ:-Asia/Hong_Kong}
-      LLAMA_MODEL_PATH: ${LLAMA_MODEL_PATH}
+      CF_WORKER_URL: ${CF_WORKER_URL}
+      CF_WORKER_USERNAME: ${CF_WORKER_USERNAME}
+      CF_WORKER_PASSWORD: ${CF_WORKER_PASSWORD}
     networks:
       - whatsbot-network
   wtstodis-mongo:

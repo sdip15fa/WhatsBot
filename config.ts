@@ -10,7 +10,11 @@ const config = {
   default_tr_lang: process.env.DEFAULT_TR_LANG || "en",
   enable_delete_alert: process.env.ENABLE_DELETE_ALERT || "true",
   ocr_space_api_key: process.env.OCR_SPACE_API_KEY || "",
-  llama_model_path: process.env.LLAMA_MODEL_PATH || "",
+  cf_worker: {
+    url: process.env.CF_WORKER_URL,
+    username: process.env.CF_WORKER_USERNAME,
+    password: process.env.CF_WORKER_PASSWORD,
+  },
 };
 
 export default config;
