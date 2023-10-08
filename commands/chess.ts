@@ -88,7 +88,7 @@ const makeComputerMove = async (
   chess: Chess
 ) => {
   const fen = chess.fen();
-  const bestMove: string = await getBestMove(fen, 30);
+  const bestMove: string = await getBestMove(fen, 15);
 
   if (bestMove) {
     chess.move(bestMove);
@@ -102,6 +102,8 @@ async function getBestMove(fen: string, depth = 20): Promise<string> {
   return await new Promise((resolve, reject) => {
     const stockfishPath = "/usr/games/stockfish";
     const stockfish = spawn(stockfishPath);
+    const moves: string[] = [];
+    let movesLength = 0;
 
     let bestMove = "";
 
@@ -112,22 +114,31 @@ async function getBestMove(fen: string, depth = 20): Promise<string> {
         if (line.includes("bestmove")) {
           const parts = line.split(" ");
           bestMove = parts[1].trim();
+          moves.push(bestMove);
+          // resolve(bestMove);
         }
       });
-      resolve(bestMove);
     });
 
     stockfish.stdout.on("exit", (code) => {
       if (code !== 0) {
         reject(`Stockfish exited with code ${code}.`);
       }
-      resolve(bestMove);
+      // resolve(bestMove);
     });
 
     stockfish.stdin.write("uci\n");
     stockfish.stdin.write(`position fen ${fen}\n`);
     stockfish.stdin.write(`go depth ${depth}\n`);
-    stockfish.stdin.write("quit\n");
+    // stockfish.stdin.write("quit\n");
+
+    (async () => {
+      while (movesLength !== moves.length || moves.length == 0) {
+        movesLength = moves.length;
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+      resolve(moves[moves.length - 1]);
+    })();
   });
 }
 
