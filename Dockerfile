@@ -20,7 +20,7 @@ USER root
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y ffmpeg && rm -rf /var/lib/{apt,dpkg,cache,log}/
+RUN apt-get update && apt-get install -y ffmpeg stockfish && rm -rf /var/lib/{apt,dpkg,cache,log}/
 
 COPY --from=build /app/dist ./
 COPY ./yarn.lock ./yarn.lock

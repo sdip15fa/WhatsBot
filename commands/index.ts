@@ -54,6 +54,7 @@ import hangman from "./hangman.js";
 import ttt from "./ttt.js";
 import hm from "./hm.js";
 import llama from "./llama.js";
+import chess from "./chess.js";
 
 export const commands = new Map();
 
@@ -113,3 +114,4 @@ commands.set(hangman.command.slice(1), hangman);
 commands.set(hm.command.slice(1), hm);
 commands.set(ttt.command.slice(1), ttt);
 commands.set(llama.command.slice(1), llama);
+commands.set(chess.command.slice(1), chess);
