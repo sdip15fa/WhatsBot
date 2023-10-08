@@ -88,7 +88,7 @@ const makeComputerMove = async (
   chess: Chess
 ) => {
   const fen = chess.fen();
-  const bestMove: string = await getBestMove(fen, 10);
+  const bestMove: string = await getBestMove(fen, 30);
 
   if (bestMove) {
     chess.move(bestMove);
@@ -98,7 +98,7 @@ const makeComputerMove = async (
   }
 };
 
-async function getBestMove(fen: string, depth = 10): Promise<string> {
+async function getBestMove(fen: string, depth = 30): Promise<string> {
   return await new Promise((resolve) => {
     const stockfishPath = "/usr/games/stockfish";
     const stockfish = spawn(stockfishPath);
@@ -107,13 +107,11 @@ async function getBestMove(fen: string, depth = 10): Promise<string> {
 
     stockfish.stdout.on("data", (data) => {
       const output: string = data.toString();
-      console.log(output);
 
       output.split("\n").forEach((line) => {
         if (line.includes("bestmove")) {
           const parts = line.split(" ");
           bestMove = parts[1].trim();
-          console.log(bestMove);
           resolve(bestMove);
         }
       });
