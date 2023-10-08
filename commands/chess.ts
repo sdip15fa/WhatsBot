@@ -42,7 +42,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         return await db("chess").coll.deleteOne({ chatId });
       }
 
-      await makeComputerMove(client, chatId, chess);
+      await makeComputerMove(client, chatId, chess, chessDoc.depth || 15);
       printBoard(client, chatId, chess);
 
       if (chess.isGameOver()) {
@@ -66,9 +66,20 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     }
   }
 
+  if (command === "depth") {
+    const depth = parseInt(args[1]);
+    if (isNaN(depth) || depth < 10 || depth > 20) {
+      client.sendMessage(chatId, "Invalid depth. Valid depths are 11-20.");
+      return;
+    }
+    await db("chess").coll.updateOne({ chatId }, { $set: { depth } });
+    client.sendMessage(chatId, "Depth set to " + depth);
+    return;
+  }
+
   client.sendMessage(
     chatId,
-    "Invalid command. Use `!chess start` to start a new game or `!chess move [move]` to make a move."
+    "Invalid command. Use `!chess start` to start a new game or `!chess depth [10-20]` to set stockfish depth or `!chess move [move]` to make a move."
   );
 };
 const printBoard = async (client: Client, chatId: string, chess: Chess) => {
@@ -85,10 +96,11 @@ const printBoard = async (client: Client, chatId: string, chess: Chess) => {
 const makeComputerMove = async (
   client: Client,
   chatId: string,
-  chess: Chess
+  chess: Chess,
+  depth = 15
 ) => {
   const fen = chess.fen();
-  const bestMove: string = await getBestMove(fen, 15);
+  const bestMove: string = await getBestMove(fen, depth);
 
   if (bestMove) {
     chess.move(bestMove);
@@ -98,7 +110,7 @@ const makeComputerMove = async (
   }
 };
 
-async function getBestMove(fen: string, depth = 20): Promise<string> {
+async function getBestMove(fen: string, depth = 15): Promise<string> {
   return await new Promise((resolve, reject) => {
     const stockfishPath = "/usr/games/stockfish";
     const stockfish = spawn(stockfishPath);
