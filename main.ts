@@ -445,7 +445,7 @@ ${msg.body || msg.type}`,
 
   // suicide
   wtsClient.on("message", async (msg) => {
-    const chatId = (await msg.getChat())?.id;
+    const chatId = (await msg.getChat())?.id._serialized;
     if (
       chatId &&
       !(await db("chats").coll.findOne({ chatId, disabled: true })) &&
