@@ -8,10 +8,14 @@ import db from "../db/index.js";
 import ChessImageGenerator from "@newyork.anthonyng/chess-image-generator";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
-  const chatId = (await msg.getChat()).id._serialized;
+  const chat = await msg.getChat();
+  const chatId = chat.id._serialized;
   const command = args[0];
 
   const chessDoc = await db("chess").coll.findOne({ chatId });
+  const mode =
+    (await db("chats").coll.findOne({ chatId }))?.chess?.mode ||
+    (chat.isGroup ? "pvp" : "pvc");
   const fen = chessDoc?.fen;
 
   if (command === "start") {
@@ -33,7 +37,12 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
 
     try {
       chess.move(move);
-      client.sendMessage(chatId, "You played: " + move);
+      client.sendMessage(
+        chatId,
+        `${
+          chess.moveNumber() % 2 ? "White" : "Black"
+        } played: ${chess.moveNumber()}. ${move}`
+      );
       // printBoard(client, chatId, chess);
 
       if (chess.isGameOver()) {
@@ -42,7 +51,9 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         return await db("chess").coll.deleteOne({ chatId });
       }
 
-      await makeComputerMove(client, chatId, chess, chessDoc.depth || 15);
+      if (mode === "pvc") {
+        await makeComputerMove(client, chatId, chess, chessDoc.depth || 15);
+      }
       printBoard(client, chatId, chess);
 
       if (chess.isGameOver()) {
@@ -69,7 +80,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   if (command === "depth") {
     const depth = parseInt(args[1]);
     if (isNaN(depth) || depth < 10 || depth > 20) {
-      client.sendMessage(chatId, "Invalid depth. Valid depths are 11-20.");
+      client.sendMessage(chatId, "Invalid depth. Valid depths are 10-20.");
       return;
     }
     await db("chess").coll.updateOne({ chatId }, { $set: { depth } });
@@ -77,9 +88,27 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     return;
   }
 
+  if (command === "pvp") {
+    await db("chats").coll.updateOne(
+      { chatId },
+      { $set: { "chess.mode": "pvp" } },
+      { upsert: true }
+    );
+    await client.sendMessage(chatId, "Mode set to pvp.");
+  }
+
+  if (command === "pvc") {
+    await db("chats").coll.updateOne(
+      { chatId },
+      { $set: { "chess.mode": "pvc" } },
+      { upsert: true }
+    );
+    await client.sendMessage(chatId, "Mode set to pvc.");
+  }
+
   client.sendMessage(
     chatId,
-    "Invalid command. Use `!chess start` to start a new game or `!chess depth [10-20]` to set stockfish depth or `!chess move [move]` to make a move."
+    "Invalid command. Use `!chess start` to start a new game or `!chess depth [10-20]` to set stockfish depth or `!chess move [move]` to make a move or `!chess pvp` to play with others or `!chess pvc` to play with computer."
   );
 };
 const printBoard = async (client: Client, chatId: string, chess: Chess) => {
@@ -164,6 +193,9 @@ export default {
   • Start a game: \`!chess start\`
   • Make a move: \`!chess move [move]\`
   • Help: \`!chess help\`
+  • Set mode:
+  • \`!chess pvp\`
+  • \`!chess pvc\`
   `,
   execute,
   public: true,
