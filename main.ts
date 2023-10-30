@@ -543,6 +543,33 @@ https://faq.whatsapp.com/1417269125743673
     }
   });
 
+  wtsClient.on("message_edit", async (after, before) => {
+    try {
+      if (before) {
+        if (config.enable_delete_alert == "true") {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const chat = await after.getChat();
+          if (chat.id._serialized === process.env.WTS_OWNER_ID) return;
+          wtsClient
+            .sendMessage(
+              process.env.WTS_OWNER_ID,
+              `_${after.isStatus ? "Status" : "Message"} from ${
+                (await after.getContact())?.name ||
+                (after.author || after.from)?.split("@")[0]
+              } with id \`\`\`${after.id._serialized}\`\`\` sent *${timeToWord(
+                after.timestamp * 1000
+              )} from now* was deleted in ${
+                chat.name || chat.id
+              }_ 👇👇\n\n${before}`
+            )
+            .catch(console.log);
+        }
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  });
+
   wtsClient.on("message_revoke_everyone", async (_after, before) => {
     try {
       if (before) {
