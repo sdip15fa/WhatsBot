@@ -55,6 +55,7 @@ import ttt from "./ttt.js";
 import hm from "./hm.js";
 import llama from "./llama.js";
 import chess from "./chess.js";
+import autoreply from "./autoreply.js";
 
 export const commands = new Map();
 
@@ -115,3 +116,4 @@ commands.set(hm.command.slice(1), hm);
 commands.set(ttt.command.slice(1), ttt);
 commands.set(llama.command.slice(1), llama);
 commands.set(chess.command.slice(1), chess);
+commands.set(autoreply.command.slice(1), autoreply);

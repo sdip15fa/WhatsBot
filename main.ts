@@ -308,6 +308,13 @@ export default async function main() {
     }
   });
 
+  wtsClient.on("message", async (msg) => {
+    const chatId = (await msg.getChat()).id._serialized;
+    if ((await db("chats").coll.findOne({ chatId }))?.autoreply) {
+      await wtsClient.sendMessage(chatId, msg.body);
+    }
+  });
+
   wtsClient.on("message_revoke_everyone", async (_msg, before) => {
     const groupId = (await before.getChat())?.id?._serialized;
     if (groupId && !before.isStatus) {
