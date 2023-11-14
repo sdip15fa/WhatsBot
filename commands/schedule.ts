@@ -39,7 +39,12 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     .schedule(date, "send message", {
       id,
       chats,
-      body: quoted.body,
+      body: msg.fromMe
+        ? ""
+        : `${
+            (await msg.getContact())?.name ||
+            (msg.author || msg.from)?.split("@")[0]
+          }: ` + quoted.body,
       sticker: quoted.type === "sticker",
       ...(quoted.hasMedia &&
         media && {
@@ -66,5 +71,5 @@ export default {
   isDependent: false,
   help: `*Schedule a message to be sent at a specific time.*\n\nReply to the message you want to schedule.\n\n*!schedule [chat id] [time]*\n\nIf the chat id is invalid / omitted the current chat would be used.\n\nTime example: \`\`\`in 1 minute\`\`\`\n\nFor list of chats and chat ids, use !chatlist.`,
   execute,
-  public: false,
+  public: true,
 };
