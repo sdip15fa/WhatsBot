@@ -41,7 +41,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         chatId,
         `${
           chess.moveNumber() % 2 ? "White" : "Black"
-        } played: ${chess.moveNumber()}. ${move}`
+        } played: ${chess.moveNumber()}. ${move}`,
       );
       // printBoard(client, chatId, chess);
 
@@ -64,14 +64,14 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
 
       await db("chess").coll.updateOne(
         { chatId },
-        { $set: { fen: chess.fen() } }
+        { $set: { fen: chess.fen() } },
       );
 
       return;
     } catch {
       client.sendMessage(
         chatId,
-        "Invalid move. Please provide a valid move in algebraic notation (e.g., e2e4)."
+        "Invalid move. Please provide a valid move in algebraic notation (e.g., e2e4).",
       );
       return;
     }
@@ -92,23 +92,29 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     await db("chats").coll.updateOne(
       { chatId },
       { $set: { "chess.mode": "pvp" } },
-      { upsert: true }
+      { upsert: true },
     );
-    await client.sendMessage(chatId, "Mode set to pvp.");
+    return await client.sendMessage(chatId, "Mode set to pvp.");
   }
 
   if (command === "pvc") {
     await db("chats").coll.updateOne(
       { chatId },
       { $set: { "chess.mode": "pvc" } },
-      { upsert: true }
+      { upsert: true },
     );
-    await client.sendMessage(chatId, "Mode set to pvc.");
+    return await client.sendMessage(chatId, "Mode set to pvc.");
   }
 
   client.sendMessage(
     chatId,
-    "Invalid command. Use `!chess start` to start a new game or `!chess depth [10-20]` to set stockfish depth or `!chess move [move]` to make a move or `!chess pvp` to play with others or `!chess pvc` to play with computer."
+    `*Chess Game Commands*:
+• Start a game: \`!chess start\`
+• Make a move: \`!chess move [move]\`
+• Help: \`!chess help\`
+• Set mode:
+• \`!chess pvp\`
+• \`!chess pvc\``,
   );
 };
 const printBoard = async (client: Client, chatId: string, chess: Chess) => {
@@ -118,7 +124,7 @@ const printBoard = async (client: Client, chatId: string, chess: Chess) => {
 
   client.sendMessage(
     chatId,
-    new MessageMedia("image/png", image.toString("base64"), chess.fen())
+    new MessageMedia("image/png", image.toString("base64"), chess.fen()),
   );
 };
 
@@ -126,7 +132,7 @@ const makeComputerMove = async (
   client: Client,
   chatId: string,
   chess: Chess,
-  depth = 15
+  depth = 15,
 ) => {
   const fen = chess.fen();
   const bestMove: string = await getBestMove(fen, depth);
