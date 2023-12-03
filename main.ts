@@ -311,6 +311,7 @@ export default async function main() {
   wtsClient.on("message", async (msg) => {
     const chatId = (await msg.getChat()).id._serialized;
     if ((await db("chats").coll.findOne({ chatId }))?.autoreply) {
+      if (!msg.body.trim().startsWith("$"))
       await wtsClient.sendMessage(chatId, msg.body);
     }
   });
