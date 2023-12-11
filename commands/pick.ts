@@ -5,6 +5,9 @@ const execute = async (_client: Client, msg: Message, args: string[]) => {
   if (msg.hasQuotedMsg) {
     args = (await msg.getQuotedMessage())?.body?.split("");
   }
+  args = args.map((arg) => {
+    return arg.replace(/!*(\S+)/, "$1");
+  });
   if (!args.length) {
     return msg.reply("Please provide options!");
   }
