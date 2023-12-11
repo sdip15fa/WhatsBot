@@ -56,6 +56,7 @@ import hm from "./hm.js";
 import llama from "./llama.js";
 import chess from "./chess.js";
 import autoreply from "./autoreply.js";
+import pick from "./pick.js";
 
 export const commands = new Map();
 
@@ -117,3 +118,4 @@ commands.set(ttt.command.slice(1), ttt);
 commands.set(llama.command.slice(1), llama);
 commands.set(chess.command.slice(1), chess);
 commands.set(autoreply.command.slice(1), autoreply);
+commands.set(pick.command.slice(1), pick);
