@@ -6339,7 +6339,7 @@ websocket-extensions@>=0.1.1:
 
 "whatsapp-web.js@https://github.com/pedroslopez/whatsapp-web.js":
   version "1.23.1-alpha.1"
-  resolved "https://github.com/pedroslopez/whatsapp-web.js#5001a8971450eaf342c2f4eaa9ab6a4bab377462"
+  resolved "https://github.com/pedroslopez/whatsapp-web.js#ac0a50082f3c6fba92916c98d002c3529381354c"
   dependencies:
     "@pedroslopez/moduleraid" "^5.0.2"
     fluent-ffmpeg "^2.1.2"
