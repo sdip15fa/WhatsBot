@@ -6333,8 +6333,8 @@ websocket-extensions@>=0.1.1:
   integrity sha512-OqedPIGOfsDlo31UNwYbCFMSaO9m9G/0faIHj5/dZFDMFqPTcx6UwqyOy3COEaEOg/9VsGIpdqn62W5KhoKSpg==
 
 "whatsapp-web.js@https://github.com/pedroslopez/whatsapp-web.js":
-  version "1.23.1-alpha.0"
-  resolved "https://github.com/pedroslopez/whatsapp-web.js#b5eb4f97ce0c7f9a63275841bef4e61d0e4b4db4"
+  version "1.23.1-alpha.1"
+  resolved "https://github.com/pedroslopez/whatsapp-web.js#981fa822a0e5fa2906ef6c2a2a926c926aa49079"
   dependencies:
     "@pedroslopez/moduleraid" "^5.0.2"
     fluent-ffmpeg "^2.1.2"
