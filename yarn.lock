@@ -1490,11 +1490,6 @@
     "@types/mime" "*"
     "@types/node" "*"
 
-"@types/urban-dictionary@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@types/urban-dictionary/-/urban-dictionary-3.0.0.tgz#6a10f692fd872b03758bcde3308ec6791c567a15"
-  integrity sha512-zGc/rL7a11fSf98MsVKnTLQ0s3BukUrdHRWe4Hf4jj3psTVqBIibv7cKUF23We3qDn29/2mYeo56jLZjnm5ZzA==
-
 "@types/uuid@^9.0.1":
   version "9.0.1"
   resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-9.0.1.tgz#98586dc36aee8dacc98cc396dbca8d0429647aa6"
@@ -6168,6 +6163,11 @@ typescript@^4.9.4:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.9.4.tgz#a2a3d2756c079abda241d75f149df9d561091e78"
   integrity sha512-Uz+dTXYzxXXbsFpM86Wh3dKCxrQqUcVMxwU54orwlJjOpO3ao8L7j5lH+dWfTwgCwIuM9GQ2kvVotzYJMXTBZg==
 
+ud-api@^3.0.2-2:
+  version "3.0.2-2"
+  resolved "https://registry.yarnpkg.com/ud-api/-/ud-api-3.0.2-2.tgz#02178c5206b0b0e3b57c34bb93bcc905556a92e8"
+  integrity sha512-tUPA0mmGTUD2rqdAcX+5neZo+5vOLr+bVOgiRUJxJgMAuajGzq9yjDYhjcHRI4zOBZoUlTJRij28BY7D1nlSTA==
+
 uid2@0.0.3:
   version "0.0.3"
   resolved "https://registry.yarnpkg.com/uid2/-/uid2-0.0.3.tgz#483126e11774df2f71b8b639dcd799c376162b82"
@@ -6226,11 +6226,6 @@ unzipper@^0.10.11:
     listenercount "~1.0.1"
     readable-stream "~2.3.6"
     setimmediate "~1.0.4"
-
-urban-dictionary@^3.0.2:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/urban-dictionary/-/urban-dictionary-3.0.2.tgz#8028350dfd57e80a17b4fdac1cbc81f0672a38bc"
-  integrity sha512-hoYevSg6JNr8NiYRtxz7sqBDBu4RL52Bd45L2jQQ44Rwrz6ACmnKnRcUkH2TIQRILN+viZMT/MYYU3OyBz68AA==
 
 uri-js@^4.2.2:
   version "4.4.1"
