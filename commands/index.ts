@@ -57,6 +57,7 @@ import llama from "./llama.js";
 import chess from "./chess.js";
 import autoreply from "./autoreply.js";
 import pick from "./pick.js";
+import transcribe from "./transcribe.js";
 
 export const commands = new Map();
 
@@ -119,3 +120,4 @@ commands.set(llama.command.slice(1), llama);
 commands.set(chess.command.slice(1), chess);
 commands.set(autoreply.command.slice(1), autoreply);
 commands.set(pick.command.slice(1), pick);
+commands.set(transcribe.command.slice(1), transcribe);
