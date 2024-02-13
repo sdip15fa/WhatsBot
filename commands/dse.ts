@@ -108,7 +108,7 @@ export default {
   command: "!dse",
   commandType: "plugin",
   isDependent: false,
-  help: `!dse [paper]
+  help: `Command: !dse [paper]
 
 Not supplying the paper will give the earliest paper.
 
