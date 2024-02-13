@@ -23,7 +23,6 @@ session-output/*
 session-output
 session.secure
 /.lh/
-**/*.js
 /dist/
 /docker/data
 /docker/wtstodis-data

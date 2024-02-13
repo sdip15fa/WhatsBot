@@ -29,7 +29,6 @@
   },
   "homepage": "https://gitlab.com/wcyat/whatsapp-to-discord",
   "dependencies": {
-    "@gradio/client": "^0.10.1",
     "@iamtraction/google-translate": "^2.0.1",
     "@newyork.anthonyng/chess-image-generator": "^1.0.0",
     "@types/gifencoder": "^2.0.1",
