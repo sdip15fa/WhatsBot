@@ -20,7 +20,7 @@ export default {
   command: "!pick", //command with prefix. Ex command: '!test'
   commandType: "plugin", //
   isDependent: false, //whether this command is related/dependent to some other command
-  help: "Randomly pick an option.\n\n!flip [option1] [option2] [option3] etc.", // a string descring how to use this command Ex = help : 'To use this command type !test arguments'
+  help: "Randomly pick an option.\n\n!pick [option1] [option2] [option3] etc.", // a string descring how to use this command Ex = help : 'To use this command type !test arguments'
   public: true,
   execute,
 };
