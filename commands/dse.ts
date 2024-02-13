@@ -53,20 +53,8 @@ const timetable: { [key: string]: string } = {
 };
 
 // Function to calculate duration before the start of an examination paper
-function timeUntilExam(paper: string = null) {
+function timeUntilExam(paper = "Chinese 1") {
   // If no paper is specified, find the paper with the earliest starting time
-  if (!paper) {
-    let earliestTime = Infinity;
-    let earliestPaper = null;
-    for (const key in timetable) {
-      const startTime = new Date(timetable[key]);
-      if (startTime.getDate() < earliestTime) {
-        earliestTime = startTime.getTime();
-        earliestPaper = key;
-      }
-    }
-    paper = earliestPaper;
-  }
 
   paper = paper
     .trim()
@@ -98,7 +86,7 @@ function timeUntilExam(paper: string = null) {
     round: true,
   });
 
-  return `Time until ${paper}: ${formattedDuration}`;
+  return `Time until HKDSE *${paper}* examination: ${formattedDuration}`;
 }
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
