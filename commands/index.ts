@@ -58,6 +58,7 @@ import chess from "./chess.js";
 import autoreply from "./autoreply.js";
 import pick from "./pick.js";
 import transcribe from "./transcribe.js";
+import dse from "./dse.js";
 
 export const commands = new Map();
 
@@ -121,3 +122,4 @@ commands.set(chess.command.slice(1), chess);
 commands.set(autoreply.command.slice(1), autoreply);
 commands.set(pick.command.slice(1), pick);
 commands.set(transcribe.command.slice(1), transcribe);
+commands.set(dse.command.slice(1), dse);
