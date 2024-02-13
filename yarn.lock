@@ -3267,7 +3267,7 @@ flatted@^3.1.0:
   resolved "https://registry.yarnpkg.com/flatted/-/flatted-3.2.7.tgz#609f39207cb614b89d0765b477cb2d437fbf9787"
   integrity sha512-5nqDSxl8nn5BSNxyR3n4I6eDmbolI6WT+QqR547RwxQapgjQBmtktdP+HTBb/a/zLsbzERTONyUB5pefh5TtjQ==
 
-fluent-ffmpeg@^2.1.2:
+fluent-ffmpeg@2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/fluent-ffmpeg/-/fluent-ffmpeg-2.1.2.tgz#c952de2240f812ebda0aa8006d7776ee2acf7d74"
   integrity sha512-IZTB4kq5GK0DPp7sGQ0q/BWurGHffRtQQwVkiqDgeO6wYJLLV5ZhgNOQ65loZxxuPMKZKZcICCUnaGtlxBiR0Q==
@@ -4048,11 +4048,6 @@ jsprim@^1.2.2:
     json-schema "0.4.0"
     verror "1.10.0"
 
-jsqr@^1.3.1:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/jsqr/-/jsqr-1.4.0.tgz#8efb8d0a7cc6863cb6d95116b9069123ce9eb2d1"
-  integrity sha512-dxLob7q65Xg2DvstYkRpkYtmKm2sPJ9oFhrhmudT1dZvNFFTlroai3AWSpLey/w5vMcLBXRgOJsbXpdN9HzU/A==
-
 jwa@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/jwa/-/jwa-1.4.1.tgz#743c32985cb9e98655530d53641b66c8645b039a"
@@ -4637,10 +4632,10 @@ node-static@^0.7.11:
     mime "^1.2.9"
     optimist ">=0.3.4"
 
-node-webpmux@^3.1.0:
-  version "3.1.3"
-  resolved "https://registry.yarnpkg.com/node-webpmux/-/node-webpmux-3.1.3.tgz#1111d74b0f588e3908ba16e579cdff0436a06c13"
-  integrity sha512-337vJ7dtoGUhE1zoN4s0mWqDO+RLVseShoWAy0FjGx0hsyDEKfVMAkHu4zfNf0RnPyGqGxnRrPZam36ld9KsxA==
+node-webpmux@3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/node-webpmux/-/node-webpmux-3.1.0.tgz#f8fdde2d6c55a51ffd5f91e3b0c70daae963b8d4"
+  integrity sha512-0fBo2eDIxLBVyFLqLJwPxQAgwRnMhv/l8M8kKWRuFvPz+InrLh+AAt8faVLaOlO8bQBA7MPEt5o12nc9uHu21g==
 
 nodemailer@^6.4.6:
   version "6.9.0"
@@ -6359,15 +6354,14 @@ websocket-extensions@>=0.1.1:
   integrity sha512-OqedPIGOfsDlo31UNwYbCFMSaO9m9G/0faIHj5/dZFDMFqPTcx6UwqyOy3COEaEOg/9VsGIpdqn62W5KhoKSpg==
 
 "whatsapp-web.js@https://github.com/pedroslopez/whatsapp-web.js":
-  version "1.23.1-alpha.1"
-  resolved "https://github.com/pedroslopez/whatsapp-web.js#981fa822a0e5fa2906ef6c2a2a926c926aa49079"
+  version "1.23.1-alpha.3"
+  resolved "https://github.com/pedroslopez/whatsapp-web.js#2100853727a01dba278275fa43ec16dbca2d6c79"
   dependencies:
     "@pedroslopez/moduleraid" "^5.0.2"
-    fluent-ffmpeg "^2.1.2"
-    jsqr "^1.3.1"
+    fluent-ffmpeg "2.1.2"
     mime "^3.0.0"
     node-fetch "^2.6.5"
-    node-webpmux "^3.1.0"
+    node-webpmux "3.1.0"
     puppeteer "^13.0.0"
   optionalDependencies:
     archiver "^5.3.1"
