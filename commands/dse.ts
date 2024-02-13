@@ -53,8 +53,12 @@ const timetable: { [key: string]: string } = {
 };
 
 // Function to calculate duration before the start of an examination paper
-function timeUntilExam(paper = "Chinese 1") {
+function timeUntilExam(paper: string) {
   // If no paper is specified, find the paper with the earliest starting time
+
+  if (!paper?.trim()) {
+    paper = "Chinese 1";
+  }
 
   paper = paper
     .trim()
