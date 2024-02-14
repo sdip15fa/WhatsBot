@@ -2,6 +2,7 @@
   "name": "wtstodis-worker",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
@@ -10,5 +11,7 @@
   "devDependencies": {
     "wrangler": "^3.0.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@cloudflare/ai": "^1.0.50"
+  }
 }
