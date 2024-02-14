@@ -9,7 +9,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   if (!config.cf_worker.url) {
     return client.sendMessage(
       chatId,
-      "Sorry, cf worker url not specified in the environment variable."
+      "Sorry, cf worker url not specified in the environment variable.",
     );
   }
 
@@ -21,19 +21,67 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   }
 
   const text = args.join(" ") || quotedMsg.body;
+  const messages: { role: "system" | "user"; content: string }[] = [];
+
+  if (
+    args.length &&
+    msg.hasQuotedMsg &&
+    quotedMsg.fromMe &&
+    quotedMsg.body.startsWith("Llama:")
+  ) {
+    let currMsg: Message | null = msg;
+    while (currMsg?.body) {
+      messages.unshift({
+        role:
+          currMsg.body.startsWith("Llama:") && currMsg.fromMe
+            ? "system"
+            : "user",
+        content: currMsg.body,
+      });
+      if (currMsg.hasQuotedMsg) {
+        const nextQuotedMsg = await currMsg.getQuotedMessage();
+        if (!nextQuotedMsg?.body) {
+          break;
+        }
+
+        if (
+          currMsg.body.startsWith("Llama:") &&
+          currMsg.fromMe &&
+          nextQuotedMsg.fromMe &&
+          nextQuotedMsg.body.startsWith("Llama:")
+        ) {
+          break;
+        }
+
+        if (
+          !(currMsg.body.startsWith("Llama:") && currMsg.fromMe) &&
+          !(nextQuotedMsg.fromMe && nextQuotedMsg.body.startsWith("Llama:"))
+        ) {
+          break;
+        }
+
+        currMsg = nextQuotedMsg;
+      } else {
+        break;
+      }
+    }
+  }
 
   const username = config.cf_worker.username;
   const password = config.cf_worker.password;
 
   const encodedCredentials = Buffer.from(`${username}:${password}`).toString(
-    "base64"
+    "base64",
   );
   const authHeader = `Basic ${encodedCredentials}`;
 
   // Call Llama model with the obtained text
   const response = await axios.get<{ response: string }>(config.cf_worker.url, {
     params: {
-      prompt: text,
+      ...(!messages?.length && { prompt: text }),
+      ...(messages?.length && {
+        messages: encodeURIComponent(JSON.stringify(messages)),
+      }),
     },
     headers: {
       Authorization: authHeader,
