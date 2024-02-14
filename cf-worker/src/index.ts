@@ -1,4 +1,6 @@
-import { Ai } from '@cloudflare/ai/dist/ai.js';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import { Ai } from '@cloudflare/ai';
 import { Env } from './types.js';
 import { BadRequestException } from './exceptions.js';
 import { basicAuthentication, verifyCredentials } from './auth.js';
@@ -47,23 +49,26 @@ export default {
 			const params = url.searchParams;
 
 			const prompt = params.get('prompt');
+			let messages: { role: 'user' | 'system'; content: string }[] = [];
+			try {
+				messages = JSON.parse(decodeURIComponent(params.get('messages')) || '[]');
+			} catch {
+				return new BadRequestException('Messages must be a valid JSON array.');
+			}
 
+			let response: string;
 			// prompt - simple completion style input
-			const simple = {
-				prompt: `Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\n Instruction: ${prompt}\n\n Response: \n\n`,
-			};
-			const response = await ai.run('@hf/thebloke/zephyr-7b-beta-awq', simple);
-			// tasks.push({ inputs: simple, response });
-
-			/*// messages - chat style input
-    let chat = {
-      messages: [
-        { role: 'system', content: 'You are a helpful assistant.' },
-        { role: 'user', content: 'Who won the world series in 2020?' }
-      ]
-    };
-    response = await ai.run('@cf/meta/llama-2-7b-chat-int8', chat);
-    tasks.push({ inputs: chat, response });*/
+			if (!messages?.length) {
+				const simple = {
+					prompt: `Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\n Instruction: ${prompt}\n\n Response: \n\n`,
+				};
+				response = await ai.run('@hf/thebloke/zephyr-7b-beta-awq', simple);
+			} else {
+				const chat = {
+					messages,
+				};
+				response = await ai.run('@cf/meta/llama-2-7b-chat-int8', chat);
+			}
 
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
