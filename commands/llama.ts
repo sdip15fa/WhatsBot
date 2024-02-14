@@ -36,7 +36,10 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
           currMsg.body.startsWith("Llama:") && currMsg.fromMe
             ? "system"
             : "user",
-        content: currMsg.body,
+        content:
+          currMsg.body.startsWith("Llama:") && currMsg.fromMe
+            ? currMsg.body.replace("Llama: ", "")
+            : currMsg.body,
       });
       if (currMsg.hasQuotedMsg) {
         const nextQuotedMsg = await currMsg.getQuotedMessage();
