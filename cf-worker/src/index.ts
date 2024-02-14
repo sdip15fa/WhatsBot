@@ -62,7 +62,7 @@ export default {
 				const simple = {
 					prompt: `Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\n Instruction: ${prompt}\n\n Response: \n\n`,
 				};
-				response = await ai.run('@hf/thebloke/zephyr-7b-beta-awq', simple);
+				response = await ai.run('@hf/thebloke/openhermes-2.5-mistral-7b-awq', simple);
 			} else {
 				const chat = {
 					messages,
