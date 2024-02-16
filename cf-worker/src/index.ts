@@ -49,7 +49,7 @@ export default {
 			const params = url.searchParams;
 
 			const prompt = params.get('prompt');
-			let messages: { role: 'user' | 'system'; content: string }[] = [];
+			let messages: { role: 'user' | 'system' | 'assistant'; content: string }[] = [];
 			try {
 				messages = JSON.parse(decodeURIComponent(params.get('messages')) || '[]');
 			} catch {
