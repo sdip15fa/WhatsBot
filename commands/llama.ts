@@ -22,13 +22,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
 
   const text = args.join(" ") || quotedMsg.body;
   const messages: { role: "system" | "user" | "assistant"; content: string }[] =
-    [
-      {
-        role: "system",
-        content:
-          "Below are a series of dialogues between various people and an AI assistant. The AI tries to be helpful, polite, honest, sophisticated, emotionally aware, and humble-but-knowledgeable. The assistant is happy to help with almost anything, and will do its best to understand exactly what is needed. It also tries to avoid giving false or misleading information, and it caveats when it isn't entirely sure about the right answer. That said, the assistant is practical and really does its best, and doesn't let caution get too much in the way of being useful.",
-      },
-    ];
+    [];
 
   if (
     args.length &&
@@ -89,8 +83,8 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   // Call Llama model with the obtained text
   const response = await axios.get<{ response: string }>(config.cf_worker.url, {
     params: {
-      ...(!(messages?.length > 1) && { prompt: text }),
-      ...(messages?.length > 1 && {
+      ...(!messages?.length && { prompt: text }),
+      ...(messages?.length && {
         messages: encodeURIComponent(JSON.stringify(messages)),
       }),
     },
