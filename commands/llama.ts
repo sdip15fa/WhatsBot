@@ -81,22 +81,29 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   );
   const authHeader = `Basic ${encodedCredentials}`;
 
-  // Call Llama model with the obtained text
-  const response = await axios.get<{ response: string }>(config.cf_worker.url, {
-    params: {
-      ...(!messages?.length && { prompt: text }),
-      ...(messages?.length && {
-        messages: encodeURIComponent(JSON.stringify(messages)),
-      }),
-    },
-    headers: {
-      Authorization: authHeader,
-    },
-  });
-
   try {
+    // Call Llama model with the obtained text
+    const response = await axios.get<{ response: string }>(
+      config.cf_worker.url,
+      {
+        params: {
+          ...(!messages?.length && { prompt: text }),
+          ...(messages?.length && {
+            messages: encodeURIComponent(JSON.stringify(messages)),
+          }),
+        },
+        headers: {
+          Authorization: authHeader,
+        },
+      },
+    );
+
     // Send the response back to the user
-    await client.sendMessage(chatId, `Llama: ${response.data.response}`);
+    try {
+      await msg.reply(chatId, `Llama: ${response.data.response}`);
+    } catch {
+      await client.sendMessage(chatId, `Llama: ${response.data.response}`);
+    }
   } catch {
     await client.sendMessage(chatId, "LLaMA generation failed.");
   }
