@@ -1,5 +1,6 @@
 //jshint esversion:8
 import whatsapp, { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 const { MessageMedia } = whatsapp;
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
@@ -11,7 +12,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   if (count <= 0) {
     await client.sendMessage(
       msg.to,
-      `🙇‍♂️ *Error*\n\n` + "```Count can't be zero.```"
+      `🙇‍♂️ *Error*\n\n` + "```Count can't be zero.```",
     );
     return 0;
   }
@@ -31,7 +32,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         await client.sendMessage(
           msg.to,
           new MessageMedia(media.mimetype, media.data, media.filename),
-          { sendMediaAsSticker: sticker }
+          { sendMediaAsSticker: sticker },
         );
     } else {
       for (let i = 0; i < count; i++)
@@ -44,13 +45,13 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     } else {
       await client.sendMessage(
         msg.to,
-        "```No text found for spamming!!! Please read !help spam.```"
+        "```No text found for spamming!!! Please read !help spam.```",
       );
     }
   }
 };
 
-export default {
+const command: Command = {
   name: "Spam",
   description: "spams a certain message for given number of times",
   command: "!spam",
@@ -60,3 +61,5 @@ export default {
   execute,
   public: false,
 };
+
+export default command;

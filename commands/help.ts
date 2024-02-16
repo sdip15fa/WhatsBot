@@ -44,7 +44,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   }
 };
 
-export default {
+const command: Command = {
   name: "help",
   description: "get information about available commands",
   command: "!help",
@@ -54,3 +54,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

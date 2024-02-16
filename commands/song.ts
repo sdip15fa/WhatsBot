@@ -1,4 +1,5 @@
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 
 //jshint esversion:8
 import fs from "fs";
@@ -8,20 +9,18 @@ import { search } from "../helpers/song.js";
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const getdata = await search(args.join(" "));
   const sendmessage = await client.sendMessage(
-    (
-      await msg.getChat()
-    ).id._serialized,
-    getdata.content
+    (await msg.getChat()).id._serialized,
+    getdata.content,
   ); // have to grab the message ID
   if (getdata.status) {
     fs.writeFileSync(
       path.join(__dirname, `../cache/song~${sendmessage.id.id}.json`),
-      JSON.stringify(getdata.songarray)
+      JSON.stringify(getdata.songarray),
     );
   }
 };
 
-export default {
+const command: Command = {
   name: "Search Song",
   description: "Search songs on jiosaavn",
   command: "!song",
@@ -31,3 +30,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

@@ -1,5 +1,6 @@
 //jshint esversion:8
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 
 const execute = async (client: Client, msg: Message) => {
   if (!msg.to.includes("-")) {
@@ -8,12 +9,12 @@ const execute = async (client: Client, msg: Message) => {
     unmuteDate.setSeconds(Number(unmuteDate.getSeconds()) + 3600);
     await chat.mute(unmuteDate);
     msg.reply(
-      `*🤫 Muted*\n\nYou have been muted for 1 hour\n\n _Powered by WhatsBot_`
+      `*🤫 Muted*\n\nYou have been muted for 1 hour\n\n _Powered by WhatsBot_`,
     );
   }
 };
 
-export default {
+const command: Command = {
   name: "Mute", //name of the module
   description: "mute the current chat", // short description of what this command does
   command: "!mute", //command with prefix. Ex command: '!test'
@@ -23,3 +24,5 @@ export default {
   execute,
   public: false,
 };
+
+export default command;

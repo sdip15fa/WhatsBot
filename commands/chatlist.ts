@@ -1,10 +1,11 @@
 //jshint esversion:8
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 
 const execute = async (client: Client, _msg: Message, args: string[]) => {
   const page = Number(args[0]) || 1;
   const chats = (await client.getChats()).filter(
-    (_v, index) => index < page * 20 && index >= (page - 1) * 20
+    (_v, index) => index < page * 20 && index >= (page - 1) * 20,
   );
   await client.sendMessage(
     process.env.WTS_OWNER_ID,
@@ -12,13 +13,13 @@ const execute = async (client: Client, _msg: Message, args: string[]) => {
 ${chats
   .map(
     (chat, index) =>
-      `${index + 1}. ${chat.name} \`\`\`${chat.id._serialized}\`\`\``
+      `${index + 1}. ${chat.name} \`\`\`${chat.id._serialized}\`\`\``,
   )
-  .join("\n")}`
+  .join("\n")}`,
   );
 };
 
-export default {
+const command: Command = {
   name: "Chat list",
   description: "Get a list of chats",
   command: "!chatlist",
@@ -28,3 +29,5 @@ export default {
   execute,
   public: false,
 };
+
+export default command;

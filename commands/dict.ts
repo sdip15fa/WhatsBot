@@ -1,4 +1,5 @@
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 import dictionary from "../helpers/dict.js";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
@@ -14,7 +15,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       chatId,
       definition.status
         ? `${definition.status} ${definition.title}`
-        : "An unknown error occurred."
+        : "An unknown error occurred.",
     );
   } else {
     await client.sendMessage(
@@ -29,7 +30,7 @@ ${definition.phonetics
     (phonetic, index) =>
       `${index + 1}.${phonetic.text ? `\nText: ${phonetic.text}` : ""}${
         phonetic.audio ? `\nAudio: ${phonetic.audio}` : ""
-      }`
+      }`,
   )
   ?.join("\n\n")}\n`
     : ""
@@ -59,21 +60,21 @@ ${def?.synonyms?.map((synonym) => `- ${synonym}`)?.join("\n")}`
           ? `\n_Antonyms_
 ${def?.antonyms?.map((antonym) => `- ${antonym}`)?.join("\n")}`
           : ""
-      }`
+      }`,
   )
-  ?.join("\n\n")}`
+  ?.join("\n\n")}`,
   )
   ?.join("\n\n")}${
         definition?.origin
           ? `\n\n*Origin*:
 ${definition?.origin}`
           : ""
-      }`
+      }`,
     );
   }
 };
 
-export default {
+const command: Command = {
   name: "Dictionary",
   description: "Get word definition",
   command: "!dict",
@@ -83,3 +84,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

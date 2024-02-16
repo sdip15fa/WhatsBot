@@ -1,5 +1,6 @@
 //jshint esversion:8
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 import db from "../db/index.js";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
@@ -24,17 +25,15 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   await db("chats").coll.updateOne(
     { chatId },
     { $set: { autoreply: !curr } },
-    { upsert: true }
+    { upsert: true },
   );
   await client.sendMessage(
-    (
-      await msg.getChat()
-    ).id._serialized,
-    `Autoreply set for ${chatId}.`
+    (await msg.getChat()).id._serialized,
+    `Autoreply set for ${chatId}.`,
   );
 };
 
-export default {
+const command: Command = {
   name: "Autoreply",
   description: "Set a chat to autoreply",
   command: "!autoreply",
@@ -44,3 +43,5 @@ export default {
   execute,
   public: false,
 };
+
+export default command;

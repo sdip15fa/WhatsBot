@@ -1,4 +1,5 @@
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 import { weakness } from "../helpers/weakness.js";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
@@ -9,7 +10,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   await client.sendMessage(chatId, weakness(args[0]));
 };
 
-export default {
+const command: Command = {
   name: "Weakness",
   description: "Get pokemon weakness",
   command: "!weakness",
@@ -19,3 +20,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

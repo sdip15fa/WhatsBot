@@ -1,6 +1,7 @@
 //jshint esversion:8
 import dictionary from "ud-api";
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 
 async function ud(term: string) {
   try {
@@ -35,7 +36,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   }
 };
 
-export default {
+const command: Command = {
   name: "Urban Dictionary",
   description: "Gets dictionary meanings of words",
   command: "!ud",
@@ -45,3 +46,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

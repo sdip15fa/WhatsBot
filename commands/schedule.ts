@@ -2,6 +2,7 @@
 import { randomBytes } from "crypto";
 import { Client, Message, MessageMedia } from "whatsapp-web.js";
 import { agenda } from "../helpers/agenda.js";
+import { Command } from "../types/command.js";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   if (!msg.hasQuotedMsg) {
@@ -24,7 +25,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
             msg.reply(`Chat ${chatId} not found`).catch(() => {});
             return false;
           }
-        })
+        }),
       )
     ).every((v) => v)
   )
@@ -63,7 +64,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     });
 };
 
-export default {
+const command: Command = {
   name: "Schedule message",
   description: "Schedule a message to be sent at a specific time",
   command: "!schedule",
@@ -73,3 +74,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

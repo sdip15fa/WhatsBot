@@ -1,5 +1,6 @@
 //jshint esversion:8
 import whatsapp, { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 const { MessageMedia } = whatsapp;
 
 const execute = async (client: Client, msg: Message) => {
@@ -18,15 +19,15 @@ const execute = async (client: Client, msg: Message) => {
       new MessageMedia(
         attachmentData.mimetype,
         attachmentData.data,
-        attachmentData.filename
-      )
+        attachmentData.filename,
+      ),
     );
   } else {
     await client.sendMessage(chatId, `🙇‍♂️ *Error*\n\n` + "```No media found```");
   }
 };
 
-export default {
+const command: Command = {
   name: "Get media",
   description: "Get media from message",
   command: "!media",
@@ -36,3 +37,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

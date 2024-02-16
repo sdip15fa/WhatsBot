@@ -1,5 +1,6 @@
 //jshint esversion:8
 import whatsapp, { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 const { MessageMedia } = whatsapp;
 import qr from "qr-image";
 
@@ -24,15 +25,13 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   }
 
   await client.sendMessage(
-    (
-      await msg.getChat()
-    ).id._serialized,
+    (await msg.getChat()).id._serialized,
     new MessageMedia(data.mimetype, data.data, data.filename),
-    { caption: `QR code for 👇\n` + "```" + msg.body + "```" }
+    { caption: `QR code for 👇\n` + "```" + msg.body + "```" },
   );
 };
 
-export default {
+const command: Command = {
   name: "QR generator",
   description: "Generates QR for given text",
   command: "!qr",
@@ -42,3 +41,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

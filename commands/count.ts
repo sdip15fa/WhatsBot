@@ -1,5 +1,6 @@
 //jshint esversion:8
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 import { agenda } from "../helpers/agenda.js";
 import { countMessage } from "../helpers/count.js";
 import { getDate } from "../helpers/date.js";
@@ -24,11 +25,11 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         {
           timezone: "Asia/Hong_Kong",
           skipImmediate: true,
-        }
+        },
       );
       return await client.sendMessage(
         chatId,
-        "Subscribed! Message counts will be sent at 23:59 every day."
+        "Subscribed! Message counts will be sent at 23:59 every day.",
       );
     } else {
       return await client.sendMessage(chatId, "Already subscribed!");
@@ -60,11 +61,11 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
 
   await client.sendMessage(
     chatId,
-    await countMessage(chatId, chat.name || "", date)
+    await countMessage(chatId, chat.name || "", date),
   );
 };
 
-export default {
+const command: Command = {
   name: "Count",
   description: "Get count of messages in the chat",
   command: "!count",
@@ -74,3 +75,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

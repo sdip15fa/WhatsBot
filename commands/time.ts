@@ -1,5 +1,6 @@
 //jshint esversion:8
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 
 function isValidTimeZone(tz: string) {
   if (!tz) {
@@ -23,7 +24,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   const timeZone = isValidTimeZone(args[0]) ? args[0] : process.env.TZ;
   try {
     const date = new Date(
-      (isValidTimeZone(args[0]) ? args[1] : args[0]) || new Date()
+      (isValidTimeZone(args[0]) ? args[1] : args[0]) || new Date(),
     );
     await client.sendMessage(
       chatId,
@@ -33,14 +34,14 @@ ${date.toLocaleString("en-UK", {
 })}
 
 ISO:
-\`\`\`${date.toISOString()}\`\`\``
+\`\`\`${date.toISOString()}\`\`\``,
     );
   } catch {
     return await client.sendMessage(chatId, "An error occured.");
   }
 };
 
-export default {
+const command: Command = {
   name: "Time",
   description: "Query time in specific time zone",
   command: "!time",
@@ -50,3 +51,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

@@ -1,11 +1,12 @@
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 
 const execute = async (client: Client, msg: Message) => {
   const chatId = (await msg.getChat()).id._serialized;
   if (!msg.hasQuotedMsg) {
     return await client.sendMessage(
       chatId,
-      "Please reply to a message to delete."
+      "Please reply to a message to delete.",
     );
   }
 
@@ -19,7 +20,7 @@ const execute = async (client: Client, msg: Message) => {
   }
 };
 
-export default {
+const command: Command = {
   name: "Delete",
   description: "Delete a message for everyone",
   command: "!delete",
@@ -29,3 +30,5 @@ export default {
   execute,
   public: false,
 };
+
+export default command;

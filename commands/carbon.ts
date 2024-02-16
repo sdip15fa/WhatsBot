@@ -2,6 +2,7 @@
 
 //TODO: fix it
 import whatsapp, { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 const { MessageMedia } = whatsapp;
 import axios from "../helpers/axios.js";
 
@@ -10,9 +11,9 @@ async function carbon(text: string) {
     .get<ArrayBuffer>(
       `https://carbonnowsh.herokuapp.com/?code=${text.replace(
         / /gi,
-        "+"
+        "+",
       )}&theme=darcula&backgroundColor=rgba(36, 75, 115)`,
-      { responseType: "arraybuffer" }
+      { responseType: "arraybuffer" },
     )
     .catch(() => {
       return null;
@@ -44,7 +45,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     await client.sendMessage(
       msg.to,
       `🙇‍♂️ *Error*\n\n` +
-        "```Something Unexpected Happened to create the Carbon.```"
+        "```Something Unexpected Happened to create the Carbon.```",
     );
   } else {
     await client.sendMessage(
@@ -53,12 +54,12 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       {
         caption:
           `Carbon for 👇\n` + "```" + msg.body.replace("!carbon ", "") + "```",
-      }
+      },
     );
   }
 };
 
-export default {
+const command: Command = {
   name: "Carbon",
   description: "Creates a carbon.now.sh image from text",
   command: "!carbon",
@@ -67,3 +68,5 @@ export default {
   help: `*Carbon*\n\nGenerate beautiful image with carbon.now.sh. Just send the text it will generate an image for you.\n\n*!carbon [Text]*\nor,\nReply a message with *!carbon* to Create`,
   execute,
 };
+
+export default command;

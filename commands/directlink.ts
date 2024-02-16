@@ -1,6 +1,7 @@
 //jshint esversion:8
 import FormData from "form-data";
 import { Client, Message, MessageMedia } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 import mime from "mime-to-extensions";
 import axios from "../helpers/axios.js";
@@ -38,15 +39,13 @@ const execute = async (client: Client, msg: Message) => {
     }
   } else {
     await client.sendMessage(
-      (
-        await msg.getChat()
-      ).id._serialized,
-      "Please reply to a media file"
+      (await msg.getChat()).id._serialized,
+      "Please reply to a media file",
     );
   }
 };
 
-export default {
+const command: Command = {
   name: "Direct Link",
   description:
     "uploads media toh telegra.ph and creates a direct download link",
@@ -57,3 +56,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

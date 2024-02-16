@@ -1,5 +1,6 @@
 //jshint esversion:8
 import whatsapp, { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 
 const execute = async (client: Client, msg: Message) => {
   const chatId = (await msg.getChat()).id._serialized;
@@ -43,7 +44,7 @@ const execute = async (client: Client, msg: Message) => {
   }
 };
 
-export default {
+const command: Command = {
   name: "Transcribe",
   description: "Transcribe audio",
   command: "!transcribe",
@@ -53,3 +54,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

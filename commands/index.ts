@@ -59,8 +59,10 @@ import autoreply from "./autoreply.js";
 import pick from "./pick.js";
 import transcribe from "./transcribe.js";
 import dse from "./dse.js";
+import suicide from "./suicide.js";
+import { Command } from "../types/command.js";
 
-export const commands = new Map();
+export const commands = new Map<string, Command>();
 
 commands.set(afk.command.slice(1), afk);
 commands.set(chatlist.command.slice(1), chatlist);
@@ -123,3 +125,4 @@ commands.set(autoreply.command.slice(1), autoreply);
 commands.set(pick.command.slice(1), pick);
 commands.set(transcribe.command.slice(1), transcribe);
 commands.set(dse.command.slice(1), dse);
+commands.set(suicide.command.slice(1), suicide);

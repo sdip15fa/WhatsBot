@@ -1,5 +1,6 @@
 import humanizeDuration from "humanize-duration";
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 
 const timetable: { [key: string]: string } = {
   "VA 1": "2024-04-09T08:30:00.000+08:00",
@@ -106,7 +107,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   return client.sendMessage(chatId, eta);
 };
 
-export default {
+const command: Command = {
   name: "DSE",
   description: "Get time until examinations (2024).",
   command: "!dse",
@@ -121,3 +122,5 @@ ${Object.keys(timetable).join("\n")}`,
   execute,
   public: true,
 };
+
+export default command;

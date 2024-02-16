@@ -1,5 +1,6 @@
 //jshint esversion:8
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 import db from "../db/index.js";
 import Story from "../models/story.js";
 
@@ -14,7 +15,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       if (text.length > 15) {
         return await client.sendMessage(
           chatId,
-          "Word is too long (maximum is 15 characters)"
+          "Word is too long (maximum is 15 characters)",
         );
       }
       if (Number(args[2])) {
@@ -22,7 +23,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
           !(
             await db("story").coll.updateOne(
               { chatId, id: Number(args[2]) },
-              { $push: { story: text }, $currentDate: { lastModified: true } }
+              { $push: { story: text }, $currentDate: { lastModified: true } },
             )
           ).matchedCount
         ) {
@@ -30,7 +31,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         } else {
           return await client.sendMessage(
             chatId,
-            `Story updated: added \`\`\`${text}\`\`\``
+            `Story updated: added \`\`\`${text}\`\`\``,
           );
         }
       }
@@ -38,7 +39,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         !(
           await db("story").coll.updateOne(
             { chatId, current: true },
-            { $push: { story: text }, $currentDate: { lastModified: true } }
+            { $push: { story: text }, $currentDate: { lastModified: true } },
           )
         ).matchedCount
       ) {
@@ -60,7 +61,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       }
       await client.sendMessage(
         chatId,
-        `Story updated: added \`\`\`${text}\`\`\``
+        `Story updated: added \`\`\`${text}\`\`\``,
       );
       break;
     }
@@ -73,7 +74,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         await client.sendMessage(
           chatId,
           `${Number(args[1]) ? `Story ${Number(args[1])}` : "Current story"}:
-${story.story.join(" ")}`
+${story.story.join(" ")}`,
         );
       } else {
         await client.sendMessage(chatId, "Story doesn't exist.");
@@ -88,13 +89,13 @@ ${story.story.join(" ")}`
       if (text.length > 15) {
         return await client.sendMessage(
           chatId,
-          "Word is too long (maximum is 15 characters)"
+          "Word is too long (maximum is 15 characters)",
         );
       }
 
       await db("story").coll.updateMany(
         { chatId },
-        { $set: { current: false } }
+        { $set: { current: false } },
       );
 
       await db("story").coll.insertOne(<Story>{
@@ -115,7 +116,7 @@ ${story.story.join(" ")}`
 
       await client.sendMessage(
         chatId,
-        `New story created: \`\`\`${text}\`\`\``
+        `New story created: \`\`\`${text}\`\`\``,
       );
       break;
     }
@@ -146,7 +147,7 @@ Content: ${story.story.filter((_v, i) => i < 10).join(" ")}${
       story.story.length > 10 ? "..." : ""
     }`;
   })
-  .join("\n\n")}`
+  .join("\n\n")}`,
       );
       break;
     }
@@ -155,15 +156,15 @@ Content: ${story.story.filter((_v, i) => i < 10).join(" ")}${
         if (await db("story").coll.findOne({ chatId, id: Number(args[1]) })) {
           await db("story").coll.updateMany(
             { chatId },
-            { $set: { current: false } }
+            { $set: { current: false } },
           );
           await db("story").coll.updateOne(
             { chatId, id: Number(args[1]) },
-            { $set: { current: true } }
+            { $set: { current: true } },
           );
           await client.sendMessage(
             chatId,
-            `Current story set to ${Number(args[1])}`
+            `Current story set to ${Number(args[1])}`,
           );
         } else {
           await client.sendMessage(chatId, "Story doesn't exist!");
@@ -177,7 +178,7 @@ Content: ${story.story.filter((_v, i) => i < 10).join(" ")}${
         )?.id;
         await client.sendMessage(
           chatId,
-          id ? `Current story id: ${id}` : "No stories yet."
+          id ? `Current story id: ${id}` : "No stories yet.",
         );
       }
       break;
@@ -195,13 +196,13 @@ Content: ${story.story.filter((_v, i) => i < 10).join(" ")}${
                 ? { id: Number(args[1]) }
                 : { current: true }),
             },
-            { $pop: { story: 1 } }
+            { $pop: { story: 1 } },
           )
         ).modifiedCount
       ) {
         return await client.sendMessage(
           chatId,
-          "Nothing was removed. Please check."
+          "Nothing was removed. Please check.",
         );
       }
       await client.sendMessage(chatId, "Last word removed.");
@@ -217,7 +218,7 @@ Content: ${story.story.filter((_v, i) => i < 10).join(" ")}${
       ) {
         return await client.sendMessage(
           chatId,
-          "Nothing was removed. Please check."
+          "Nothing was removed. Please check.",
         );
       }
       await client.sendMessage(chatId, `Story ${Number(args[1])} removed.`);
@@ -226,14 +227,14 @@ Content: ${story.story.filter((_v, i) => i < 10).join(" ")}${
     default: {
       await client.sendMessage(
         chatId,
-        `Use \`\`\`!help story\`\`\` for syntax.`
+        `Use \`\`\`!help story\`\`\` for syntax.`,
       );
       break;
     }
   }
 };
 
-export default {
+const command: Command = {
   name: "Story",
   description: "One word story",
   command: "!story",
@@ -243,3 +244,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

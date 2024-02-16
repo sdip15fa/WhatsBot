@@ -1,5 +1,6 @@
 //jshint esversion:8
 import whatsapp, { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 const { MessageMedia } = whatsapp;
 import axios from "../helpers/axios.js";
 import formatNum from "../helpers/formatNum.js";
@@ -21,7 +22,7 @@ async function youtube(url: string) {
           data.images[2] ||
           data.images[1] ||
           data.images[0] ||
-          null
+          null,
       ),
     };
   } catch (error) {
@@ -44,7 +45,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     await client.sendMessage(
       chatId,
       `🙇‍♂️ *Error*\n\n` +
-        "```Something Unexpected Happened to fetch the YouTube video```"
+        "```Something Unexpected Happened to fetch the YouTube video```",
     );
   } else if (typeof data !== "string") {
     await client.sendMessage(
@@ -52,7 +53,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       new MessageMedia(
         data.image.mimetype,
         data.image.data,
-        data.image.filename
+        data.image.filename,
       ),
       {
         caption:
@@ -65,12 +66,12 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
           "```\nComments: " +
           "```" +
           data.comments,
-      }
+      },
     );
   }
 };
 
-export default {
+const command: Command = {
   name: "YouTube",
   description: "Get youtube video info",
   command: "!yt",
@@ -80,3 +81,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

@@ -1,6 +1,7 @@
 //jshint esversion:8
 import { ChatGPTAPI } from "chatgpt";
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 import db from "../db/index.js";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
@@ -9,7 +10,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   if (!process.env.OPENAI_API_KEY) {
     return client.sendMessage(
       chatId,
-      "Sorry, chatgpt not / no longer available."
+      "Sorry, chatgpt not / no longer available.",
     );
   }
 
@@ -22,11 +23,11 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     !(await db("chats").coll.findOne({ chatId, ratelimit: false }))
   ) {
     const remainingTime = Math.ceil(
-      (lastExecution.lastExecutedAt + 60 * 1000 - now) / 1000
+      (lastExecution.lastExecutedAt + 60 * 1000 - now) / 1000,
     );
     return client.sendMessage(
       chatId,
-      `Please wait ${remainingTime} seconds before executing chatgpt again!`
+      `Please wait ${remainingTime} seconds before executing chatgpt again!`,
     );
   }
 
@@ -56,7 +57,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   await client.sendMessage(
     chatId,
     `ChatGPT:
-${res.text}`
+${res.text}`,
   );
 
   if (!parentMessageId) {
@@ -73,12 +74,12 @@ ${res.text}`
           parentMessageId: res.id,
           lastExecutedAt: now,
         },
-      }
+      },
     );
   }
 };
 
-export default {
+const command: Command = {
   name: "chatgpt",
   description: "Ask chatgpt",
   command: "!gpt",
@@ -88,3 +89,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

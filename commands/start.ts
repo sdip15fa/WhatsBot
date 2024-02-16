@@ -7,6 +7,7 @@ import whatsapp, {
   ClientInfoPhone,
   Message,
 } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 import packageJson from "../package.json" assert { type: "json" };
 
 async function get(battery: BatteryInfo, phn_info: ClientInfoPhone) {
@@ -28,7 +29,7 @@ async function get(battery: BatteryInfo, phn_info: ClientInfoPhone) {
         await axios.get("https://telegra.ph/file/ecbc27f276890bf2f65a2.jpg", {
           responseType: "arraybuffer",
         })
-      ).data
+      ).data,
     ).toString("base64"),
     filename: "start.jpg",
   };
@@ -37,20 +38,20 @@ async function get(battery: BatteryInfo, phn_info: ClientInfoPhone) {
 const execute = async (client: Client, msg: Message) => {
   const startdata = await get(
     await client.info.getBatteryStatus(),
-    client.info.phone
+    client.info.phone,
   );
   await client.sendMessage(
     msg.to,
     new whatsapp.MessageMedia(
       startdata.mimetype,
       startdata.data,
-      startdata.filename
+      startdata.filename,
     ),
-    { caption: startdata.msg }
+    { caption: startdata.msg },
   );
 };
 
-export default {
+const command: Command = {
   name: "Start",
   description: "Get device, client and bot info",
   command: "!start",
@@ -60,3 +61,5 @@ export default {
   execute,
   public: false,
 };
+
+export default command;

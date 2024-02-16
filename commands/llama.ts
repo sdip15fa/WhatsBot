@@ -1,5 +1,6 @@
 // Import necessary modules and dependencies
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 import config from "../config.js";
 import axios from "../helpers/axios.js";
 
@@ -105,7 +106,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   // Optionally, update the last execution timestamp in your database
 };
 
-export default {
+const command: Command = {
   name: "llama",
   description: "Ask Llama",
   command: "!llama",
@@ -115,3 +116,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

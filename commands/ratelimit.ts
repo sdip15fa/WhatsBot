@@ -1,4 +1,5 @@
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 import db from "../db/index.js";
 
 //jshint esversion:8
@@ -11,7 +12,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         (await db("chats").coll.findOne({ chatId }))?.ratelimit ?? true
           ? "enabled"
           : "disabled"
-      }.`
+      }.`,
     );
   }
   if (!["true", "false"].includes(args[0])) {
@@ -21,7 +22,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     !(
       await db("chats").coll.updateOne(
         { chatId },
-        { $set: { ratelimit: JSON.parse(args[0]) } }
+        { $set: { ratelimit: JSON.parse(args[0]) } },
       )
     ).matchedCount
   ) {
@@ -32,11 +33,11 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   }
   return client.sendMessage(
     chatId,
-    `Rate limit changed to ${JSON.parse(args[0])}.`
+    `Rate limit changed to ${JSON.parse(args[0])}.`,
   );
 };
 
-export default {
+const command: Command = {
   name: "Rate limit", //name of the module
   description: "Enable / disable rate limit.", // short description of what this command does
   command: "!ratelimit", //command with prefix. Ex command: '!test'
@@ -46,3 +47,5 @@ export default {
   public: false,
   execute,
 };
+
+export default command;

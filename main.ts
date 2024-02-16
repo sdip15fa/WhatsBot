@@ -57,13 +57,13 @@ export default async function main() {
       {
         timezone: "Asia/Hong_Kong",
         skipImmediate: true,
-      }
+      },
     );
   }
 
   wtsClient.on("auth_failure", () => {
     console.error(
-      "There is a problem in authentication, Kindly set the env var again and restart the app"
+      "There is a problem in authentication, Kindly set the env var again and restart the app",
     );
   });
 
@@ -102,13 +102,13 @@ export default async function main() {
                 return new MessageMedia(
                   attachment.contentType,
                   attachment.attachment.toString("base64"),
-                  attachment.name
+                  attachment.name,
                 );
               } catch {
                 return null;
               }
             })
-            .filter((a) => a)
+            .filter((a) => a),
         );
 
         while (media?.length > 1) {
@@ -152,7 +152,7 @@ export default async function main() {
         console.log("msg id", msg.id._serialized);
         if (groupId === process.env.WTS_GROUP_ID) {
           const channel = dcClient.channels.cache.get(
-            process.env.DISCORD_FORWARD_CHANNEL_ID
+            process.env.DISCORD_FORWARD_CHANNEL_ID,
           );
 
           if (channel && channel instanceof TextChannel) {
@@ -164,7 +164,7 @@ export default async function main() {
               if (name)
                 msg.body = msg.body?.replaceAll?.(
                   `@${contact.number}`,
-                  `@${name}`
+                  `@${name}`,
                 );
             });
 
@@ -189,7 +189,7 @@ export default async function main() {
 
               if (!disId) {
                 const name = await getName(
-                  quoted.fromMe ? process.env.WTS_OWNER_ID : quoted.author
+                  quoted.fromMe ? process.env.WTS_OWNER_ID : quoted.author,
                 );
                 embed = embed.setFields([
                   {
@@ -209,7 +209,7 @@ export default async function main() {
                   Buffer.from(media?.data, "base64"),
                   {
                     name: media?.filename || "image.png",
-                  }
+                  },
                 );
                 const fileUrl = `attachment://${media.filename || "image.png"}`;
                 embed = embed.setImage(fileUrl);
@@ -254,7 +254,7 @@ export default async function main() {
         !(
           await db("count").coll.updateOne(
             { groupId, date },
-            { $inc: { count: 1, words } }
+            { $inc: { count: 1, words } },
           )
         ).modifiedCount
       ) {
@@ -282,12 +282,12 @@ export default async function main() {
             },
             {
               $inc: { "users.$.count": 1, "users.$.words": words },
-            }
+            },
           )
         ).modifiedCount
       ) {
         const name = await getName(
-          msg.fromMe ? process.env.WTS_OWNER_ID : msg.author || msg.from
+          msg.fromMe ? process.env.WTS_OWNER_ID : msg.author || msg.from,
         );
         await db("count").coll.updateOne(
           { groupId, date },
@@ -302,7 +302,7 @@ export default async function main() {
                 words,
               },
             },
-          }
+          },
         );
       }
     }
@@ -312,7 +312,7 @@ export default async function main() {
     const chatId = (await msg.getChat()).id._serialized;
     if ((await db("chats").coll.findOne({ chatId }))?.autoreply) {
       if (!msg.body.trim().startsWith("$"))
-      await wtsClient.sendMessage(chatId, msg.body);
+        await wtsClient.sendMessage(chatId, msg.body);
     }
   });
 
@@ -323,7 +323,7 @@ export default async function main() {
 
       await db("count").coll.updateOne(
         { groupId, date },
-        { $inc: { count: -1 } }
+        { $inc: { count: -1 } },
       );
 
       await db("count").coll.updateOne(
@@ -340,7 +340,7 @@ export default async function main() {
         },
         {
           $inc: { "users.$.count": -1 },
-        }
+        },
       );
     }
   });
@@ -365,7 +365,7 @@ export default async function main() {
               (msg.author || msg.from)?.split("@")[0]
             } with id \`\`\`${msg.id._serialized}\`\`\`:
 ${msg.body || msg.type}`,
-            { ...(media && { media }) }
+            { ...(media && { media }) },
           )
           .then((newMsg) => {
             db("media").coll.insertOne(<Media>{
@@ -390,7 +390,7 @@ ${msg.body || msg.type}`,
               chat?.name || chat?.id
             }:
 ${msg.body || msg.type}`,
-            { ...(msg.type !== "sticker" && { media }) }
+            { ...(msg.type !== "sticker" && { media }) },
           )
           .then((newMsg) => {
             db("media").coll.insertOne(<Media>{
@@ -402,7 +402,7 @@ ${msg.body || msg.type}`,
           await wtsClient.sendMessage(
             sendTo,
             new MessageMedia(media.mimetype, media.data, media.filename),
-            { sendMediaAsSticker: true }
+            { sendMediaAsSticker: true },
           );
         }
       }
@@ -442,9 +442,9 @@ ${msg.body || msg.type}`,
         } catch (e) {
           await logger(
             wtsClient,
-            `Incoming afk message error from ${msg.from.split("@")[0]}.\n\n${
-              e?.message
-            }`
+            `Incoming afk message error from ${
+              msg.from.split("@")[0]
+            }.\n\n${e?.message}`,
           );
         }
       }
@@ -456,7 +456,10 @@ ${msg.body || msg.type}`,
     const chatId = (await msg.getChat())?.id._serialized;
     if (
       chatId &&
-      !(await db("chats").coll.findOne({ chatId, disabled: true })) &&
+      !(await db("chats").coll.findOne({
+        chatId,
+        $or: [{ disabled: true }, { suicide: false }],
+      })) &&
       (await msg.getContact())?.name &&
       msg.body
     ) {
@@ -464,7 +467,7 @@ ${msg.body || msg.type}`,
 
       if (
         triggers.some((trigger) =>
-          new RegExp(trigger, "g").test(msg.body.toLowerCase())
+          new RegExp(trigger, "g").test(msg.body.toLowerCase()),
         )
       ) {
         await msg.reply(`Please, do not suicide!
@@ -537,7 +540,7 @@ https://faq.whatsapp.com/1417269125743673
         } else if (msg.fromMe) {
           await wtsClient.sendMessage(
             process.env.WTS_OWNER_ID,
-            "No such command found. Type !help to get the list of available commands"
+            "No such command found. Type !help to get the list of available commands",
           );
         }
       }
@@ -558,10 +561,10 @@ https://faq.whatsapp.com/1417269125743673
                 (await after.getContact())?.name ||
                 (after.author || after.from)?.split("@")[0]
               } with id \`\`\`${after.id._serialized}\`\`\` sent *${timeToWord(
-                after.timestamp * 1000
+                after.timestamp * 1000,
               )} from now* was deleted in ${
                 chat.name || chat.id
-              }_ 👇👇\n\n${before}`
+              }_ 👇👇\n\n${before}`,
             )
             .catch(console.log);
         }
@@ -591,11 +594,11 @@ https://faq.whatsapp.com/1417269125743673
                 (await before.getContact())?.name ||
                 (before.author || before.from)?.split("@")[0]
               } with id \`\`\`${before.id._serialized}\`\`\` sent *${timeToWord(
-                before.timestamp * 1000
+                before.timestamp * 1000,
               )} from now* was deleted in ${chat.name || chat.id}_ 👇👇\n\n${
                 before.body || before.type
               }`,
-              { ...(media && { media }) }
+              { ...(media && { media }) },
             )
             .catch(console.log);
         }
