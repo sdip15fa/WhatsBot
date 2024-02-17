@@ -12,8 +12,6 @@ COPY . ./
 
 RUN yarn build
 
-RUN yarn install --production
-
 FROM ghcr.io/puppeteer/puppeteer:latest
 
 USER root
