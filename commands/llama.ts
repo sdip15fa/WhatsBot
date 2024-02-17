@@ -42,7 +42,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         content:
           role === "assistant"
             ? currMsg.body.replace("Llama: ", "")
-            : currMsg.body,
+            : currMsg.body.trim().slice(1).trim().replace("llama", "").trim(),
       });
       if (currMsg.hasQuotedMsg) {
         const nextQuotedMsg = await currMsg.getQuotedMessage();
@@ -100,8 +100,9 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
 
     // Send the response back to the user
     try {
-      await msg.reply(chatId, `Llama: ${response.data.response}`);
-    } catch {
+      await msg.reply(`Llama: ${response.data.response}`);
+    } catch (error) {
+      console.error(error);
       await client.sendMessage(chatId, `Llama: ${response.data.response}`);
     }
   } catch {
