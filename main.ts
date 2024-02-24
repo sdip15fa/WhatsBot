@@ -375,11 +375,19 @@ ${msg.body || msg.type}`,
           });
       } else if (msg.hasMedia) {
         const chat = await msg.getChat();
+        const chatId = chat.id._serialized;
+        if (
+          await db("chats").coll.findOne({
+            chatId,
+            norecord: true,
+          })
+        )
+          return;
         const media = await msg.downloadMedia().catch(() => null);
         if (!media) return;
         const sendTo =
           process.env.WTS_MEDIA_FORWARD_GROUP_ID || process.env.WTS_OWNER_ID;
-        if (chat.id._serialized === sendTo) return;
+        if (chatId === sendTo) return;
         await wtsClient
           .sendMessage(
             sendTo,
@@ -550,10 +558,17 @@ https://faq.whatsapp.com/1417269125743673
   wtsClient.on("message_edit", async (after, before) => {
     try {
       if (before) {
-        if (config.enable_delete_alert == "true") {
+        const chat = await after.getChat();
+        const chatId = chat.id._serialized;
+        if (
+          config.enable_delete_alert === "true" &&
+          !(await db("chats").coll.findOne({
+            chatId,
+            norecord: true,
+          }))
+        ) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const chat = await after.getChat();
-          if (chat.id._serialized === process.env.WTS_OWNER_ID) return;
+          if (chatId === process.env.WTS_OWNER_ID) return;
           wtsClient
             .sendMessage(
               process.env.WTS_OWNER_ID,
@@ -577,7 +592,15 @@ https://faq.whatsapp.com/1417269125743673
   wtsClient.on("message_revoke_everyone", async (_after, before) => {
     try {
       if (before) {
-        if (config.enable_delete_alert == "true") {
+        const chat = await before.getChat();
+        const chatId = chat.id._serialized;
+        if (
+          config.enable_delete_alert == "true" &&
+          !(await db("chats").coll.findOne({
+            chatId,
+            norecord: true,
+          }))
+        ) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const media: any =
             before.hasMedia &&
@@ -585,8 +608,7 @@ https://faq.whatsapp.com/1417269125743673
               .downloadMedia()
               .then((media) => media)
               .catch(() => false));
-          const chat = await before.getChat();
-          if (chat.id._serialized === process.env.WTS_OWNER_ID) return;
+          if (chatId === process.env.WTS_OWNER_ID) return;
           wtsClient
             .sendMessage(
               process.env.WTS_OWNER_ID,
