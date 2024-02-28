@@ -2,7 +2,7 @@
 // @ts-ignore
 import { Ai } from '@cloudflare/ai';
 import { Env } from './types.js';
-import { BadRequestException } from './exceptions.js';
+import { BadRequestException, FailedException } from './exceptions.js';
 import { basicAuthentication, verifyCredentials } from './auth.js';
 
 export default {
@@ -72,7 +72,17 @@ export default {
 						  ]),
 				],
 			};
-			const response = await ai.run('@hf/thebloke/orca-2-13b-awq', chat);
+			let response: string;
+			for (let i = 5; i > 0; i--) {
+				try {
+					response = await ai.run('@hf/thebloke/openchat_3.5-awq', chat);
+					break;
+				} catch {
+					if (i === 1) {
+						return new FailedException('Failed to generate after five tries.');
+					}
+				}
+			}
 
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore

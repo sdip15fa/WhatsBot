@@ -21,3 +21,15 @@ export class BadRequestException {
 		this.reason = reason;
 	}
 }
+
+export class FailedException {
+	status: number;
+	statusText: string;
+	reason: string;
+
+	constructor(reason: string) {
+		this.status = 500;
+		this.statusText = 'Internal Server Error';
+		this.reason = reason;
+	}
+}
