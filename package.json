@@ -10,14 +10,14 @@
     "dev": "nodemon startProcess.ts",
     "test": "tsc --noEmit",
     "lint": "eslint --fix **/*.ts && prettier --write **/*.ts",
-    "docker": "docker build . -t registry.gitlab.com/wcyat/whatsapp-to-discord",
+    "docker": "docker build . -t registry.gitlab.com/wcyat/whatsbot",
     "gentoken": "node dist/session/genToken.js",
     "gentokenwithdownload": "node dist/session/genTokenWithDownload.js",
     "prepare": "husky install"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://gitlab.com/wcyat/whatsapp-to-discord.git"
+    "url": "git+https://gitlab.com/wcyat/whatsbot.git"
   },
   "keywords": [
     "whatsapp-bot"
@@ -25,12 +25,13 @@
   "author": "wcyat",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://gitlab.com/wcyat/whatsapp-to-discord/-/issues"
+    "url": "https://gitlab.com/wcyat/whatsbot/-/issues"
   },
-  "homepage": "https://gitlab.com/wcyat/whatsapp-to-discord",
+  "homepage": "https://gitlab.com/wcyat/whatsbot",
   "dependencies": {
     "@iamtraction/google-translate": "^2.0.1",
     "@newyork.anthonyng/chess-image-generator": "^1.0.0",
+    "@types/fluent-ffmpeg": "^2.1.24",
     "@types/gifencoder": "^2.0.1",
     "@types/humanize-duration": "^3.27.1",
     "@types/probe-image-size": "^7.2.0",
@@ -47,6 +48,7 @@
     "discord.js": "^14.7.1",
     "dotenv": "^16.0.3",
     "download": "^8.0.0",
+    "fluent-ffmpeg": "^2.1.2",
     "form-data": "^4.0.0",
     "gifencoder": "^2.0.1",
     "gify": "^0.2.0",

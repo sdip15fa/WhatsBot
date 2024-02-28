@@ -1,9 +1,9 @@
 version: "3.9"
 
 services:
-  wtstodis:
-    image: registry.gitlab.com/wcyat/whatsapp-to-discord
-    container_name: wtstodis
+  whatsbot:
+    image: registry.gitlab.com/wcyat/whatsbot
+    container_name: whatsbot
     restart: unless-stopped
     build:
       context: ..
@@ -11,13 +11,13 @@ services:
     volumes:
      - ./session.secure:/app/session.secure
      - ./.wwebjs_auth:/app/.wwebjs_auth
-     - ./wtstodis-data:/app/data
+     - ./whatsbot-data:/app/data
      - ./llama:/app/llama
     environment:
       SESSION_KEY: ${SESSION_KEY}
       PMPERMIT_ENABLED: ${PMPERMIT_ENABLED}
       MARK_AS_SEEN: ${MARK_AS_SEEN}
-      MONGODB_URL: "mongodb://${MONGO_USER}:${MONGO_PASSWORD}@wtstodis-mongo:${MONGO_PORT}"
+      MONGODB_URL: "mongodb://${MONGO_USER}:${MONGO_PASSWORD}@whatsbot-mongo:${MONGO_PORT}"
       DEFAULT_TR_LANG: ${DEFAULT_TR_LANG}
       ENABLE_DELETE_ALERT: ${ENABLE_DELETE_ALERT}
       OCR_SPACE_API_KEY: ${OCR_SPACE_API_KEY}
@@ -38,8 +38,8 @@ services:
       CF_WORKER_PASSWORD: ${CF_WORKER_PASSWORD}
     networks:
       - whatsbot-network
-  wtstodis-mongo:
-    container_name: wtstodis-mongo
+  whatsbot-mongo:
+    container_name: whatsbot-mongo
     image: mongo
     tty: true
     command: mongod --auth --port=${MONGO_PORT} --bind_ip_all
