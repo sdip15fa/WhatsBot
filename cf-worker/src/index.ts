@@ -72,7 +72,7 @@ export default {
 						  ]),
 				],
 			};
-			const response = await ai.run('@cf/meta/llama-2-7b-chat-int8', chat);
+			const response = await ai.run('@hf/thebloke/orca-2-13b-awq', chat);
 
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
