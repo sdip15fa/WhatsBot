@@ -56,25 +56,23 @@ export default {
 				return new BadRequestException('Messages must be a valid JSON array.');
 			}
 
-			let response: string;
-			// prompt - simple completion style input
-			if (!messages?.length) {
-				const simple = {
-					prompt: `Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\n Instruction: ${prompt}\n\n Response: \n\n`,
-				};
-				response = await ai.run('@hf/thebloke/openhermes-2.5-mistral-7b-awq', simple);
-			} else {
-				const chat = {
-					messages: [
-						{
-							role: 'system',
-							content: 'Below is an instruction that describes a task. Write a response that appropriately completes the request.',
-						},
-						...messages,
-					],
-				};
-				response = await ai.run('@cf/meta/llama-2-7b-chat-int8', chat);
-			}
+			const chat = {
+				messages: [
+					{
+						role: 'system',
+						content: 'Below is an instruction that describes a task. Write a response that appropriately completes the request.',
+					},
+					...(messages?.length
+						? messages
+						: [
+								{
+									role: 'user',
+									content: prompt,
+								},
+						  ]),
+				],
+			};
+			const response = await ai.run('@cf/meta/llama-2-7b-chat-int8', chat);
 
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
