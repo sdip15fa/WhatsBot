@@ -639,7 +639,7 @@ https://faq.whatsapp.com/1417269125743673
     wtsClient.initialize();
     setInterval(() => {
       wtsClient.pupPage?.screenshot().then((screenshot) => {
-        writeFileSync("screenshot.jpg", screenshot, "base64");
+        writeFileSync("screenshot.png", screenshot, "base64");
       });
     }, 30000);
     dcClient.login(process.env.DISCORD_TOKEN).then(() => {

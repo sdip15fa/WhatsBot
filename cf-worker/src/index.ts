@@ -44,10 +44,11 @@ export default {
 
 		const ai = new Ai(env.AI);
 
-		if (request.method === 'GET') {
-			const url = new URL(request.url);
-			const params = url.searchParams;
+		const url = new URL(request.url);
+		const params = url.searchParams;
+		const path = url.pathname;
 
+		if ((path === '/' && request.method === 'GET') || path === '/llama') {
 			const prompt = params.get('prompt');
 			let messages: { role: 'user' | 'system' | 'assistant'; content: string }[] = [];
 			try {
@@ -87,7 +88,9 @@ export default {
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			return Response.json(response);
-		} else if (request.method === 'POST') {
+		}
+
+		if ((path === '/' && request.method === 'POST') || path === '/transcribe') {
 			const contentType = request.headers.get('Content-Type');
 			if (!contentType || !contentType.includes('multipart/form-data')) {
 				return new Response('Content-Type must be "multipart/form-data"', { status: 400 });
@@ -110,6 +113,21 @@ export default {
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			return Response.json(response);
+		}
+
+		if (path === '/sd') {
+			const prompt = params.get('prompt');
+			const inputs = {
+				prompt,
+			};
+
+			const response = await ai.run('@cf/stabilityai/stable-diffusion-xl-base-1.0', inputs);
+
+			return new Response(response, {
+				headers: {
+					'content-type': 'image/png',
+				},
+			});
 		}
 	},
 };
