@@ -121,7 +121,7 @@ export default {
 				prompt,
 			};
 
-			const response = await ai.run('@cf/stabilityai/stable-diffusion-xl-base-1.0', inputs);
+			const response = await ai.run('@cf/lykon/dreamshaper-8-lcm', inputs);
 
 			return new Response(response, {
 				headers: {
