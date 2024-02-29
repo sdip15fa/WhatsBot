@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   whatsbot:
-    image: registry.gitlab.com/wcyat/whatsbot
+    image: registry.gitlab.com/wc-yat/whatsbot
     container_name: whatsbot
     restart: unless-stopped
     build:
