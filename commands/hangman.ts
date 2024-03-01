@@ -148,7 +148,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
             perPerson ? `@${contact.id.user} ` : ""
           }A game is already in progress. Type !hangman delete to delete the current game.`,
           {
-            ...(perPerson && { mentions: [contact] }),
+            ...(perPerson && { mentions: [contact.id._serialized] }),
           },
         );
       }
@@ -168,7 +168,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
           word.length
         } letters. Here's the hidden word:\n\n\`\`\`${hiddenWord}\`\`\`\n\nSend \`\`\`!hangman [letter]\`\`\` to guess.`,
         {
-          ...(perPerson && { mentions: [contact] }),
+          ...(perPerson && { mentions: [contact.id._serialized] }),
         },
       );
       break;
@@ -183,7 +183,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
             perPerson ? `@${contact.id.user} ` : ""
           }Game deleted. The word was ${game.gameState.word}.`,
           {
-            ...(perPerson && { mentions: [contact] }),
+            ...(perPerson && { mentions: [contact.id._serialized] }),
           },
         );
       }
@@ -204,7 +204,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
             !perPerson ? "enabled" : "disabled"
           }.`,
           {
-            ...(perPerson && { mentions: [contact] }),
+            ...(perPerson && { mentions: [contact.id._serialized] }),
           },
         );
       } else {
@@ -213,7 +213,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
           `${perPerson ? `@${contact.id.user} ` : ""}Available configs:
 - per-person: enable per-person mode, and thus the score counting`,
           {
-            ...(perPerson && { mentions: [contact] }),
+            ...(perPerson && { mentions: [contact.id._serialized] }),
           },
         );
       }
@@ -258,7 +258,7 @@ ${(
               perPerson ? `@${contact.id.user} ` : ""
             }Use \`\`\`!hangman start\`\`\` to start a new game.`,
             {
-              ...(perPerson && { mentions: [contact] }),
+              ...(perPerson && { mentions: [contact.id._serialized] }),
             },
           );
           return;
@@ -275,7 +275,7 @@ ${(
                 perPerson ? `@${contact.id.user} ` : ""
               }You can't guess the whole word when only one character is remaining!`,
               {
-                ...(perPerson && { mentions: [contact] }),
+                ...(perPerson && { mentions: [contact.id._serialized] }),
               },
             );
           }
@@ -304,7 +304,7 @@ ${(
                   : ""
               }`,
               {
-                ...(perPerson && { mentions: [contact] }),
+                ...(perPerson && { mentions: [contact.id._serialized] }),
               },
             );
             await hangmanCollection.deleteOne(query);
@@ -316,7 +316,7 @@ ${(
                 perPerson ? `@${contact.id.user} ` : ""
               }Wrong guess! The word ${letter} is incorrect! Guessing the whole word does not count against your remaining chances.`,
               {
-                ...(perPerson && { mentions: [contact] }),
+                ...(perPerson && { mentions: [contact.id._serialized] }),
               },
             );
             continue;
@@ -329,7 +329,7 @@ ${(
               perPerson ? `@${contact.id.user} ` : ""
             }Please enter a valid letter.`,
             {
-              mentions: [contact],
+              mentions: [contact.id._serialized],
             },
           );
           continue;
@@ -341,7 +341,7 @@ ${(
               perPerson ? `@${contact.id.user} ` : ""
             }You already guessed "${letter}". Try another letter.`,
             {
-              ...(perPerson && { mentions: [contact] }),
+              ...(perPerson && { mentions: [contact.id._serialized] }),
             },
           );
           continue;
@@ -380,7 +380,7 @@ ${(
                   : ""
               }`,
               {
-                ...(perPerson && { mentions: [contact] }),
+                ...(perPerson && { mentions: [contact.id._serialized] }),
               },
             );
             await hangmanCollection.deleteOne(query);
@@ -394,7 +394,7 @@ ${(
               perPerson ? `@${contact.id.user} ` : ""
             }Good guess! ${letter} is correct! Here's the updated hidden word:\n\n\`\`\`${hiddenWord}\`\`\`\n\nSend !hangman [letter] to guess.`,
             {
-              ...(perPerson && { mentions: [contact] }),
+              ...(perPerson && { mentions: [contact.id._serialized] }),
             },
           );
         } else {
@@ -407,7 +407,7 @@ ${(
                 HANGMAN_STAGES[6]
               }\n\nTry again with !hangman start.`,
               {
-                ...(perPerson && { mentions: [contact] }),
+                ...(perPerson && { mentions: [contact.id._serialized] }),
               },
             );
             await hangmanCollection.deleteOne(query);
@@ -424,7 +424,7 @@ ${(
               perPerson ? `@${contact.id.user} ` : ""
             }Wrong guess! "${letter}" is not in the word. You have ${remainingGuesses} guesses left.\n\n${hangmanStage}\n\n\`\`\`${hiddenWord}\`\`\`\n\nSend !hangman [letter] to guess.`,
             {
-              ...(perPerson && { mentions: [contact] }),
+              ...(perPerson && { mentions: [contact.id._serialized] }),
             },
           );
         }
