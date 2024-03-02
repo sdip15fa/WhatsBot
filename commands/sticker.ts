@@ -18,7 +18,8 @@ const execute = async (client: Client, msg: Message) => {
     if (!attachmentData) {
       return;
     }
-    await client.sendMessage(
+    try {
+      await client.sendMessage(
       chatId,
       new MessageMedia(
         attachmentData.mimetype,
@@ -27,6 +28,9 @@ const execute = async (client: Client, msg: Message) => {
       ),
       { sendMediaAsSticker: true },
     );
+    } catch {
+      await client.sendMessage(chatId, "Sending sticker failed.")
+    }
   } else {
     await client.sendMessage(
       chatId,
