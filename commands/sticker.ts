@@ -20,16 +20,16 @@ const execute = async (client: Client, msg: Message) => {
     }
     try {
       await client.sendMessage(
-      chatId,
-      new MessageMedia(
-        attachmentData.mimetype,
-        attachmentData.data,
-        attachmentData.filename,
-      ),
-      { sendMediaAsSticker: true },
-    );
+        chatId,
+        new MessageMedia(
+          attachmentData.mimetype,
+          attachmentData.data,
+          attachmentData.filename,
+        ),
+        { sendMediaAsSticker: true },
+      );
     } catch {
-      await client.sendMessage(chatId, "Sending sticker failed.")
+      await client.sendMessage(chatId, "Sending sticker failed.");
     }
   } else {
     await client.sendMessage(
