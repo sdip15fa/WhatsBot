@@ -36,6 +36,7 @@ services:
       CF_WORKER_URL: ${CF_WORKER_URL}
       CF_WORKER_USERNAME: ${CF_WORKER_USERNAME}
       CF_WORKER_PASSWORD: ${CF_WORKER_PASSWORD}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
     networks:
       - whatsbot-network
   whatsbot-mongo:
