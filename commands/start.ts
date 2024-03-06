@@ -40,15 +40,17 @@ const execute = async (client: Client, msg: Message) => {
     await client.info.getBatteryStatus(),
     client.info.phone,
   );
-  await client.sendMessage(
-    msg.to,
-    new whatsapp.MessageMedia(
-      startdata.mimetype,
-      startdata.data,
-      startdata.filename,
-    ),
-    { caption: startdata.msg },
-  );
+  try {
+    await client.sendMessage(
+      msg.to,
+      new whatsapp.MessageMedia(
+        startdata.mimetype,
+        startdata.data,
+        startdata.filename,
+      ),
+      { caption: startdata.msg },
+    );
+  } catch {}
 };
 
 const command: Command = {

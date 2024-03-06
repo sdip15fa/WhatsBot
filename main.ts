@@ -407,11 +407,13 @@ ${msg.body || msg.type}`,
             });
           });
         if (msg.type === "sticker") {
-          await wtsClient.sendMessage(
-            sendTo,
-            new MessageMedia(media.mimetype, media.data, media.filename),
-            { sendMediaAsSticker: true },
-          );
+          try {
+            await wtsClient.sendMessage(
+              sendTo,
+              new MessageMedia(media.mimetype, media.data, media.filename),
+              { sendMediaAsSticker: true },
+            );
+          } catch {}
         }
       }
     }

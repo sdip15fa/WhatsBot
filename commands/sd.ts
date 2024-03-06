@@ -54,7 +54,9 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       await msg.reply(media);
     } catch (error) {
       console.error(error);
-      await client.sendMessage(chatId, media);
+      try {
+        await client.sendMessage(chatId, media);
+      } catch {}
     }
   } catch (error) {
     console.error(error);

@@ -38,7 +38,9 @@ const execute = async (client: Client, msg: Message) => {
       );
     }
 
-    await client.sendMessage(chatId, gif);
+    try {
+      await client.sendMessage(chatId, gif);
+    } catch {}
   } else {
     await client.sendMessage(
       chatId,

@@ -48,14 +48,19 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         "```Something Unexpected Happened to create the Carbon.```",
     );
   } else {
-    await client.sendMessage(
-      msg.to,
-      new MessageMedia(data.mimetype, data.data, data.filename),
-      {
-        caption:
-          `Carbon for 👇\n` + "```" + msg.body.replace("!carbon ", "") + "```",
-      },
-    );
+    try {
+      await client.sendMessage(
+        msg.to,
+        new MessageMedia(data.mimetype, data.data, data.filename),
+        {
+          caption:
+            `Carbon for 👇\n` +
+            "```" +
+            msg.body.replace("!carbon ", "") +
+            "```",
+        },
+      );
+    } catch {}
   }
 };
 

@@ -68,14 +68,16 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   const data = await gitinfo(args[0]);
   if (data.status) {
     if (data.data.status) {
-      await client.sendMessage(
-        msg.to,
-        new MessageMedia(
-          data.data.mimetype,
-          data.data.data,
-          data.data.filename,
-        ),
-      );
+      try {
+        await client.sendMessage(
+          msg.to,
+          new MessageMedia(
+            data.data.mimetype,
+            data.data.data,
+            data.data.filename,
+          ),
+        );
+      } catch {}
     }
     await client.sendMessage(msg.to, data.msg);
   } else {

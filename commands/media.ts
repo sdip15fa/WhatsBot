@@ -14,14 +14,16 @@ const execute = async (client: Client, msg: Message) => {
     if (!attachmentData) {
       return;
     }
-    await client.sendMessage(
-      chatId,
-      new MessageMedia(
-        attachmentData.mimetype,
-        attachmentData.data,
-        attachmentData.filename,
-      ),
-    );
+    try {
+      await client.sendMessage(
+        chatId,
+        new MessageMedia(
+          attachmentData.mimetype,
+          attachmentData.data,
+          attachmentData.filename,
+        ),
+      );
+    } catch {}
   } else {
     await client.sendMessage(chatId, `🙇‍♂️ *Error*\n\n` + "```No media found```");
   }

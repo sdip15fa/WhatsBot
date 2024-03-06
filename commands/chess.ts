@@ -123,10 +123,12 @@ const printBoard = async (client: Client, chatId: string, chess: Chess) => {
   await imageGenerator.loadFEN(chess.fen());
   const image: Buffer = await imageGenerator.generateBuffer();
 
-  client.sendMessage(
-    chatId,
-    new MessageMedia("image/png", image.toString("base64"), chess.fen()),
-  );
+  try {
+    client.sendMessage(
+      chatId,
+      new MessageMedia("image/png", image.toString("base64"), chess.fen()),
+    );
+  } catch {}
 };
 
 const makeComputerMove = async (

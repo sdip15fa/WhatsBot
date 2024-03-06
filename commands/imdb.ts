@@ -33,11 +33,13 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       )
       .join("\n")}\n\n*IMDB Link:* ${result.imdb}`;
 
-    await client.sendMessage(
-      chatId,
-      new MessageMedia(image.mimetype, image.data, `${result.title}.jpg`),
-      { caption: text },
-    );
+    try {
+      await client.sendMessage(
+        chatId,
+        new MessageMedia(image.mimetype, image.data, `${result.title}.jpg`),
+        { caption: text },
+      );
+    } catch {}
   } catch (error) {
     const messagetosend = `Something went wrong to get this content\n\n${error?.message}`;
     await client.sendMessage(chatId, messagetosend);

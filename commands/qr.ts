@@ -24,11 +24,13 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     data = await qrgen(args.join(" "));
   }
 
-  await client.sendMessage(
-    (await msg.getChat()).id._serialized,
-    new MessageMedia(data.mimetype, data.data, data.filename),
-    { caption: `QR code for 👇\n` + "```" + msg.body + "```" },
-  );
+  try {
+    await client.sendMessage(
+      (await msg.getChat()).id._serialized,
+      new MessageMedia(data.mimetype, data.data, data.filename),
+      { caption: `QR code for 👇\n` + "```" + msg.body + "```" },
+    );
+  } catch {}
 };
 
 const command: Command = {

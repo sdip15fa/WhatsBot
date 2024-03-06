@@ -10,15 +10,17 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     const quotedMsg = await msg.getQuotedMessage();
     const getdata = await download(args[0], quotedMsg.id.id);
     if (getdata.status && typeof getdata.content !== "string") {
-      await client.sendMessage(
-        chatId,
-        new MessageMedia(
-          getdata.content.image.mimetype,
-          getdata.content.image.data,
-          getdata.content.image.filename,
-        ),
-        { caption: getdata.content.text },
-      );
+      try {
+        await client.sendMessage(
+          chatId,
+          new MessageMedia(
+            getdata.content.image.mimetype,
+            getdata.content.image.data,
+            getdata.content.image.filename,
+          ),
+          { caption: getdata.content.text },
+        );
+      } catch {}
     } else if (typeof getdata.content === "string") {
       await client.sendMessage(chatId, getdata.content);
     }

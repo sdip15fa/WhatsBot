@@ -28,12 +28,15 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       let sticker = false;
       if (quotedMsg.type == "sticker" && media) sticker = true;
 
-      for (let i = 0; i < count; i++)
-        await client.sendMessage(
-          msg.to,
-          new MessageMedia(media.mimetype, media.data, media.filename),
-          { sendMediaAsSticker: sticker },
-        );
+      for (let i = 0; i < count; i++) {
+        try {
+          await client.sendMessage(
+            msg.to,
+            new MessageMedia(media.mimetype, media.data, media.filename),
+            { sendMediaAsSticker: sticker },
+          );
+        } catch {}
+      }
     } else {
       for (let i = 0; i < count; i++)
         await client.sendMessage(msg.to, quotedMsg.body);
