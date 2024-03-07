@@ -611,20 +611,24 @@ https://faq.whatsapp.com/1417269125743673
               .then((media) => media)
               .catch(() => false));
           if (chatId === process.env.WTS_OWNER_ID) return;
-          wtsClient
-            .sendMessage(
-              process.env.WTS_OWNER_ID,
-              `_${before.isStatus ? "Status" : "Message"} from ${
-                (await before.getContact())?.name ||
-                (before.author || before.from)?.split("@")[0]
-              } with id \`\`\`${before.id._serialized}\`\`\` sent *${timeToWord(
-                before.timestamp * 1000,
-              )} from now* was deleted in ${chat.name || chat.id}_ 👇👇\n\n${
-                before.body || before.type
-              }`,
-              { ...(media && { media }) },
-            )
-            .catch(console.log);
+          try {
+            wtsClient
+              .sendMessage(
+                process.env.WTS_OWNER_ID,
+                `_${before.isStatus ? "Status" : "Message"} from ${
+                  (await before.getContact())?.name ||
+                  (before.author || before.from)?.split("@")[0]
+                } with id \`\`\`${
+                  before.id._serialized
+                }\`\`\` sent *${timeToWord(
+                  before.timestamp * 1000,
+                )} from now* was deleted in ${chat.name || chat.id}_ 👇👇\n\n${
+                  before.body || before.type
+                }`,
+                { ...(media && { media }) },
+              )
+              .catch(console.log);
+          } catch {}
         }
       }
     } catch (e) {
