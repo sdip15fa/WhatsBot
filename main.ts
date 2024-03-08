@@ -113,28 +113,32 @@ export default async function main() {
 
         while (media?.length > 1) {
           const i = media.shift();
-          wtsClient
-            .sendMessage(process.env.WTS_GROUP_ID, "", {
-              ...(wtsId && { quotedMessageId: wtsId }),
-              media: i,
-            })
-            .catch(console.log);
+          try {
+            wtsClient
+              .sendMessage(process.env.WTS_GROUP_ID, "", {
+                ...(wtsId && { quotedMessageId: wtsId }),
+                media: i,
+              })
+              .catch(console.log);
+          } catch {}
         }
 
-        wtsClient
-          .sendMessage(process.env.WTS_GROUP_ID, replyMsg, {
-            ...(wtsId && { quotedMessageId: wtsId }),
-            ...(media?.[0] && { media: media[0] }),
-          })
-          .then(() => {
-            if (
-              wtsId ||
-              process.env.DISCORD_READ_CHANNEL_ID ===
-                process.env.DISCORD_FORWARD_CHANNEL_ID
-            )
-              msg.delete().catch(() => {});
-          })
-          .catch(console.log);
+        try {
+          wtsClient
+            .sendMessage(process.env.WTS_GROUP_ID, replyMsg, {
+              ...(wtsId && { quotedMessageId: wtsId }),
+              ...(media?.[0] && { media: media[0] }),
+            })
+            .then(() => {
+              if (
+                wtsId ||
+                process.env.DISCORD_READ_CHANNEL_ID ===
+                  process.env.DISCORD_FORWARD_CHANNEL_ID
+              )
+                msg.delete().catch(() => {});
+            })
+            .catch(console.log);
+        } catch {}
       } catch (e) {
         console.log(e);
       }
@@ -355,24 +359,27 @@ export default async function main() {
   wtsClient.on("message_create", async (msg) => {
     if (config.enable_delete_alert == "true") {
       if (msg.isStatus) {
-        const media =
-          msg.hasMedia && (await msg.downloadMedia().catch(() => null));
-        await wtsClient
-          .sendMessage(
-            process.env.WTS_OWNER_ID,
-            `Status from ${
-              (await msg.getContact())?.name ||
-              (msg.author || msg.from)?.split("@")[0]
-            } with id \`\`\`${msg.id._serialized}\`\`\`:
+        try {
+          const media =
+            msg.hasMedia && (await msg.downloadMedia().catch(() => null));
+          await wtsClient
+            .sendMessage(
+              process.env.WTS_OWNER_ID,
+              `Status from ${
+                (await msg.getContact())?.name ||
+                (msg.author || msg.from)?.split("@")[0]
+              } with id \`\`\`${msg.id._serialized}\`\`\`:
 ${msg.body || msg.type}`,
-            { ...(media && { media }) },
-          )
-          .then((newMsg) => {
-            db("media").coll.insertOne(<Media>{
-              orgId: msg.id._serialized,
-              fwdId: newMsg.id._serialized,
-            });
-          });
+              { ...(media && { media }) },
+            )
+            .then((newMsg) => {
+              db("media").coll.insertOne(<Media>{
+                orgId: msg.id._serialized,
+                fwdId: newMsg.id._serialized,
+              });
+            })
+            .catch(() => {});
+        } catch {}
       } else if (msg.hasMedia) {
         const chat = await msg.getChat();
         const chatId = chat.id._serialized;
@@ -388,24 +395,27 @@ ${msg.body || msg.type}`,
         const sendTo =
           process.env.WTS_MEDIA_FORWARD_GROUP_ID || process.env.WTS_OWNER_ID;
         if (chatId === sendTo) return;
-        await wtsClient
-          .sendMessage(
-            sendTo,
-            `Message from ${
-              (await msg.getContact())?.name ||
-              (msg.author || msg.from)?.split("@")[0]
-            } with id \`\`\`${msg.id._serialized}\`\`\` in ${
-              chat?.name || chat?.id
-            }:
+        try {
+          await wtsClient
+            .sendMessage(
+              sendTo,
+              `Message from ${
+                (await msg.getContact())?.name ||
+                (msg.author || msg.from)?.split("@")[0]
+              } with id \`\`\`${msg.id._serialized}\`\`\` in ${
+                chat?.name || chat?.id
+              }:
 ${msg.body || msg.type}`,
-            { ...(msg.type !== "sticker" && { media }) },
-          )
-          .then((newMsg) => {
-            db("media").coll.insertOne(<Media>{
-              orgId: msg.id._serialized,
-              fwdId: newMsg.id._serialized,
-            });
-          });
+              { ...(msg.type !== "sticker" && { media }) },
+            )
+            .then((newMsg) => {
+              db("media").coll.insertOne(<Media>{
+                orgId: msg.id._serialized,
+                fwdId: newMsg.id._serialized,
+              });
+            })
+            .catch(() => {});
+        } catch {}
         if (msg.type === "sticker") {
           try {
             await wtsClient.sendMessage(
