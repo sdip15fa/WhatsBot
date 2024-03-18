@@ -62,6 +62,7 @@ import dse from "./dse.js";
 import suicide from "./suicide.js";
 import sd from "./sd.js";
 import gemini from "./gemini.js";
+import wf from "./wf.js";
 import { Command } from "../types/command.js";
 
 export const commands = new Map<string, Command>();
@@ -130,3 +131,4 @@ commands.set(dse.command.slice(1), dse);
 commands.set(suicide.command.slice(1), suicide);
 commands.set(sd.command.slice(1), sd);
 commands.set(gemini.command.slice(1), gemini);
+commands.set(wf.command.slice(1), wf);

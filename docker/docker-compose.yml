@@ -9,10 +9,10 @@ services:
       context: ..
       dockerfile: Dockerfile
     volumes:
-     - ./session.secure:/app/session.secure
-     - ./.wwebjs_auth:/app/.wwebjs_auth
-     - ./whatsbot-data:/app/data
-     - ./llama:/app/llama
+     - ./session.secure:/app/session.secure:Z
+     - ./.wwebjs_auth:/app/.wwebjs_auth:Z
+     - ./whatsbot-data:/app/data:Z
+     - ./llama:/app/llama:Z
     environment:
       SESSION_KEY: ${SESSION_KEY}
       PMPERMIT_ENABLED: ${PMPERMIT_ENABLED}
@@ -37,6 +37,7 @@ services:
       CF_WORKER_USERNAME: ${CF_WORKER_USERNAME}
       CF_WORKER_PASSWORD: ${CF_WORKER_PASSWORD}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
+      WOLFRAM_APP_ID: ${WOLFRAM_APP_ID}
     networks:
       - whatsbot-network
   whatsbot-mongo:
