@@ -20,6 +20,7 @@ async function readImage(attachmentData: MessageMedia) {
 }
 
 const execute = async (client: Client, msg: Message) => {
+  const chatId = (await msg.getChat()).id._serialized;
   if (msg.hasQuotedMsg) {
     const quotedMsg = await msg.getQuotedMessage();
     const attachmentData = await quotedMsg
@@ -29,11 +30,13 @@ const execute = async (client: Client, msg: Message) => {
     if (!attachmentData) return;
     const data = await readImage(attachmentData);
     if (data == "error") {
-      quotedMsg.reply(
+      await client.sendMessage(
+        chatId,
         `Error occured while reading the image. Please make sure the image is clear.`,
       );
     } else if (typeof data !== "string") {
-      quotedMsg.reply(
+      await client.sendMessage(
+        chatId,
         `*Extracted Text from the Image*  👇\n\n${data.parsedText}`,
       );
     }
