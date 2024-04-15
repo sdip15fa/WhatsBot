@@ -12,6 +12,10 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   while (/^[\d|-]+@(g|c)\.us$/.test(args[0])) {
     chats.push(args.shift());
   }
+  if (chats.length && !msg.fromMe) {
+    try { await msg.reply("Not allowed.")} catch {}
+    return;
+  }
   if (!chats.length) chats.push((await msg.getChat()).id._serialized);
   const date = args.join(" ");
   if (
