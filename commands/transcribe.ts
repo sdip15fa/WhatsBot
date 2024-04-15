@@ -40,9 +40,9 @@ const execute = async (client: Client, msg: Message) => {
 
     await client.sendMessage(
       chatId,
-      `*Transcription*\n\n` + result.text ||
-        "" +
-          `
+      `*Transcription*\n\n` +
+        (result.text || "") +
+        `
     
 Note: this does not work with audios >30s. You may want to use my android app: https://l.wcyat.me/gQAKgl`,
     );
