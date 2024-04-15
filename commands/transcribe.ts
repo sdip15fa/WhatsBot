@@ -38,7 +38,14 @@ const execute = async (client: Client, msg: Message) => {
       },
     ).then((res) => res.json())) as { text: string };
 
-    await client.sendMessage(chatId, `*Transcription*\n\n` + result.text || "");
+    await client.sendMessage(
+      chatId,
+      `*Transcription*\n\n` + result.text ||
+        "" +
+          `
+    
+Note: this does not work with audios >30s. You may want to use my android app: https://l.wcyat.me/gQAKgl`,
+    );
   } else {
     await client.sendMessage(chatId, `🙇‍♂️ *Error*\n\n` + "```No media found```");
   }
