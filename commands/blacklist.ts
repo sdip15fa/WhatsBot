@@ -20,7 +20,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
           `Please provide a word to add to the blacklist.`,
         );
       }
-      args.pop();
+      args.shift();
       const word = args.join(" ").toLowerCase();
       const chatDoc = await chatsCollection.findOne({ chatId });
       if (!chatDoc) {
@@ -50,7 +50,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
           `Please provide a word to remove from the blacklist.`,
         );
       }
-      args.pop();
+      args.shift();
       const word = args.join(" ").toLowerCase();
       await chatsCollection.updateOne(
         { chatId },
