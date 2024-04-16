@@ -358,13 +358,23 @@ export default async function main() {
 
   wtsClient.on("message", async (msg) => {
     const chatId = (await msg.getChat()).id._serialized;
-    const blacklist: string[] = (await db("chats").coll.findOne({ chatId }))
-      ?.blacklist;
-    if (blacklist?.length) {
+    const chatDoc = await db("chats").coll.findOne({ chatId });
+
+    if (chatDoc?.blacklist?.length) {
       const converted = msg.body?.replaceAll(" ", "")?.toLowerCase();
       if (
-        blacklist.some((v) => converted?.includes?.(v?.replaceAll(" ", "")))
+        chatDoc?.blacklist.some(
+          (v: string) => converted?.includes?.(v?.replaceAll(" ", "")),
+        )
       ) {
+        try {
+          await msg.delete(true);
+        } catch {}
+      }
+    }
+
+    if (chatDoc?.blacklist_media?.length && msg.hasMedia && msg.mediaKey) {
+      if (chatDoc?.blacklist_media?.includes(msg.mediaKey)) {
         try {
           await msg.delete(true);
         } catch {}

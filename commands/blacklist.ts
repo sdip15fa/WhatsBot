@@ -14,14 +14,43 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       if (!msg.fromMe) {
         return;
       }
-      if (!args[1]) {
+      if (!args[1] && !msg.hasQuotedMsg) {
         return await client.sendMessage(
           chatId,
           `Please provide a word to add to the blacklist.`,
         );
       }
+      const quotedMsg = await msg.getQuotedMessage();
+      if (quotedMsg.hasMedia && quotedMsg.mediaKey) {
+        const chatDoc = await chatsCollection.findOne({ chatId });
+        if (!chatDoc) {
+          await chatsCollection.insertOne({
+            chatId,
+            blacklist_media: [quotedMsg.mediaKey],
+          });
+        } else {
+          await chatsCollection.updateOne(
+            { chatId },
+            { $push: { blacklist_media: quotedMsg.mediaKey } },
+          );
+        }
+        await client.sendMessage(
+          chatId,
+          `The media has been added to the blacklist.`,
+        );
+        break;
+      }
       args.shift();
-      const word = args.join(" ").toLowerCase();
+      let word = args.join(" ").toLowerCase();
+      if (!word.trim()) {
+        word = quotedMsg.body.toLowerCase();
+      }
+      if (!word.trim()) {
+        return await client.sendMessage(
+          chatId,
+          `Please provide a word to add to the blacklist.`,
+        );
+      }
       const chatDoc = await chatsCollection.findOne({ chatId });
       if (!chatDoc) {
         await chatsCollection.insertOne({
