@@ -356,6 +356,22 @@ export default async function main() {
         .catch(() => {});
   });
 
+  wtsClient.on("message", async (msg) => {
+    const chatId = (await msg.getChat()).id._serialized;
+    const blacklist: string[] = (await db("chats").coll.findOne({ chatId }))
+      ?.blacklist;
+    if (blacklist?.length) {
+      const converted = msg.body?.replaceAll(" ", "")?.toLowerCase();
+      if (
+        blacklist.some((v) => converted?.includes?.(v?.replaceAll(" ", "")))
+      ) {
+        try {
+          await msg.delete(true);
+        } catch {}
+      }
+    }
+  });
+
   wtsClient.on("message_create", async (msg) => {
     if (config.enable_delete_alert == "true") {
       if (msg.isStatus) {
