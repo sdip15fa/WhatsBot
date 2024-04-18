@@ -11,9 +11,6 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
 
   switch (args[0]) {
     case "add": {
-      if (!msg.fromMe) {
-        return;
-      }
       if (!args[1] && !msg.hasQuotedMsg) {
         return await client.sendMessage(
           chatId,
@@ -34,11 +31,10 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
             { $push: { blacklist_media: quotedMsg.mediaKey } },
           );
         }
-        await client.sendMessage(
+        return await client.sendMessage(
           chatId,
           `The media has been added to the blacklist.`,
         );
-        break;
       }
       args.shift();
       let word = args.join(" ").toLowerCase();
@@ -70,8 +66,18 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       break;
     }
     case "remove": {
-      if (!msg.fromMe) {
-        return;
+      if (msg.hasQuotedMsg) {
+        const quotedMsg = await msg.getQuotedMessage();
+        if (quotedMsg.mediaKey) {
+          await chatsCollection.updateOne(
+            { chatId },
+            { $pull: { blacklist_media: quotedMsg.mediaKey } },
+          );
+          return await client.sendMessage(
+            chatId,
+            "The media has been removed from the blacklist.",
+          );
+        }
       }
       if (!args[1]) {
         return await client.sendMessage(
@@ -89,6 +95,14 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         chatId,
         `The word "${word}" has been removed from the blacklist.`,
       );
+      break;
+    }
+    case "removeall": {
+      await chatsCollection.updateOne(
+        { chatId },
+        { $unset: { blacklist: 1, blacklist_media: 1 } },
+      );
+      return await client.sendMessage(chatId, "All blacklist items removed.");
       break;
     }
     case "list": {
@@ -122,9 +136,9 @@ const command: Command = {
   description: "Manage a blacklist of words in a specific group.",
   commandType: "plugin",
   isDependent: false,
-  help: `*Blacklist*\n\nManage a blacklist of words in a specific group.\n\n*Commands*\n\n!blacklist add [word]\n!blacklist remove [word]\n!blacklist list\n\n*How to Use*\n\nUse !blacklist add [word] to add a word to the blacklist. Use !blacklist remove [word] to remove a word from the blacklist. Use !blacklist list to see the current blacklist.\n\nNote: add and remove are only available to me`,
+  help: `*Blacklist*\n\nManage a blacklist of words in a specific group.\n\n*Commands*\n\n!blacklist add [word]\n!blacklist remove [word]\n!blacklist list\n\n*How to Use*\n\nUse !blacklist add [word] to add a word to the blacklist. Use !blacklist remove [word] to remove a word from the blacklist. Use !blacklist list to see the current blacklist.`,
   execute,
-  public: true,
+  public: false,
 };
 
 export default command;
