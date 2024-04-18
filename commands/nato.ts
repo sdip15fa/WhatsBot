@@ -18,7 +18,10 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     return client.sendMessage(chatId, "Text too long.");
   }
 
-  await client.sendMessage(chatId, natoPad(args.join(" ") || quotedMsg.body));
+  await client.sendMessage(
+    chatId,
+    `NATO: ${natoPad(args.join(" ") || quotedMsg.body)}`,
+  );
 };
 
 const command: Command = {
