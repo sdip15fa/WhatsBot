@@ -55,10 +55,18 @@ const timetable: { [key: string]: string } = {
 
 // Function to calculate duration before the start of an examination paper
 function timeUntilExam(paper: string) {
-  // If no paper is specified, find the paper with the earliest starting time
-
+  // If no paper is specified, find the paper with the closest starting time
   if (!paper?.trim()) {
-    paper = "Chinese 1";
+    let earliestTime = Infinity;
+    let earliestPaper = "";
+    for (const [key, value] of Object.entries(timetable)) {
+      const startTime = new Date(value);
+      if (startTime < new Date() && startTime.getTime() < earliestTime) {
+        earliestTime = startTime.getTime();
+        earliestPaper = key;
+      }
+    }
+    paper = earliestPaper;
   }
 
   paper = paper
@@ -80,18 +88,24 @@ function timeUntilExam(paper: string) {
   if (!match) {
     return null;
   }
+
   // Calculate the duration until the start of the examination paper
   const currentTime = new Date();
   const startTime = new Date(timetable[match]);
   const duration = startTime.getTime() - currentTime.getTime();
+  const isPast = duration < 0;
 
   // Format the duration using humanize-duration
-  const formattedDuration = humanizeDuration(duration, {
+  const formattedDuration = humanizeDuration(Math.abs(duration), {
     units: ["d", "h", "m"],
     round: true,
   });
 
-  return `Time until HKDSE *${paper}* examination: ${formattedDuration}`;
+  if (isPast) {
+    return `HKDSE *${paper}* examination was: ${formattedDuration} ago`;
+  } else {
+    return `Time until HKDSE *${paper}* examination: ${formattedDuration}`;
+  }
 }
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
@@ -115,7 +129,7 @@ const command: Command = {
   isDependent: false,
   help: `Command: !dse [paper]
 
-Not supplying the paper will give the earliest paper.
+Not supplying the paper will give the closest paper in time.
 
 *Available papers:*
 ${Object.keys(timetable).join("\n")}`,
