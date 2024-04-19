@@ -65,6 +65,7 @@ import gemini from "./gemini.js";
 import wf from "./wf.js";
 import chm from "./chm.js";
 import blacklist from "./blacklist.js";
+import joke from "./joke.js";
 import { Command } from "../types/command.js";
 
 export const commands = new Map<string, Command>();
@@ -136,3 +137,4 @@ commands.set(gemini.command.slice(1), gemini);
 commands.set(wf.command.slice(1), wf);
 commands.set(chm.command.slice(1), chm);
 commands.set(blacklist.command.slice(1), blacklist);
+commands.set(joke.command.slice(1), joke);
