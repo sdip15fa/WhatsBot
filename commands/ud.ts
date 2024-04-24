@@ -1,6 +1,7 @@
 //jshint esversion:8
-import dictionary from "urban-dictionary";
+import dictionary from "ud-api";
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 
 async function ud(term: string) {
   try {
@@ -17,7 +18,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     await client.sendMessage(
       chatId,
       `🙇‍♂️ *Error*\n\n` +
-        "```Something Unexpected Happened while Lookup on Urban Dictionary```"
+        "```Something Unexpected Happened while Lookup on Urban Dictionary```",
     );
   } else if (typeof data !== "string") {
     await client.sendMessage(
@@ -30,12 +31,12 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         "```\n\n" +
         "*Example:* ```" +
         data[0].example +
-        "```"
+        "```",
     );
   }
 };
 
-export default {
+const command: Command = {
   name: "Urban Dictionary",
   description: "Gets dictionary meanings of words",
   command: "!ud",
@@ -45,3 +46,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

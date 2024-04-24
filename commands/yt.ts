@@ -1,5 +1,6 @@
 //jshint esversion:8
 import whatsapp, { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 const { MessageMedia } = whatsapp;
 import axios from "../helpers/axios.js";
 import formatNum from "../helpers/formatNum.js";
@@ -21,7 +22,7 @@ async function youtube(url: string) {
           data.images[2] ||
           data.images[1] ||
           data.images[0] ||
-          null
+          null,
       ),
     };
   } catch (error) {
@@ -44,33 +45,35 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     await client.sendMessage(
       chatId,
       `🙇‍♂️ *Error*\n\n` +
-        "```Something Unexpected Happened to fetch the YouTube video```"
+        "```Something Unexpected Happened to fetch the YouTube video```",
     );
   } else if (typeof data !== "string") {
-    await client.sendMessage(
-      chatId,
-      new MessageMedia(
-        data.image.mimetype,
-        data.image.data,
-        data.image.filename
-      ),
-      {
-        caption:
-          `*${data.title}*\n\nViews: ` +
-          "```" +
-          data.views +
-          "```\nLikes: " +
-          "```" +
-          data.likes +
-          "```\nComments: " +
-          "```" +
-          data.comments,
-      }
-    );
+    try {
+      await client.sendMessage(
+        chatId,
+        new MessageMedia(
+          data.image.mimetype,
+          data.image.data,
+          data.image.filename,
+        ),
+        {
+          caption:
+            `*${data.title}*\n\nViews: ` +
+            "```" +
+            data.views +
+            "```\nLikes: " +
+            "```" +
+            data.likes +
+            "```\nComments: " +
+            "```" +
+            data.comments,
+        },
+      );
+    } catch {}
   }
 };
 
-export default {
+const command: Command = {
   name: "YouTube",
   description: "Get youtube video info",
   command: "!yt",
@@ -80,3 +83,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

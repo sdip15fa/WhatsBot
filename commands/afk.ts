@@ -1,4 +1,5 @@
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 import { startAfk, afkStatus, stopAfk } from "../helpers/afkWrapper.js";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
@@ -35,7 +36,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       }
       default: {
         throw new Error(
-          "Invalid argument. Valid arguments are: on, off, status"
+          "Invalid argument. Valid arguments are: on, off, status",
         );
       }
     }
@@ -45,7 +46,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   }
 };
 
-export default {
+const command: Command = {
   name: "afk", //name of the module
   description: "Turn on or off afk mode", // short description of what this command does
   command: "!afk", //command with prefix. Ex command: '!test'
@@ -55,5 +56,7 @@ export default {
   public: false,
   execute,
 };
+
+export default command;
 
 // switch to es6 syntax

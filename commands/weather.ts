@@ -1,6 +1,7 @@
 //jshint esversion:8
 import weatherjs, { WeatherData } from "weather-js";
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 
 async function fetchweather(query: string): Promise<WeatherData[] | "error"> {
   const weatherfind = new Promise<WeatherData[] | "error">((resolve) => {
@@ -21,7 +22,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   if (data == "error") {
     await client.sendMessage(
       chatId,
-      `🙇‍♂️ *Error*\n\n` + "```Something Unexpected Happened to fetch Weather```"
+      `🙇‍♂️ *Error*\n\n` + "```Something Unexpected Happened to fetch Weather```",
     );
   } else if (data instanceof Array) {
     const weather = data[0];
@@ -38,12 +39,12 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         "°C```\n*Humidity:* " +
         "```" +
         weather.current.humidity +
-        "```"
+        "```",
     );
   }
 };
 
-export default {
+const command: Command = {
   name: "Weather",
   description: "Gets weather info for given location",
   command: "!weather",
@@ -53,3 +54,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

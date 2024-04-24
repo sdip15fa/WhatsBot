@@ -17,7 +17,7 @@ agenda.define(
           groupId: string;
         };
       };
-    }
+    },
   ) => {
     const { groupId } = job.attrs.data;
     const date = getDate();
@@ -27,10 +27,10 @@ agenda.define(
       await countMessage(
         groupId,
         (await wtsClient.getChatById(groupId))?.name || "",
-        date
-      )
+        date,
+      ),
     );
-  }
+  },
 );
 
 agenda.define(
@@ -50,7 +50,7 @@ agenda.define(
           };
         };
       };
-    }
+    },
   ) => {
     const { chatId, body, sticker, media } = job.attrs.data;
     let { chats } = job.attrs.data;
@@ -63,7 +63,7 @@ agenda.define(
           const messageMedia = new MessageMedia(
             media.mimetype,
             media.data,
-            media.filename || "image.png"
+            media.filename || "image.png",
           );
           if (sticker) {
             return await wtsClient.sendMessage(chatId, messageMedia, {
@@ -74,12 +74,18 @@ agenda.define(
             return await wtsClient.sendMessage(chatId, media);
           }
         }
-        await wtsClient.sendMessage(chatId, body, {
-          ...(media && {
-            media: new MessageMedia(media.mimetype, media.data, media.filename),
-          }),
-        });
-      })
+        try {
+          await wtsClient.sendMessage(chatId, body, {
+            ...(media && {
+              media: new MessageMedia(
+                media.mimetype,
+                media.data,
+                media.filename,
+              ),
+            }),
+          });
+        } catch {}
+      }),
     );
-  }
+  },
 );

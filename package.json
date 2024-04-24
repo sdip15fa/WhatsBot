@@ -10,14 +10,14 @@
     "dev": "nodemon startProcess.ts",
     "test": "tsc --noEmit",
     "lint": "eslint --fix **/*.ts && prettier --write **/*.ts",
-    "docker": "docker build . -t registry.gitlab.com/wcyat/whatsapp-to-discord",
+    "docker": "docker build . -t registry.gitlab.com/wcyat/whatsbot",
     "gentoken": "node dist/session/genToken.js",
     "gentokenwithdownload": "node dist/session/genTokenWithDownload.js",
     "prepare": "husky install"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://gitlab.com/wcyat/whatsapp-to-discord.git"
+    "url": "git+https://gitlab.com/wcyat/whatsbot.git"
   },
   "keywords": [
     "whatsapp-bot"
@@ -25,37 +25,44 @@
   "author": "wcyat",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://gitlab.com/wcyat/whatsapp-to-discord/-/issues"
+    "url": "https://gitlab.com/wcyat/whatsbot/-/issues"
   },
-  "homepage": "https://gitlab.com/wcyat/whatsapp-to-discord",
+  "homepage": "https://gitlab.com/wcyat/whatsbot",
   "dependencies": {
+    "@google/generative-ai": "^0.2.1",
     "@iamtraction/google-translate": "^2.0.1",
+    "@newyork.anthonyng/chess-image-generator": "^1.0.0",
+    "@types/fluent-ffmpeg": "^2.1.24",
     "@types/gifencoder": "^2.0.1",
     "@types/humanize-duration": "^3.27.1",
     "@types/probe-image-size": "^7.2.0",
     "@types/uuid": "^9.0.1",
     "@wcyat/pokemon-showdown": "^0.11.9",
+    "@wolfram-alpha/wolfram-alpha-api": "^23.1004.144821-RELEASE",
     "adm-zip": "^0.5.9",
     "aes-encrypt-stream": "^0.2.0",
     "agenda": "^5.0.0",
-    "axios": "^0.27.2",
+    "axios": "^0.28.0",
     "chatgpt": "^5.0.10",
+    "chess.js": "^1.0.0-beta.6",
     "child_process": "^1.0.2",
     "decode-uri-component": "^0.2.1",
     "discord.js": "^14.7.1",
     "dotenv": "^16.0.3",
     "download": "^8.0.0",
+    "fluent-ffmpeg": "^2.1.2",
     "form-data": "^4.0.0",
     "gifencoder": "^2.0.1",
     "gify": "^0.2.0",
     "humanize-duration": "^3.27.3",
-    "llama-node": "^0.1.6",
     "metar": "^1.0.0",
     "mime-to-extensions": "^1.0.2",
     "mongodb": "^4.17.0",
     "nato-pad": "^0.0.4",
     "node-cron": "^3.0.0",
-    "node-html-parser": "^6.1.4",
+    "node-html-parser": "^6.1.12",
+    "node-html-to-image": "^4.0.0",
+    "node-llama-cpp": "^2.5.1",
     "ocr-space-api-wrapper": "^2.1.3",
     "probe-image-size": "^7.2.3",
     "qr-image": "^3.2.0",
@@ -64,10 +71,10 @@
     "scalc": "^2.0.1",
     "serve-index": "^1.9.1",
     "strict-uri-encode": "^2.0.0",
-    "urban-dictionary": "^3.0.2",
+    "ud-api": "^3.0.2-2",
     "uuid": "^9.0.0",
     "weather-js": "^2.0.0",
-    "whatsapp-web.js": "^1.22.1"
+    "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js#webpack-exodus"
   },
   "devDependencies": {
     "@types/adm-zip": "^0.5.0",
@@ -77,14 +84,16 @@
     "@types/node-fetch": "^2.6.2",
     "@types/qr-image": "^3.2.5",
     "@types/qrcode-terminal": "^0.12.0",
-    "@types/urban-dictionary": "^3.0.0",
     "@typescript-eslint/eslint-plugin": "^5.49.0",
     "@typescript-eslint/parser": "^5.49.0",
     "eslint": "^8.31.0",
     "husky": "^8.0.0",
     "nodemon": "^2.0.20",
-    "prettier": "^2.8.0",
+    "prettier": "^3.1.0",
     "ts-node": "^10.9.1",
     "typescript": "^4.9.4"
+  },
+  "resolutions": {
+    "minimist": "^1.2.8"
   }
 }

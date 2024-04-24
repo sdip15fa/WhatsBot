@@ -2,6 +2,7 @@
 import { randomBytes } from "crypto";
 import { Client, Message, MessageMedia } from "whatsapp-web.js";
 import { agenda } from "../helpers/agenda.js";
+import { Command } from "../types/command.js";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   if (!msg.hasQuotedMsg) {
@@ -10,6 +11,10 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   const chats: string[] = [];
   while (/^[\d|-]+@(g|c)\.us$/.test(args[0])) {
     chats.push(args.shift());
+  }
+  if (chats.length && !msg.fromMe) {
+    try { await msg.reply("Not allowed.")} catch {}
+    return;
   }
   if (!chats.length) chats.push((await msg.getChat()).id._serialized);
   const date = args.join(" ");
@@ -24,7 +29,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
             msg.reply(`Chat ${chatId} not found`).catch(() => {});
             return false;
           }
-        })
+        }),
       )
     ).every((v) => v)
   )
@@ -39,7 +44,12 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     .schedule(date, "send message", {
       id,
       chats,
-      body: quoted.body,
+      body: msg.fromMe
+        ? ""
+        : `${
+            (await msg.getContact())?.name ||
+            (msg.author || msg.from)?.split("@")[0]
+          }: ` + quoted.body,
       sticker: quoted.type === "sticker",
       ...(quoted.hasMedia &&
         media && {
@@ -58,7 +68,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     });
 };
 
-export default {
+const command: Command = {
   name: "Schedule message",
   description: "Schedule a message to be sent at a specific time",
   command: "!schedule",
@@ -66,5 +76,7 @@ export default {
   isDependent: false,
   help: `*Schedule a message to be sent at a specific time.*\n\nReply to the message you want to schedule.\n\n*!schedule [chat id] [time]*\n\nIf the chat id is invalid / omitted the current chat would be used.\n\nTime example: \`\`\`in 1 minute\`\`\`\n\nFor list of chats and chat ids, use !chatlist.`,
   execute,
-  public: false,
+  public: true,
 };
+
+export default command;

@@ -52,7 +52,7 @@ update-dependencies:
     - git reset --hard origin/main
   script:
     - yarn
-    - yarn add whatsapp-web.js@latest
+    - yarn add https://github.com/pedroslopez/whatsapp-web.js
     - git commit -a -m "Update whatsapp-web.js" || exit 0
     - git push origin main
   rules:

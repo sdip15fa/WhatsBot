@@ -1,4 +1,5 @@
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 
 //jshint esversion:8
 const execute = async (_client: Client, msg: Message, args: string[]) => {
@@ -56,7 +57,7 @@ const execute = async (_client: Client, msg: Message, args: string[]) => {
 ${responses[Math.floor(Math.random() * responses.length)]}`);
 };
 
-export default {
+const command: Command = {
   name: "8ball", //name of the module
   description: "Ask 8ball", // short description of what this command does
   command: "!8ball", //command with prefix. Ex command: '!test'
@@ -66,3 +67,5 @@ export default {
   public: true,
   execute,
 };
+
+export default command;

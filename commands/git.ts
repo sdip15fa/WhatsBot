@@ -1,5 +1,6 @@
 //jshint esversion:8
 import whatsapp, { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 const { MessageMedia } = whatsapp;
 import axios from "../helpers/axios.js";
 
@@ -8,7 +9,7 @@ async function downloadzip(url: string, name: string) {
     return {
       status: true,
       data: Buffer.from(
-        (await axios.get(url, { responseType: "arraybuffer" })).data
+        (await axios.get(url, { responseType: "arraybuffer" })).data,
       ).toString("base64"),
       filename: `${name}.zip`,
       mimetype: "application/zip",
@@ -52,7 +53,7 @@ async function gitinfo(url: string) {
       }`,
       data: await downloadzip(
         `https://github.com/${repo.user}/${repo.repo}/archive/${repodata.default_branch}.zip`,
-        repodata.name
+        repodata.name,
       ),
     };
   } catch (err) {
@@ -67,21 +68,27 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   const data = await gitinfo(args[0]);
   if (data.status) {
     if (data.data.status) {
-      await client.sendMessage(
-        msg.to,
-        new MessageMedia(data.data.mimetype, data.data.data, data.data.filename)
-      );
+      try {
+        await client.sendMessage(
+          msg.to,
+          new MessageMedia(
+            data.data.mimetype,
+            data.data.data,
+            data.data.filename,
+          ),
+        );
+      } catch {}
     }
     await client.sendMessage(msg.to, data.msg);
   } else {
     await client.sendMessage(
       msg.to,
-      `🙇‍♂️ *Error*\n\n` + "```" + data.msg + "```"
+      `🙇‍♂️ *Error*\n\n` + "```" + data.msg + "```",
     );
   }
 };
 
-export default {
+const command: Command = {
   name: "Git Info",
   description: "gets information for requested git repo",
   command: "!git",
@@ -91,3 +98,5 @@ export default {
   execute,
   public: false,
 };
+
+export default command;

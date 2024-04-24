@@ -1,6 +1,7 @@
 //jshint esversion:8
 import natoPad from "nato-pad";
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
@@ -17,10 +18,13 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     return client.sendMessage(chatId, "Text too long.");
   }
 
-  await client.sendMessage(chatId, natoPad(args.join(" ") || quotedMsg.body));
+  await client.sendMessage(
+    chatId,
+    `NATO: ${natoPad(args.join(" ") || quotedMsg.body)}`,
+  );
 };
 
-export default {
+const command: Command = {
   name: "Nato",
   description: "Transform text to nato alphabets",
   command: "!nato",
@@ -30,3 +34,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

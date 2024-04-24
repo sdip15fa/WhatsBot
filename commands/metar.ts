@@ -1,5 +1,6 @@
 //jshint esversion:8
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 import { parse } from "node-html-parser";
 import parseMETAR from "metar";
 import axios from "../helpers/axios.js";
@@ -7,7 +8,7 @@ import axios from "../helpers/axios.js";
 async function fetchmetar(airport = "VHHH") {
   try {
     const { data } = await axios.get(
-      `https://en.allmetsat.com/metar-taf/asia.php?icao=${airport}`
+      `https://en.allmetsat.com/metar-taf/asia.php?icao=${airport}`,
     );
     const parsed = parse(data);
     const metar = `METAR ${Array.from(parsed.querySelectorAll("p"))
@@ -34,7 +35,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   if (!data) {
     await client.sendMessage(
       chatId,
-      `🙇‍♂️ *Error*\n\n` + "```Something Unexpected Happened to fetch METAR```"
+      `🙇‍♂️ *Error*\n\n` + "```Something Unexpected Happened to fetch METAR```",
     );
   } else {
     const date = new Date(data.time);
@@ -66,12 +67,12 @@ Clouds ${
       }
 Temperature ${data.temperature}.${data.dewpoint}°C
 QNH ${data.altimeterInHpa} hPa
-${data.special_weather_conditions}`
+${data.special_weather_conditions}`,
     );
   }
 };
 
-export default {
+const command: Command = {
   name: "METAR",
   description: "Gets METAR info",
   command: "!metar",
@@ -81,3 +82,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

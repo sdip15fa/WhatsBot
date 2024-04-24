@@ -1,5 +1,6 @@
 //jshint esversion:8
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 import db from "../db/index.js";
 import { agenda } from "../helpers/agenda.js";
 import { getDate, getTime } from "../helpers/date.js";
@@ -26,11 +27,11 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         {
           timezone: "Asia/Hong_Kong",
           skipImmediate: true,
-        }
+        },
       );
       return await client.sendMessage(
         chatId,
-        "Subscribed! Message counts will be sent at 23:59 every day."
+        "Subscribed! Message counts will be sent at 23:59 every day.",
       );
     } else {
       return await client.sendMessage(chatId, "Already subscribed!");
@@ -74,9 +75,9 @@ ${(() => {
             (v) =>
               `${v.time}: ${v.temperature || ""}${
                 v.symptoms ? ` ${v.symptoms}` : ""
-              }`
+              }`,
           )
-          .join("\n")}`
+          .join("\n")}`,
     )
     .join("\n\n");
 })()}`
@@ -102,13 +103,13 @@ ${(() => {
             (v) =>
               `${v.time}: ${v.temperature || ""}${
                 v.symptoms ? ` ${v.symptoms}` : ""
-              }`
+              }`,
           )
-          .join("\n")}`
+          .join("\n")}`,
     )
     .join("\n\n");
 })()}`
-      }`
+      }`,
     );
   }
 
@@ -131,7 +132,7 @@ ${(() => {
   if (temperature < 35 || temperature > 42) {
     return await client.sendMessage(
       chatId,
-      "Temperature must be between 35 and 42"
+      "Temperature must be between 35 and 42",
     );
   }
 
@@ -157,7 +158,7 @@ ${(() => {
               ...(symptoms && { symptoms }),
             },
           },
-        }
+        },
       )
     ).matchedCount
   )
@@ -179,7 +180,7 @@ ${(() => {
   await client.sendMessage(chatId, "Covid status has been updated.");
 };
 
-export default {
+const command: Command = {
   name: "Covid",
   description: "Report / get covid status",
   command: "!covid",
@@ -189,3 +190,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

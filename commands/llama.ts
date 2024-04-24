@@ -1,72 +1,120 @@
 // Import necessary modules and dependencies
-import { LLM } from "llama-node";
-import { LLamaCpp } from "llama-node/dist/llm/llama-cpp.js";
-import path from "path";
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 import config from "../config.js";
-
-const modelPath = config.llama_model_path; // Retrieve model path from environment variable
-const llama = new LLM(LLamaCpp);
-const llama_config = {
-  modelPath: path.resolve(__dirname, modelPath), // Resolve model path based on the environment variable
-  enableLogging: true,
-  nCtx: 1024,
-  seed: 0,
-  f16Kv: false,
-  logitsAll: false,
-  vocabOnly: false,
-  useMlock: false,
-  embedding: false,
-  useMmap: true,
-  nGpuLayers: 0,
-};
+import axios from "../helpers/axios.js";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
 
-  if (!modelPath) {
+  if (!config.cf_worker.url) {
     return client.sendMessage(
       chatId,
-      "Sorry, llama model path not specified in the environment variable."
+      "Sorry, cf worker url not specified in the environment variable.",
     );
   }
 
   // Extract the text from the user's message
-  const text = args.join(" ");
+  const quotedMsg = msg.hasQuotedMsg && (await msg.getQuotedMessage());
 
-  // Call Llama model with the obtained text
-  const response = await llamaChat(text);
+  if (!args.length && !quotedMsg.body) {
+    return client.sendMessage(chatId, "Please provide prompt to llama!");
+  }
 
-  // Send the response back to the user
-  await client.sendMessage(chatId, `Llama: ${response}`);
+  const text = args.join(" ") || quotedMsg.body;
+  const messages: { role: "system" | "user" | "assistant"; content: string }[] =
+    [];
+
+  if (
+    args.length &&
+    msg.hasQuotedMsg &&
+    quotedMsg.fromMe &&
+    quotedMsg.body.startsWith("Llama:")
+  ) {
+    let currMsg: Message | null = msg;
+    while (currMsg?.body) {
+      const role =
+        currMsg.body.startsWith("Llama:") && currMsg.fromMe
+          ? "assistant"
+          : "user";
+      messages.unshift({
+        role,
+        content:
+          role === "assistant"
+            ? currMsg.body.replace("Llama: ", "")
+            : currMsg.body.trim().slice(1).trim().replace("llama", "").trim(),
+      });
+      if (currMsg.hasQuotedMsg) {
+        const nextQuotedMsg = await currMsg.getQuotedMessage();
+        if (!nextQuotedMsg?.body) {
+          break;
+        }
+
+        if (
+          currMsg.body.startsWith("Llama:") &&
+          currMsg.fromMe &&
+          nextQuotedMsg.fromMe &&
+          nextQuotedMsg.body.startsWith("Llama:")
+        ) {
+          break;
+        }
+
+        if (
+          !(currMsg.body.startsWith("Llama:") && currMsg.fromMe) &&
+          !(nextQuotedMsg.fromMe && nextQuotedMsg.body.startsWith("Llama:"))
+        ) {
+          break;
+        }
+
+        currMsg = nextQuotedMsg;
+      } else {
+        break;
+      }
+    }
+  }
+
+  const username = config.cf_worker.username;
+  const password = config.cf_worker.password;
+
+  const encodedCredentials = Buffer.from(`${username}:${password}`).toString(
+    "base64",
+  );
+  const authHeader = `Basic ${encodedCredentials}`;
+
+  try {
+    // Call Llama model with the obtained text
+    const response = await axios.get<{ response: string }>(
+      config.cf_worker.url,
+      {
+        params: {
+          ...(!messages?.length && { prompt: text }),
+          ...(messages?.length && {
+            messages: encodeURIComponent(JSON.stringify(messages)),
+          }),
+        },
+        headers: {
+          Authorization: authHeader,
+        },
+      },
+    );
+
+    // Send the response back to the user
+    try {
+      await msg.reply(`Llama: ${response.data.response}`);
+    } catch (error) {
+      console.error(error);
+      await client.sendMessage(chatId, `Llama: ${response.data.response}`);
+    }
+  } catch {
+    await client.sendMessage(chatId, "LLaMA generation failed.");
+  }
 
   // Optionally, you can handle conversation history or context here
 
   // Optionally, update the last execution timestamp in your database
 };
 
-// Function to interact with the Llama model
-const llamaChat = async (text: string) => {
-  await llama.load(llama_config);
-  let response = "";
-  await llama.createCompletion(
-    {
-      nThreads: 4,
-      nTokPredict: 2048,
-      topK: 40,
-      topP: 0.1,
-      temp: 0.2,
-      repeatPenalty: 1,
-      prompt: text,
-    },
-    (output: { token: string }) => {
-      response = output.token;
-    }
-  );
-  return response;
-};
-
-export default {
+const command: Command = {
   name: "llama",
   description: "Ask Llama",
   command: "!llama",
@@ -76,3 +124,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

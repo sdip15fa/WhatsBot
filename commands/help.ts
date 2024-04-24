@@ -32,19 +32,19 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   } else if (commands.has(args[0])) {
     await client.sendMessage(
       chatId,
-      `${commands.get(args[0]).help}\npublic: ${
+      `${commands.get(args[0]).help}\n\npublic: ${
         commands.get(args[0]).public ? "yes" : "no"
-      }`
+      }`,
     );
   } else {
     await client.sendMessage(
       chatId,
-      `No command with the name *${args[0]}*...`
+      `No command with the name *${args[0]}*...`,
     );
   }
 };
 
-export default {
+const command: Command = {
   name: "help",
   description: "get information about available commands",
   command: "!help",
@@ -54,3 +54,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

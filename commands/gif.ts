@@ -1,5 +1,6 @@
 //jshint esversion:8
 import whatsapp, { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 import { toGIF } from "../helpers/togif.js";
 
 const execute = async (client: Client, msg: Message) => {
@@ -33,20 +34,22 @@ const execute = async (client: Client, msg: Message) => {
     } catch {
       return await client.sendMessage(
         chatId,
-        "Error converting the media to GIF."
+        "Error converting the media to GIF.",
       );
     }
 
-    await client.sendMessage(chatId, gif);
+    try {
+      await client.sendMessage(chatId, gif);
+    } catch {}
   } else {
     await client.sendMessage(
       chatId,
-      `🙇‍♂️ *Error*\n\n` + "```No media found to make a GIF image```"
+      `🙇‍♂️ *Error*\n\n` + "```No media found to make a GIF image```",
     );
   }
 };
 
-export default {
+const command: Command = {
   name: "GIF Maker",
   description: "generates GIF from media",
   command: "!gif",
@@ -56,3 +59,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

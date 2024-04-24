@@ -1,11 +1,12 @@
 //jshint esversion:8
 // Coded by Sumanjay (https://github.com/cyberboysumanjay)
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 import axios from "../helpers/axios.js";
 
 async function getTrackingDetails(
   trackingService: string,
-  trackingNumber: string
+  trackingNumber: string,
 ) {
   let statusString =
     "Unable to get information for your shipment. Please check the tracking id or try again later!";
@@ -51,17 +52,17 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     await client.sendMessage(
       chatId,
       `🙇‍♂️ *Error*\n\n` +
-        "```Something unexpected happened while fetching the courier details.```"
+        "```Something unexpected happened while fetching the courier details.```",
     );
   } else {
     await client.sendMessage(
       chatId,
-      `🙇‍♂️ *Courier/Shipment Details*\n\n` + "```" + data.status + "```"
+      `🙇‍♂️ *Courier/Shipment Details*\n\n` + "```" + data.status + "```",
     );
   }
 };
 
-export default {
+const command: Command = {
   name: "Courier",
   description:
     "Get courier details from multiple providers. Currently supports: Gati Express and Ekart",
@@ -72,3 +73,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

@@ -1,6 +1,7 @@
 //jshint esversion:8
 
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 import { exec } from "child_process";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
@@ -15,7 +16,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   });
 };
 
-export default {
+const command: Command = {
   name: "Terminal",
   description: "Use teminal remotely",
   command: "!term",
@@ -25,3 +26,5 @@ export default {
   execute,
   public: false,
 };
+
+export default command;

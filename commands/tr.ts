@@ -1,6 +1,7 @@
 //jshint esversion:8
 import translate from "@iamtraction/google-translate";
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 import config from "../config.js";
 import tr_languages from "../helpers/tr_languages.js";
 
@@ -41,13 +42,11 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   if (data == "error") {
     await client.sendMessage(
       msg.to,
-      `🙇‍♂️ *Error*\n\n` + "```Something Unexpected Happened while translate```"
+      `🙇‍♂️ *Error*\n\n` + "```Something Unexpected Happened while translate```",
     );
   } else if (typeof data !== "string") {
     await client.sendMessage(
-      (
-        await msg.getChat()
-      ).id._serialized,
+      (await msg.getChat()).id._serialized,
       `*Original (${data.ori_lang}) :* ` +
         "```" +
         data.original +
@@ -55,7 +54,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         `*Translation (${data.trans_lang}) :* ` +
         "```" +
         data.translated +
-        "```"
+        "```",
     );
   }
 };
@@ -66,10 +65,10 @@ function getLanguageandText(args: string[]) {
 
   if (args[0]) {
     const getLangFromFullname = tr_languages().find(
-      (fullName) => fullName.matchName === args[0].toLowerCase()
+      (fullName) => fullName.matchName === args[0].toLowerCase(),
     ); // match the full name
     const getLangFromCode = tr_languages().find(
-      (shortName) => shortName.code === args[0].toLowerCase()
+      (shortName) => shortName.code === args[0].toLowerCase(),
     ); // match the lang code
 
     if (getLangFromFullname || getLangFromCode) {
@@ -91,7 +90,7 @@ function getLanguageandText(args: string[]) {
   return { lang, text };
 }
 
-export default {
+const command: Command = {
   name: "Translator",
   description: "Translates given text to requested language",
   command: "!tr",
@@ -101,3 +100,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

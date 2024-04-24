@@ -1,4 +1,5 @@
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 import scalc from "scalc";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
@@ -12,14 +13,14 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     return await client.sendMessage(
       chatId,
       `${args.join(" ")}
-= ${result}`
+= ${result}`,
     );
   } catch {
     return await client.sendMessage(chatId, "An error occured.");
   }
 };
 
-export default {
+const command: Command = {
   name: "Calculator",
   description: "Calculate an expression",
   command: "!calc",
@@ -29,3 +30,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

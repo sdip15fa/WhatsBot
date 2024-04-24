@@ -1,6 +1,6 @@
-# Whatsapp to Discord
+# Whatsbot
 
-Forward messages between whatsapp and discord. Based on [WhatsBot](https://github.com/tuhinpal/WhatsBot/).
+This is a feature-rich heavily-modified Whatsbot fork.
 
 <!-- <h1 align="center">
   <a href="https://github.com/tuhinpal/WhatsBot"><img src="https://telegra.ph/file/96ccad5945c18944c5f15.png" alt="whatsbot" width="290"></a>

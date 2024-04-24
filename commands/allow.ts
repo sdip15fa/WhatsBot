@@ -1,5 +1,6 @@
 //jshint esversion:8
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 import config from "../config.js";
 import pmpermit from "../helpers/pmpermit.js";
 
@@ -8,12 +9,12 @@ const execute = async (client: Client, msg: Message) => {
   if (config.pmpermit_enabled == "true" && !msg.to.includes("-")) {
     await pmpermit.permit(msg.to.split("@")[0]);
     msg.reply(
-      "*✅ Allowed*\n\nYou are allowed for PM\n\n _Powered by WhatsBot_"
+      "*✅ Allowed*\n\nYou are allowed for PM\n\n _Powered by WhatsBot_",
     );
   }
 };
 
-export default {
+const command: Command = {
   name: "Allow for PM",
   description: "Allow personal messaging for a conatct",
   command: "!allow",
@@ -23,3 +24,5 @@ export default {
   public: false,
   execute,
 };
+
+export default command;

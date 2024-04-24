@@ -1,23 +1,23 @@
 version: "3.9"
 
 services:
-  wtstodis:
-    image: registry.gitlab.com/wcyat/whatsapp-to-discord
-    container_name: wtstodis
+  whatsbot:
+    image: registry.gitlab.com/wc-yat/whatsbot
+    container_name: whatsbot
     restart: unless-stopped
     build:
       context: ..
       dockerfile: Dockerfile
     volumes:
-     - ./session.secure:/app/session.secure
-     - ./.wwebjs_auth:/app/.wwebjs_auth
-     - ./wtstodis-data:/app/data
-     - ./llama:/app/llama
+     - ./session.secure:/app/session.secure:Z
+     - ./.wwebjs_auth:/app/.wwebjs_auth:Z
+     - ./whatsbot-data:/app/data:Z
+     - ./llama:/app/llama:Z
     environment:
       SESSION_KEY: ${SESSION_KEY}
       PMPERMIT_ENABLED: ${PMPERMIT_ENABLED}
       MARK_AS_SEEN: ${MARK_AS_SEEN}
-      MONGODB_URL: "mongodb://${MONGO_USER}:${MONGO_PASSWORD}@wtstodis-mongo:${MONGO_PORT}"
+      MONGODB_URL: "mongodb://${MONGO_USER}:${MONGO_PASSWORD}@whatsbot-mongo:${MONGO_PORT}"
       DEFAULT_TR_LANG: ${DEFAULT_TR_LANG}
       ENABLE_DELETE_ALERT: ${ENABLE_DELETE_ALERT}
       OCR_SPACE_API_KEY: ${OCR_SPACE_API_KEY}
@@ -33,11 +33,15 @@ services:
       BITLY_API_KEY: ${BITLY_API_KEY}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       TZ: ${TZ:-Asia/Hong_Kong}
-      LLAMA_MODEL_PATH: ${LLAMA_MODEL_PATH}
+      CF_WORKER_URL: ${CF_WORKER_URL}
+      CF_WORKER_USERNAME: ${CF_WORKER_USERNAME}
+      CF_WORKER_PASSWORD: ${CF_WORKER_PASSWORD}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      WOLFRAM_APP_ID: ${WOLFRAM_APP_ID}
     networks:
       - whatsbot-network
-  wtstodis-mongo:
-    container_name: wtstodis-mongo
+  whatsbot-mongo:
+    container_name: whatsbot-mongo
     image: mongo
     tty: true
     command: mongod --auth --port=${MONGO_PORT} --bind_ip_all

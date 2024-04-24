@@ -2,6 +2,7 @@
 //Coded by Sumanjay (https://github.com/cyberboysumanjay)
 import axios from "../helpers/axios.js";
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 
 async function getPrice(cryptoCode: string) {
   cryptoCode = cryptoCode.toUpperCase();
@@ -32,14 +33,14 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     await client.sendMessage(
       chatId,
       `🙇‍♂️ *Error*\n\n` +
-        "```Something unexpected happened while fetching Cryptocurrency Price```"
+        "```Something unexpected happened while fetching Cryptocurrency Price```",
     );
   }
   if (data == "unsupported") {
     await client.sendMessage(
       chatId,
       `🙇‍♂️ *Error*\n\n` +
-        "```Support for this CryptoCurrency is not yet added```"
+        "```Support for this CryptoCurrency is not yet added```",
     );
   } else if (data instanceof Object) {
     const date = new Date().toLocaleString("en-US", {
@@ -47,12 +48,12 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     });
     await client.sendMessage(
       chatId,
-      `Price of *${data.name}* as of ${date} is *₹ ${data.price}*`
+      `Price of *${data.name}* as of ${date} is *₹ ${data.price}*`,
     );
   }
 };
 
-export default {
+const command: Command = {
   name: "Crypto Currency",
   description: "Gets price info for requested crypto currency",
   command: "!crypto",
@@ -62,3 +63,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

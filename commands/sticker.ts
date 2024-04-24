@@ -1,5 +1,6 @@
 //jshint esversion:8
 import whatsapp, { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 const { MessageMedia } = whatsapp;
 
 const execute = async (client: Client, msg: Message) => {
@@ -17,24 +18,28 @@ const execute = async (client: Client, msg: Message) => {
     if (!attachmentData) {
       return;
     }
-    await client.sendMessage(
-      chatId,
-      new MessageMedia(
-        attachmentData.mimetype,
-        attachmentData.data,
-        attachmentData.filename
-      ),
-      { sendMediaAsSticker: true }
-    );
+    try {
+      await client.sendMessage(
+        chatId,
+        new MessageMedia(
+          attachmentData.mimetype,
+          attachmentData.data,
+          attachmentData.filename,
+        ),
+        { sendMediaAsSticker: true },
+      );
+    } catch {
+      await client.sendMessage(chatId, "Sending sticker failed.");
+    }
   } else {
     await client.sendMessage(
       chatId,
-      `🙇‍♂️ *Error*\n\n` + "```No image found to make a Sticker```"
+      `🙇‍♂️ *Error*\n\n` + "```No image found to make a Sticker```",
     );
   }
 };
 
-export default {
+const command: Command = {
   name: "Sticker Maker",
   description: "generates sticker from image",
   command: "!sticker",
@@ -44,3 +49,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;

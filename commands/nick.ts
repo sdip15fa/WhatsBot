@@ -1,5 +1,6 @@
 //jshint esversion:8
 import { Client, Message } from "whatsapp-web.js";
+import { Command } from "../types/command.js";
 import db from "../db/index.js";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
@@ -12,14 +13,14 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   if (nickname.length > 20) {
     return await client.sendMessage(
       chatId,
-      "Nickname too long (maximum is 20 characters)."
+      "Nickname too long (maximum is 20 characters).",
     );
   }
   if (
     !(
       await db("nickname").coll.updateOne(
         { id: userId },
-        { $set: { name: nickname } }
+        { $set: { name: nickname } },
       )
     ).matchedCount
   ) {
@@ -31,7 +32,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   return await client.sendMessage(chatId, "Nickname set!");
 };
 
-export default {
+const command: Command = {
   name: "Nickname",
   description: "Set your nickname.",
   command: "!nick",
@@ -41,3 +42,5 @@ export default {
   execute,
   public: true,
 };
+
+export default command;
