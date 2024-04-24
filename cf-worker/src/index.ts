@@ -76,7 +76,7 @@ export default {
 			let response: string;
 			for (let i = 5; i > 0; i--) {
 				try {
-					response = await ai.run('@hf/thebloke/openchat_3.5-awq', chat);
+					response = await ai.run('@cf/meta/llama-3-8b-instruct', chat);
 					break;
 				} catch {
 					if (i === 1) {

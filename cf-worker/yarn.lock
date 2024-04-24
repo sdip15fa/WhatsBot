@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@cloudflare/ai@^1.0.53":
-  version "1.0.53"
-  resolved "https://registry.yarnpkg.com/@cloudflare/ai/-/ai-1.0.53.tgz#f786fdd538e25e5023f3cdbd53a21ec0e71dd359"
-  integrity sha512-bVuvvm+LU/EoZ5mehL0uakOld1gvrOEQpnRqXbkNIjypHlxTLPLe3LDU3RZdaSTTUI+dK5beLI5qcmAu8h1/iQ==
+"@cloudflare/ai@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@cloudflare/ai/-/ai-1.1.0.tgz#89c17ae15b1779147077b4a8a0a36c422e5d7a96"
+  integrity sha512-6j2aeelMfPj2YVj/zQBAj9PAbEZSrO/t+Wywy3Gvk93JsTlsZvEH+V9JYIZHynhSt0juuOrSWP9ju3vN6lUDMQ==
 
 "@cloudflare/kv-asset-handler@^0.2.0":
   version "0.2.0"
