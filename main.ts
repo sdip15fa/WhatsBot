@@ -502,9 +502,9 @@ ${msg.body || msg.type}`,
     const chatId = (await msg.getChat())?.id._serialized;
     if (
       chatId &&
-      !(await db("chats").coll.findOne({
+      (await db("chats").coll.findOne({
         chatId,
-        $or: [{ disabled: true }, { suicide: false }],
+        $and: [{ $not: { disabled: true } }, { suicide: true }],
       })) &&
       (await msg.getContact())?.name &&
       msg.body
