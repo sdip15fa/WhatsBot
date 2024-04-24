@@ -505,7 +505,7 @@ ${msg.body || msg.type}`,
       (await db("chats").coll.findOne({
         chatId,
         suicide: true,
-        disabled: { $not: true },
+        disabled: { $not: { $eq: true } },
       })) &&
       (await msg.getContact())?.name &&
       msg.body
