@@ -7,34 +7,24 @@ import { Command } from "../types/command.js";
 export async function getShortURL(input: string) {
   return axios
     .post<{
-      references: unknown;
-      link: string;
-      id: string;
-      long_url: string;
-      archived: boolean;
+      address: string;
+      banned: boolean;
       created_at: string;
-      custom_bitlinks: string[];
-      tags: string[];
-      deeplinks: {
-        guid: string;
-        bitlink: string;
-        app_uri_path: string;
-        install_url: string;
-        app_guid: string;
-        os: string;
-        install_type: string;
-        created: string;
-        modified: string;
-        brand_guid: string;
-      }[];
+      id: string;
+      link: string;
+      password: boolean;
+      target: string;
+      description: string;
+      updated_at: string;
+      visit_count: number;
     }>(
-      "https://api-ssl.bitly.com/v4/shorten",
+      `https://${process.env.KUTT_DOMAIN}/api/v2/links`,
       {
-        long_url: input,
+        target: input,
       },
       {
         headers: {
-          authorization: `Bearer ${process.env.BITLY_API_KEY}`,
+          "X-API-KEY": process.env.KUTT_API_KEY,
         },
       },
     )
@@ -67,16 +57,13 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         "```Please make sure the entered URL is in correct format.```",
     );
   } else if (typeof data !== "string") {
-    await client.sendMessage(
-      chatId,
-      `Short URL for ${data.input} is 👇\n${data.short}`,
-    );
+    await client.sendMessage(chatId, data.short);
   }
 };
 
 const command: Command = {
   name: "Shorten Link",
-  description: "get shortend link for the given url",
+  description: "Get shortend link for the given url",
   command: "!shorten",
   commandType: "plugin",
   isDependent: false,
