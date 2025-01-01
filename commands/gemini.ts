@@ -108,18 +108,17 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
           threshold: HarmBlockThreshold.BLOCK_NONE,
         },
       ],
-      ...(searchWithGoogle && {
-        tools: [
-          {
-            googleSearchRetrieval: {
-              dynamicRetrievalConfig: {
-                mode: DynamicRetrievalMode.MODE_DYNAMIC,
-                dynamicThreshold: 0,
-              },
+
+      tools: [
+        {
+          googleSearchRetrieval: {
+            dynamicRetrievalConfig: {
+              mode: DynamicRetrievalMode.MODE_DYNAMIC,
+              dynamicThreshold: searchWithGoogle ? 0 : 0.7,
             },
           },
-        ],
-      }),
+        },
+      ],
     });
 
     const chat = model.startChat({
