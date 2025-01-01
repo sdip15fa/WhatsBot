@@ -34,7 +34,11 @@ export const dcClient = new DCClient({
 });
 
 export const wtsClient = new WTSClient({
-  puppeteer: { headless: true, args: ["--no-sandbox"] },
+  puppeteer: {
+    headless: true,
+    args: ["--no-sandbox"],
+    executablePath: "/usr/bin/chromium",
+  },
   authStrategy: new whatsapp.LocalAuth({ clientId: "whatsbot" }),
 });
 
