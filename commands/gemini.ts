@@ -114,7 +114,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
             googleSearchRetrieval: {
               dynamicRetrievalConfig: {
                 mode: DynamicRetrievalMode.MODE_DYNAMIC,
-                dynamicThreshold: 0.7,
+                dynamicThreshold: 0,
               },
             },
           },
