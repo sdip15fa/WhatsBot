@@ -3,7 +3,6 @@ import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
 import config from "../config.js";
 import {
-  DynamicRetrievalMode,
   GoogleGenerativeAI,
   HarmBlockThreshold,
   HarmCategory,
@@ -23,10 +22,10 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     return client.sendMessage(chatId, "Please provide prompt to gemini!");
   }
 
-  const searchWithGoogle = args[0] === "google";
-  if (searchWithGoogle) {
-    args.shift();
-  }
+  // const searchWithGoogle = args[0] === "google";
+  // if (searchWithGoogle) {
+  //   args.shift();
+  // }
 
   const prompt = args.join(" ") || quotedMsg.body;
   const history: { role: "model" | "user"; parts: { text: string }[] }[] = [];
@@ -109,16 +108,16 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         },
       ],
 
-      tools: [
-        {
-          googleSearchRetrieval: {
-            dynamicRetrievalConfig: {
-              mode: DynamicRetrievalMode.MODE_DYNAMIC,
-              dynamicThreshold: searchWithGoogle ? 0 : 0.7,
-            },
-          },
-        },
-      ],
+      // tools: [
+      //   {
+      //     googleSearchRetrieval: {
+      //       dynamicRetrievalConfig: {
+      //         mode: DynamicRetrievalMode.MODE_DYNAMIC,
+      //         dynamicThreshold: searchWithGoogle ? 0 : 0.7,
+      //       },
+      //     },
+      //   },
+      // ],
     });
 
     const chat = model.startChat({
@@ -134,7 +133,8 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       console.error(error);
       await client.sendMessage(chatId, `Gemini: ${result.response.text()}`);
     }
-  } catch {
+  } catch (error) {
+    console.error(error);
     await client.sendMessage(chatId, "Gemini generation failed.");
   }
 };
