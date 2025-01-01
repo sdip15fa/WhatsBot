@@ -8,7 +8,6 @@ import whatsapp, {
   Message,
 } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
-import packageJson from "../package.json" assert { type: "json" };
 
 async function get(battery: BatteryInfo, phn_info: ClientInfoPhone) {
   let batttxt;
@@ -21,7 +20,7 @@ async function get(battery: BatteryInfo, phn_info: ClientInfoPhone) {
 
   return {
     msg:
-      `*Whatsbot*\n\nThis chat is Powered By *Whatsbot*\n\n*Battery:* ${batttxt}\n*Device:* ${phn_info.device_manufacturer} ${phn_info.device_model}\n*WA Version:* ${phn_info.wa_version}\n*Whatsbot Version:* ${packageJson.version}\n*Pmpermit:* ${config.pmpermit_enabled}\n\n*Official Repository Url 👇*\n` +
+      `*Whatsbot*\n\nThis chat is Powered By *Whatsbot*\n\n*Battery:* ${batttxt}\n*Device:* ${phn_info.device_manufacturer} ${phn_info.device_model}\n*WA Version:* ${phn_info.wa_version}\n*Pmpermit:* ${config.pmpermit_enabled}\n\n*Official Repository Url 👇*\n` +
       "```https://github.com/tuhinpal/WhatsBot```",
     mimetype: "image/jpeg",
     data: Buffer.from(
