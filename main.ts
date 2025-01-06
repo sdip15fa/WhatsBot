@@ -75,78 +75,82 @@ export default async function main() {
     console.log("Whatsapp logged in");
   });
 
-  dcClient.on("messageCreate", async (msg) => {
-    if (JSON.parse(process.env.DISCORD_TO_WHATSAPP))
-      try {
-        if (msg.author.bot) return;
-        const disId = msg.reference?.messageId;
+  if (process.env.DISCORD_TOKEN) {
+    dcClient.on("messageCreate", async (msg) => {
+      if (JSON.parse(process.env.DISCORD_TO_WHATSAPP))
+        try {
+          if (msg.author.bot) return;
+          const disId = msg.reference?.messageId;
 
-        const wtsId = (await db("messages").coll.findOne({ disId }))?.wtsId;
-        console.log(msg.author.id, wtsId, process.env.WTS_GROUP_ID);
+          const wtsId = (await db("messages").coll.findOne({ disId }))?.wtsId;
+          console.log(msg.author.id, wtsId, process.env.WTS_GROUP_ID);
 
-        if (
-          (!JSON.parse(process.env.DISCORD_TO_WHATSAPP) ||
-            msg.channelId !== process.env.DISCORD_READ_CHANNEL_ID) &&
-          !wtsId
-        )
-          return;
+          if (
+            (!JSON.parse(process.env.DISCORD_TO_WHATSAPP) ||
+              msg.channelId !== process.env.DISCORD_READ_CHANNEL_ID) &&
+            !wtsId
+          )
+            return;
 
-        let replyMsg = msg.content;
-        if (msg.author.id !== process.env.DISCORD_OWNER_ID) {
-          replyMsg = `${msg.author.tag}: ${msg.content}`;
-        }
+          let replyMsg = msg.content;
+          if (msg.author.id !== process.env.DISCORD_OWNER_ID) {
+            replyMsg = `${msg.author.tag}: ${msg.content}`;
+          }
 
-        const media = await Promise.all(
-          msg.attachments
-            ?.map(async (attachment) => {
-              try {
-                if (typeof attachment.attachment === "string") {
-                  attachment.attachment = await download(attachment.attachment);
+          const media = await Promise.all(
+            msg.attachments
+              ?.map(async (attachment) => {
+                try {
+                  if (typeof attachment.attachment === "string") {
+                    attachment.attachment = await download(
+                      attachment.attachment,
+                    );
+                  }
+                  return new MessageMedia(
+                    attachment.contentType,
+                    attachment.attachment.toString("base64"),
+                    attachment.name,
+                  );
+                } catch {
+                  return null;
                 }
-                return new MessageMedia(
-                  attachment.contentType,
-                  attachment.attachment.toString("base64"),
-                  attachment.name,
-                );
-              } catch {
-                return null;
-              }
-            })
-            .filter((a) => a),
-        );
+              })
+              .filter((a) => a),
+          );
 
-        while (media?.length > 1) {
-          const i = media.shift();
+          while (media?.length > 1) {
+            const i = media.shift();
+            try {
+              wtsClient
+                .sendMessage(process.env.WTS_GROUP_ID, "", {
+                  ...(wtsId && { quotedMessageId: wtsId }),
+                  media: i,
+                })
+                .catch(console.log);
+            } catch {}
+          }
+
           try {
             wtsClient
-              .sendMessage(process.env.WTS_GROUP_ID, "", {
+              .sendMessage(process.env.WTS_GROUP_ID, replyMsg, {
                 ...(wtsId && { quotedMessageId: wtsId }),
-                media: i,
+                ...(media?.[0] && { media: media[0] }),
+              })
+              .then(() => {
+                if (
+                  wtsId ||
+                  process.env.DISCORD_READ_CHANNEL_ID ===
+                    process.env.DISCORD_FORWARD_CHANNEL_ID
+                )
+                  msg.delete().catch(() => {});
               })
               .catch(console.log);
           } catch {}
+        } catch (e) {
+          console.log(e);
         }
-
-        try {
-          wtsClient
-            .sendMessage(process.env.WTS_GROUP_ID, replyMsg, {
-              ...(wtsId && { quotedMessageId: wtsId }),
-              ...(media?.[0] && { media: media[0] }),
-            })
-            .then(() => {
-              if (
-                wtsId ||
-                process.env.DISCORD_READ_CHANNEL_ID ===
-                  process.env.DISCORD_FORWARD_CHANNEL_ID
-              )
-                msg.delete().catch(() => {});
-            })
-            .catch(console.log);
-        } catch {}
-      } catch (e) {
-        console.log(e);
-      }
-  });
+    });
+  }
 
   wtsClient.on("message_create", async (msg) => {
     if (JSON.parse(process.env.WHATSAPP_TO_DISCORD))
@@ -158,7 +162,7 @@ export default async function main() {
         console.log("from", msg.from);
         console.log("group id", groupId);
         console.log("msg id", msg.id._serialized);
-        if (groupId === process.env.WTS_GROUP_ID) {
+        if (groupId === process.env.WTS_GROUP_ID && process.env.DISCORD_TOKEN) {
           const channel = dcClient.channels.cache.get(
             process.env.DISCORD_FORWARD_CHANNEL_ID,
           );
@@ -689,9 +693,11 @@ https://faq.whatsapp.com/1417269125743673
         writeFileSync("screenshot.png", screenshot, "base64");
       });
     }, 30000);
-    dcClient.login(process.env.DISCORD_TOKEN).then(() => {
-      console.log("Discord logged in");
-    });
+    if (process.env.DISCORD_TOKEN) {
+      dcClient.login(process.env.DISCORD_TOKEN).then(() => {
+        console.log("Discord logged in");
+      });
+    }
     //    console.log(await wtsClient.getWWebVersion());
   })();
 }
