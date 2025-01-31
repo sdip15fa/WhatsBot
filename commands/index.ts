@@ -67,6 +67,7 @@ import chm from "./chm.js";
 import blacklist from "./blacklist.js";
 import joke from "./joke.js";
 import evilllama from "./evilllama.js";
+import ds from "./ds.js";
 import { Command } from "../types/command.js";
 
 export const commands = new Map<string, Command>();
@@ -140,3 +141,4 @@ commands.set(chm.command.slice(1), chm);
 commands.set(blacklist.command.slice(1), blacklist);
 commands.set(joke.command.slice(1), joke);
 commands.set(evilllama.command.slice(1), evilllama);
+commands.set(ds.command.slice(1), ds);

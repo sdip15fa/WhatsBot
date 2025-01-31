@@ -101,6 +101,52 @@ export default {
 			return Response.json({ ...response, evil: params.get('evil') === 'true' });
 		}
 
+		if (path === '/ds') {
+			const prompt = params.get('prompt');
+			let messages: { role: 'user' | 'system' | 'assistant'; content: string }[] = [];
+			try {
+				messages = JSON.parse(decodeURIComponent(params.get('messages')) || '[]');
+			} catch {
+				return new BadRequestException('Messages must be a valid JSON array.');
+			}
+
+			const chat = {
+				max_tokens: 8192,
+				messages: [
+					{
+						role: 'system',
+						content: 'Below is an instruction that describes a task. Write a response that appropriately completes the request.',
+					},
+				],
+			};
+			if (messages?.length) {
+				chat.messages = [...chat.messages, ...messages];
+			} else {
+				chat.messages.push({
+					role: 'user',
+					content: prompt,
+				});
+			}
+			let response: string;
+			for (let i = 5; i > 0; i--) {
+				try {
+					response = await ai.run('@cf/deepseek-ai/deepseek-r1-distill-qwen-32b', chat);
+					break;
+				} catch {
+					if (i === 1) {
+						return new FailedException('Failed to generate after five tries.');
+					}
+				}
+			}
+
+			(response as unknown as { response: string }).response = (response as unknown as { response: string }).response
+				.split('</think>')[1]
+				.trim();
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			return Response.json(response);
+		}
+
 		if ((path === '/' && request.method === 'POST') || path === '/transcribe') {
 			const contentType = request.headers.get('Content-Type');
 			if (!contentType || !contentType.includes('multipart/form-data')) {
