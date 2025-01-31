@@ -84,7 +84,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   try {
     // Call deepseek model with the obtained text
     const response = await axios.get<{ response: string }>(
-      config.cf_worker.url,
+      `${config.cf_worker.url}ds`,
       {
         params: {
           ...(!messages?.length && { prompt: text }),
