@@ -11,6 +11,7 @@ const config = {
   enable_delete_alert: process.env.ENABLE_DELETE_ALERT || "true",
   ocr_space_api_key: process.env.OCR_SPACE_API_KEY || "",
   gemini_api_key: process.env.GEMINI_API_KEY || "",
+  openai_api_key: process.env.OPENAI_API_KEY || "",
   wolfram_app_id: process.env.WOLFRAM_APP_ID || "",
   cf_worker: {
     url: process.env.CF_WORKER_URL,
