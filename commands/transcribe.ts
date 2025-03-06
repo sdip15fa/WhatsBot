@@ -70,12 +70,15 @@ const execute = async (client: Client, msg: Message) => {
     );
     const authHeader = `Basic ${encodedCredentials}`;
 
+    const bodyFormData = new FormData();
+    bodyFormData.append("audio", attachmentData.data);
+
     const result = await axios.post<TranscriptionResult>(
       config.cf_worker.url,
-      Buffer.from(attachmentData.data, "base64"),
+      bodyFormData,
       {
         headers: {
-          "Content-Type": attachmentData.mimetype,
+          "Content-Type": "multipart/form-data",
           Authorization: authHeader,
         },
       },
