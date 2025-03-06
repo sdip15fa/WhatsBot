@@ -1,10 +1,52 @@
 //jshint esversion:8
 import whatsapp, { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
+import config from "../config.js";
+import axios from "../helpers/axios.js";
+
+interface TranscriptionInfo {
+  language: string;
+  language_probability: number;
+  duration: number;
+  duration_after_vad: number;
+}
+
+interface Word {
+  start: number;
+  end: number;
+  word: string;
+}
+
+interface Segment {
+  start: number;
+  end: number;
+  text: string;
+  temperature: number;
+  avg_logprob: number;
+  compression_ratio: number;
+  no_speech: number;
+  words: Word[];
+}
+
+interface TranscriptionResult {
+  transcription_info: TranscriptionInfo;
+  segments: Segment[];
+  vtt: string;
+  text: string;
+  word_count: number;
+}
 
 const execute = async (client: Client, msg: Message) => {
   const chatId = (await msg.getChat()).id._serialized;
   const quotedMsg = await msg.getQuotedMessage();
+
+  if (!config.cf_worker.url) {
+    return client.sendMessage(
+      chatId,
+      "Sorry, cf worker url not specified in the environment variable.",
+    );
+  }
+
   if (quotedMsg.hasMedia) {
     const attachmentData: whatsapp.MessageMedia = await quotedMsg
       .downloadMedia()
@@ -20,31 +62,28 @@ const execute = async (client: Client, msg: Message) => {
       );
     }
 
-    const result = (await fetch(
-      "https://api-inference.huggingface.co/models/wcyat/whisper-small-yue-mdcc",
+    const username = config.cf_worker.username;
+    const password = config.cf_worker.password;
+
+    const encodedCredentials = Buffer.from(`${username}:${password}`).toString(
+      "base64",
+    );
+    const authHeader = `Basic ${encodedCredentials}`;
+
+    const result = await axios.post<TranscriptionResult>(
+      config.cf_worker.url,
+      Buffer.from(attachmentData.data, "base64"),
       {
         headers: {
-          "User-Agent":
-            "Mozilla/5.0 (Windows NT 10.0; rv:122.0) Gecko/20100101 Firefox/122.0",
-          Accept: "*/*",
-          "Accept-Language": "en-US,en;q=0.5",
-          "content-type": attachmentData.mimetype,
-          "x-wait-for-model": "true",
+          "Content-Type": attachmentData.mimetype,
+          Authorization: authHeader,
         },
-        referrer: "https://huggingface.co/",
-        method: "POST",
-        mode: "cors",
-        body: Buffer.from(attachmentData.data, "base64"),
       },
-    ).then((res) => res.json())) as { text: string };
+    );
 
     await client.sendMessage(
       chatId,
-      `*Transcription*\n\n` +
-        (result.text || "") +
-        `
-    
-Note: this does not work with audios >30s. You may want to use my android app: https://l.wcyat.me/gQAKgl`,
+      `*Transcription*\n\n` + (result.data.text || ""),
     );
   } else {
     await client.sendMessage(chatId, `🙇‍♂️ *Error*\n\n` + "```No media found```");

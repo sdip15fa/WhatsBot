@@ -1,7 +1,10 @@
 name = "your-worker-name"
 main = "src/index.ts"
-compatibility_date = "2023-10-07"
 workers_dev = true
+compatibility_flags = [ "nodejs_compat" ]
+compatibility_date = "2024-09-23"
 
 [ai]
 binding = "AI"
+[observability.logs]
+enabled = true
