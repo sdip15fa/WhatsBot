@@ -3,6 +3,7 @@ import whatsapp, { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
 import config from "../config.js";
 import axios from "../helpers/axios.js";
+import FormData from "form-data";
 
 interface TranscriptionInfo {
   language: string;
