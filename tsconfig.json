@@ -16,6 +16,6 @@
     "baseUrl": "."
   },
   "include": ["**/*.ts", "*.ts"],
-  "exclude": ["node_modules", "*.js", "dist"],
+  "exclude": ["node_modules", "*.js", "dist", "cf-worker"],
   "compileOnSave": true,
 }

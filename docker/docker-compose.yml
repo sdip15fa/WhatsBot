@@ -43,7 +43,7 @@ services:
       - whatsbot-network
   whatsbot-mongo:
     container_name: whatsbot-mongo
-    image: mongo
+    image: mongo:6.0
     tty: true
     command: mongod --auth --port=${MONGO_PORT} --bind_ip_all
     restart: always

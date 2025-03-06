@@ -26,3 +26,4 @@ session.secure
 /dist/
 /docker/data
 /docker/wtstodis-data
+.aider*
