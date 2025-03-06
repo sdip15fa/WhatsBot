@@ -70,8 +70,14 @@ const execute = async (client: Client, msg: Message) => {
     );
     const authHeader = `Basic ${encodedCredentials}`;
 
+    const b64toBlob = (base64: string, type = "application/octet-stream") =>
+      fetch(`data:${type};base64,${base64}`).then((res) => res.blob());
+
     const bodyFormData = new FormData();
-    bodyFormData.append("audio", attachmentData.data);
+    bodyFormData.append(
+      "audio",
+      await b64toBlob(attachmentData.data, attachmentData.mimetype),
+    );
 
     const result = await axios.post<TranscriptionResult>(
       config.cf_worker.url,
