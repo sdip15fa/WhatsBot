@@ -4,6 +4,7 @@ import { Command } from "../types/command.js";
 import config from "../config.js";
 import axios from "../helpers/axios.js";
 import FormData from "form-data";
+import mime from "mime-to-extensions";
 
 interface TranscriptionInfo {
   language: string;
@@ -71,21 +72,18 @@ const execute = async (client: Client, msg: Message) => {
     );
     const authHeader = `Basic ${encodedCredentials}`;
 
-    const b64toBlob = (base64: string, type = "application/octet-stream") =>
-      fetch(`data:${type};base64,${base64}`).then((res) => res.blob());
-
-    const bodyFormData = new FormData();
-    bodyFormData.append(
-      "audio",
-      await b64toBlob(attachmentData.data, attachmentData.mimetype),
-    );
+    
+    const form = new FormData();
+    form.append("audio", Buffer.from(attachmentData.data, "base64"), {
+      filename: `audio.${mime.extension(attachmentData.mimetype)}`,
+    });
 
     const result = await axios.post<TranscriptionResult>(
       config.cf_worker.url,
-      bodyFormData,
+      form,
       {
         headers: {
-          "Content-Type": "multipart/form-data",
+          ...form.getHeaders(),
           Authorization: authHeader,
         },
       },
