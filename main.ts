@@ -395,7 +395,8 @@ export default async function main() {
       if (msg.isStatus) {
         try {
           const media =
-            msg.hasMedia && (await msg.downloadMedia().catch(() => null));
+            msg.hasMedia &&
+            (await msg.downloadMedia().catch(() => null as any));
           await wtsClient
             .sendMessage(
               process.env.WTS_OWNER_ID,
@@ -424,7 +425,7 @@ ${msg.body || msg.type}`,
           })
         )
           return;
-        const media = await msg.downloadMedia().catch(() => null);
+        const media = await msg.downloadMedia().catch(() => null as any);
         if (!media) return;
         const sendTo =
           process.env.WTS_MEDIA_FORWARD_GROUP_ID || process.env.WTS_OWNER_ID;
@@ -690,7 +691,7 @@ https://faq.whatsapp.com/1417269125743673
     wtsClient.initialize();
     setInterval(() => {
       wtsClient.pupPage?.screenshot().then((screenshot) => {
-        writeFileSync("screenshot.png", screenshot, "base64");
+        writeFileSync("screenshot.png", screenshot as string, "base64");
       });
     }, 30000);
     if (process.env.DISCORD_TOKEN) {

@@ -2,11 +2,7 @@
 import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
 import config from "../config.js";
-import {
-  GoogleGenerativeAI,
-  HarmBlockThreshold,
-  HarmCategory,
-} from "@google/generative-ai";
+import { GoogleGenAI, HarmBlockThreshold, HarmCategory } from "@google/genai";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
@@ -86,52 +82,46 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   }
 
   try {
-    const genAI = new GoogleGenerativeAI(config.gemini_api_key);
-    const model = genAI.getGenerativeModel({
-      model: "gemini-pro",
-      safetySettings: [
-        {
-          category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-          threshold: HarmBlockThreshold.BLOCK_NONE,
+    const genAI = new GoogleGenAI({ apiKey: config.gemini_api_key });
+    // Instantiate the chat directly using genAI.chats.create()
+    const chat = await genAI.chats.create({
+      model: "gemini-2.5-flash-preview-04-17",
+      history: history,
+      config: {
+        thinkingConfig: {
+          includeThoughts: false,
         },
-        {
-          category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-          threshold: HarmBlockThreshold.BLOCK_NONE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-          threshold: HarmBlockThreshold.BLOCK_NONE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-          threshold: HarmBlockThreshold.BLOCK_NONE,
-        },
-      ],
-
-      // tools: [
-      //   {
-      //     googleSearchRetrieval: {
-      //       dynamicRetrievalConfig: {
-      //         mode: DynamicRetrievalMode.MODE_DYNAMIC,
-      //         dynamicThreshold: searchWithGoogle ? 0 : 0.7,
-      //       },
-      //     },
-      //   },
-      // ],
+        safetySettings: [
+          {
+            category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+            threshold: HarmBlockThreshold.BLOCK_NONE,
+          },
+          {
+            category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+            threshold: HarmBlockThreshold.BLOCK_NONE,
+          },
+          {
+            category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+            threshold: HarmBlockThreshold.BLOCK_NONE,
+          },
+          {
+            category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+            threshold: HarmBlockThreshold.BLOCK_NONE,
+          },
+        ],
+      },
     });
 
-    const chat = model.startChat({
-      history,
+    const result = await chat.sendMessage({
+      message: prompt,
     });
-
-    const result = await chat.sendMessage(prompt);
 
     // Send the response back to the user
     try {
-      await msg.reply(`Gemini: ${result.response.text()}`);
+      await msg.reply(`Gemini: ${result.text}`); // Access text as a property
     } catch (error) {
       console.error(error);
-      await client.sendMessage(chatId, `Gemini: ${result.response.text()}`);
+      await client.sendMessage(chatId, `Gemini: ${result.text}`); // Access text as a property
     }
   } catch (error) {
     console.error(error);

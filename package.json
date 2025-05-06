@@ -10,7 +10,7 @@
     "dev": "nodemon startProcess.ts",
     "test": "tsc --noEmit",
     "lint": "eslint --fix **/*.ts && prettier --write **/*.ts",
-    "docker": "docker build . -t registry.gitlab.com/wcyat/whatsbot",
+    "docker": "docker build . -t registry.gitlab.com/wc-yat/whatsbot",
     "gentoken": "node dist/session/genToken.js",
     "gentokenwithdownload": "node dist/session/genTokenWithDownload.js",
     "prepare": "husky install"
@@ -29,7 +29,7 @@
   },
   "homepage": "https://gitlab.com/wcyat/whatsbot",
   "dependencies": {
-    "@google/generative-ai": "^0.21.0",
+    "@google/genai": "^0.12.0",
     "@iamtraction/google-translate": "^2.0.1",
     "@newyork.anthonyng/chess-image-generator": "^1.0.0",
     "@types/fluent-ffmpeg": "^2.1.24",
