@@ -1,3 +1,4 @@
+import { sendLocalized } from "../helpers/localizedMessenger.js";
 //jshint esversion:8
 import whatsapp, { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
@@ -20,25 +21,28 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
           ),
           { caption: getdata.content.text },
         );
-      } catch {}
+      } catch (e) {
+        console.error("Failed to send song with media:", e);
+        // Optionally send a localized error to the user
+        // await sendLocalized(client, msg, "dldsong.send_error");
+      }
     } else if (typeof getdata.content === "string") {
-      await client.sendMessage(chatId, getdata.content);
+      await sendLocalized(client, msg, "dldsong.error", {
+        error: getdata.content,
+      });
     }
   } else {
-    await client.sendMessage(
-      chatId,
-      "```Search for the song with !song and then reply to the query result with this command```",
-    );
+    await sendLocalized(client, msg, "dldsong.no_quoted_msg");
   }
 };
 
 const command: Command = {
   name: "Download Song",
-  description: "Download selected song from the list",
+  description: "dldsong.description",
   command: "!dldsong",
   commandType: "plugin",
   isDependent: true,
-  help: "use !help song to learn about this command",
+  help: "dldsong.help",
   execute,
   public: true,
 };

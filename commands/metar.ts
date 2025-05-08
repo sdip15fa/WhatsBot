@@ -1,3 +1,8 @@
+import {
+  getGroupLanguage,
+  sendLocalized,
+} from "../helpers/localizedMessenger.js";
+import { getString } from "../helpers/i18n.js";
 //jshint esversion:8
 import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
@@ -35,22 +40,34 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   if (!data) {
     await client.sendMessage(
       chatId,
-      `🙇‍♂️ *Error*\n\n` + "```Something Unexpected Happened to fetch METAR```",
+      getString("metar.fetch_error", await getGroupLanguage(msg)),
     );
   } else {
     const date = new Date(data.time);
     await client.sendMessage(chatId, data.original);
     await client.sendMessage(
       chatId,
-      `METAR ${data.station}
+      `${getString("metar.prefix", await getGroupLanguage(msg))} ${data.station}
 ${date.toLocaleDateString("en-UK", {
   timeZone: "UTC",
 })} ${date.toLocaleTimeString("en-UK", { timeZone: "UTC" })} UTC
-Wind ${data.wind.direction}° ${data.wind.speed}${data.wind.unit}${
-        data.wind.gust ? ` Gusting ${data.wind.gust}${data.wind.unit}` : ""
+${getString("metar.wind", await getGroupLanguage(msg))} ${
+        data.wind.direction
+      }° ${data.wind.speed}${data.wind.unit}${
+        data.wind.gust
+          ? ` ${getString("metar.gusting", await getGroupLanguage(msg))} ${
+              data.wind.gust
+            }${data.wind.unit}`
+          : ""
       }
-Visibility ${data.visibility === 9999 ? "over 9999m" : `${data.visibility}km`}
-Weather ${
+${getString("metar.visibility", await getGroupLanguage(msg))} ${
+        data.visibility === 9999
+          ? getString("metar.visibility_over", await getGroupLanguage(msg), {
+              distance: 9999,
+            })
+          : `${data.visibility}km`
+      }
+${getString("metar.weather", await getGroupLanguage(msg))} ${
         data.weather
           ?.sort((a, b) => a.abbreviation.length - b.abbreviation.length)
           .map((v) => {
@@ -59,14 +76,19 @@ Weather ${
             }
             return v.meaning;
           })
-          .join(" ") || "no special weather conditions"
+          .join(" ") ||
+        getString("metar.no_special_weather", await getGroupLanguage(msg))
       }
-Clouds ${
+${getString("metar.clouds", await getGroupLanguage(msg))} ${
         data.clouds?.map((v) => `${v.meaning} ${v.altitude}ft`).join(", ") ||
-        "none"
+        getString("metar.clouds_none", await getGroupLanguage(msg))
       }
-Temperature ${data.temperature}.${data.dewpoint}°C
-QNH ${data.altimeterInHpa} hPa
+${getString("metar.temperature", await getGroupLanguage(msg))} ${
+        data.temperature
+      }.${data.dewpoint}°C
+${getString("metar.qnh", await getGroupLanguage(msg))} ${
+        data.altimeterInHpa
+      } hPa
 ${data.special_weather_conditions}`,
     );
   }
@@ -74,11 +96,11 @@ ${data.special_weather_conditions}`,
 
 const command: Command = {
   name: "METAR",
-  description: "Gets METAR info",
+  description: "metar.description",
   command: "!metar",
   commandType: "plugin",
   isDependent: false,
-  help: `*METAR*\n\nMETAR broadcast.\n\n*!metar [airport code]*\nTo get METAR info. Airport defaults to VHHH.`,
+  help: "metar.help",
   execute,
   public: true,
 };

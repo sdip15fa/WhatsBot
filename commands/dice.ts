@@ -8,11 +8,11 @@ const execute = async (_client: Client, msg: Message) => {
 
 const command: Command = {
   name: "Dice", //name of the module
-  description: "Roll a dice", // short description of what this command does
+  description: "dice.description", // short description of what this command does
   command: "!dice", //command with prefix. Ex command: '!test'
   commandType: "plugin", //
   isDependent: false, //whether this command is related/dependent to some other command
-  help: "Roll a (fair) dice\n\n!dice", // a string descring how to use this command Ex = help : 'To use this command type !test arguments'
+  help: "dice.help", // a string descring how to use this command Ex = help : 'To use this command type !test arguments'
   public: true,
   execute,
 };

@@ -1,15 +1,17 @@
+import { sendLocalized } from "../helpers/localizedMessenger.js";
 //jshint esversion:8
 import FormData from "form-data";
-import { Client, Message, MessageMedia } from "whatsapp-web.js";
+import whatsapp, { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 import mime from "mime-to-extensions";
 import axios from "../helpers/axios.js";
 
-async function telegraph(attachmentData: MessageMedia) {
+async function telegraph(attachmentData: whatsapp.MessageMedia) {
   const form = new FormData();
+  const extension = mime.extension(attachmentData.mimetype) || "bin"; // Default to 'bin' if extension not found
   form.append("file", Buffer.from(attachmentData.data, "base64"), {
-    filename: `telegraph.${mime.extension(attachmentData.mimetype)}`,
+    filename: `telegraph.${extension}`,
   });
 
   return await axios
@@ -27,32 +29,28 @@ const execute = async (client: Client, msg: Message) => {
     const attachmentData = await quotedMsg
       .downloadMedia()
       .then((media) => media)
-      .catch(() => null);
+      .catch((): null => null); // Explicitly type the return value of catch
     if (!attachmentData) {
       return;
     }
     const data = await telegraph(attachmentData);
     if (data == "error") {
-      quotedMsg.reply(`Error occured while create direct link.`);
+      sendLocalized(client, quotedMsg, "directlink.error");
     } else {
-      quotedMsg.reply(`🔗 *Direct Link 👇*\n\n` + "```" + data + "```");
+      sendLocalized(client, quotedMsg, "directlink.success", { link: data });
     }
   } else {
-    await client.sendMessage(
-      (await msg.getChat()).id._serialized,
-      "Please reply to a media file",
-    );
+    await sendLocalized(client, msg, "directlink.no_media");
   }
 };
 
 const command: Command = {
   name: "Direct Link",
-  description:
-    "uploads media toh telegra.ph and creates a direct download link",
+  description: "directlink.description",
   command: "!directlink",
   commandType: "plugin",
   isDependent: false,
-  help: `*Directlink*\n\nIt will generate photo's directlink for you.\n\nReply a photo with *!directlink* to Create`,
+  help: "directlink.help",
   execute,
   public: true,
 };

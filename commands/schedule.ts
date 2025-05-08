@@ -1,19 +1,24 @@
+import { sendLocalized } from "../helpers/localizedMessenger.js";
 //jshint esversion:8
 import { randomBytes } from "crypto";
-import { Client, Message, MessageMedia } from "whatsapp-web.js";
+import whatsapp, { Client, Message } from "whatsapp-web.js";
 import { agenda } from "../helpers/agenda.js";
 import { Command } from "../types/command.js";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   if (!msg.hasQuotedMsg) {
-    return await msg.reply("Please quote a message to schedule!");
+    return await sendLocalized(client, msg, "schedule.no_quoted_msg");
   }
   const chats: string[] = [];
   while (/^[\d|-]+@(g|c)\.us$/.test(args[0])) {
     chats.push(args.shift());
   }
   if (chats.length && !msg.fromMe) {
-    try { await msg.reply("Not allowed.")} catch {}
+    try {
+      await sendLocalized(client, msg, "schedule.not_allowed");
+    } catch (e) {
+      console.error("Error sending 'schedule.not_allowed' message:", e);
+    }
     return;
   }
   if (!chats.length) chats.push((await msg.getChat()).id._serialized);
@@ -25,8 +30,16 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
           try {
             await client.getChatById(chatId);
             return true;
-          } catch {
-            msg.reply(`Chat ${chatId} not found`).catch(() => {});
+          } catch (e) {
+            console.error(`Error fetching chat ${chatId}:`, e);
+            sendLocalized(client, msg, "schedule.chat_not_found", {
+              chatId: chatId,
+            }).catch((se) => {
+              console.error(
+                `Error sending 'schedule.chat_not_found' for ${chatId}:`,
+                se,
+              );
+            });
             return false;
           }
         }),
@@ -36,10 +49,10 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     return;
   const quoted = await msg.getQuotedMessage();
   const id = randomBytes(10).toString("hex");
-  const media: MessageMedia | null = await quoted
+  const media: whatsapp.MessageMedia | null = await quoted
     .downloadMedia()
     .then((media) => media)
-    .catch(() => null);
+    .catch((): null => null); // Added explicit null return for catch
   await agenda
     .schedule(date, "send message", {
       id,
@@ -61,20 +74,23 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         }),
     })
     .then(async () => {
-      await msg.reply(`Scheduled for *_${date}_* with id \`\`\`${id}\`\`\`.`);
+      await sendLocalized(client, msg, "schedule.success", {
+        date: date,
+        id: id,
+      });
     })
     .catch(async () => {
-      await msg.reply("An error occurred.");
+      await sendLocalized(client, msg, "schedule.error");
     });
 };
 
 const command: Command = {
   name: "Schedule message",
-  description: "Schedule a message to be sent at a specific time",
+  description: "schedule.description",
   command: "!schedule",
   commandType: "plugin",
   isDependent: false,
-  help: `*Schedule a message to be sent at a specific time.*\n\nReply to the message you want to schedule.\n\n*!schedule [chat id] [time]*\n\nIf the chat id is invalid / omitted the current chat would be used.\n\nTime example: \`\`\`in 1 minute\`\`\`\n\nFor list of chats and chat ids, use !chatlist.`,
+  help: "schedule.help",
   execute,
   public: true,
 };

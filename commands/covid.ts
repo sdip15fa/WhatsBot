@@ -6,35 +6,42 @@ import { agenda } from "../helpers/agenda.js";
 import { getDate, getTime } from "../helpers/date.js";
 import { getName } from "../helpers/getName.js";
 import Covid, { CovidStatus } from "../models/covid.js";
+import {
+  sendLocalized,
+  getGroupLanguage,
+} from "../helpers/localizedMessenger.js";
+import { getString } from "../helpers/i18n.js";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const chat = await msg.getChat();
   const chatId = chat.id._serialized;
+  const userLanguage = await getGroupLanguage(msg);
 
   if (args[0] === "subscribe") {
     if (
       !(
         await agenda.jobs({
-          name: "send count",
+          name: "send covid status", // Changed agenda job name
           "data.groupId": chatId,
         })
       )?.length
     ) {
       await agenda.every(
         "59 23 * * *",
-        "send count",
+        "send covid status", // Changed agenda job name
         { groupId: chatId },
         {
           timezone: "Asia/Hong_Kong",
           skipImmediate: true,
         },
       );
-      return await client.sendMessage(
-        chatId,
-        "Subscribed! Message counts will be sent at 23:59 every day.",
-      );
+      return await sendLocalized(client, msg, "covid.subscribe.success");
     } else {
-      return await client.sendMessage(chatId, "Already subscribed!");
+      return await sendLocalized(
+        client,
+        msg,
+        "covid.subscribe.already_subscribed",
+      );
     }
   }
 
@@ -47,70 +54,71 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       chatId,
     })) as Covid;
     if (!covid) {
-      return await client.sendMessage(chatId, "Data not available.");
+      return await sendLocalized(client, msg, "covid.status.no_data");
     }
     const positive = covid.status.filter((v) => v.rat === "positive");
     const negative = covid.status.filter((v) => v.rat === "negative");
-    return await client.sendMessage(
-      chatId,
-      `Covid status in ${chat.name} on ${covid.date}:${
-        !positive.length
-          ? ""
-          : `
-      
-*Positive*
-${(() => {
-  const people: string[] = [];
-  positive.forEach((v) => {
-    if (!people.includes(v.id)) {
-      people.push(v.id);
+
+    let statusMessage = getString("covid.status.header", userLanguage, {
+      chatName: chat.name || "",
+      date: covid.date,
+    });
+
+    if (positive.length > 0) {
+      statusMessage += `\n\n${getString(
+        "covid.status.positive_header",
+        userLanguage,
+      )}\n`;
+      const people: string[] = [];
+      positive.forEach((v) => {
+        if (!people.includes(v.id)) {
+          people.push(v.id);
+        }
+      });
+      statusMessage += people
+        .map(
+          (p) =>
+            `_${positive.find((v) => v.id === p).name}_\n${positive
+              .filter((v) => v.id === p)
+              .map(
+                (v) =>
+                  `${v.time}: ${v.temperature || ""}${
+                    v.symptoms ? ` ${v.symptoms}` : ""
+                  }`,
+              )
+              .join("\n")}`,
+        )
+        .join("\n\n");
     }
-  });
-  return people
-    .map(
-      (p) =>
-        `_${positive.find((v) => v.id === p).name}_\n${positive
-          .filter((v) => v.id === p)
-          .map(
-            (v) =>
-              `${v.time}: ${v.temperature || ""}${
-                v.symptoms ? ` ${v.symptoms}` : ""
-              }`,
-          )
-          .join("\n")}`,
-    )
-    .join("\n\n");
-})()}`
-      }${
-        !negative.length
-          ? ""
-          : `
-      
-*Negative*
-${(() => {
-  const people: string[] = [];
-  negative.forEach((v) => {
-    if (!people.includes(v.id)) {
-      people.push(v.id);
+
+    if (negative.length > 0) {
+      statusMessage += `\n\n${getString(
+        "covid.status.negative_header",
+        userLanguage,
+      )}\n`;
+      const people: string[] = [];
+      negative.forEach((v) => {
+        if (!people.includes(v.id)) {
+          people.push(v.id);
+        }
+      });
+      statusMessage += people
+        .map(
+          (p) =>
+            `_${negative.find((v) => v.id === p).name}_\n${negative
+              .filter((v) => v.id === p)
+              .map(
+                (v) =>
+                  `${v.time}: ${v.temperature || ""}${
+                    v.symptoms ? ` ${v.symptoms}` : ""
+                  }`,
+              )
+              .join("\n")}`,
+        )
+        .join("\n\n");
     }
-  });
-  return people
-    .map(
-      (p) =>
-        `_${negative.find((v) => v.id === p).name}_\n${negative
-          .filter((v) => v.id === p)
-          .map(
-            (v) =>
-              `${v.time}: ${v.temperature || ""}${
-                v.symptoms ? ` ${v.symptoms}` : ""
-              }`,
-          )
-          .join("\n")}`,
-    )
-    .join("\n\n");
-})()}`
-      }`,
-    );
+
+    return await client.sendMessage(chatId, statusMessage);
   }
 
   const rat = {
@@ -125,15 +133,12 @@ ${(() => {
   }[args[0].toLowerCase().trim()];
 
   if (!rat) {
-    return await client.sendMessage(chatId, "Rat result invalid");
+    return await sendLocalized(client, msg, "covid.report.invalid_rat");
   }
 
   const temperature = Number(args[1]);
   if (temperature < 35 || temperature > 42) {
-    return await client.sendMessage(
-      chatId,
-      "Temperature must be between 35 and 42",
-    );
+    return await sendLocalized(client, msg, "covid.report.invalid_temperature");
   }
 
   const symptoms = args.filter((_v, i) => i > (temperature ? 1 : 0)).join(" ");
@@ -143,50 +148,45 @@ ${(() => {
 
   const userId = msg.fromMe ? process.env.WTS_OWNER_ID : msg.author || msg.from;
 
+  const covidStatusEntry: CovidStatus = {
+    id: userId,
+    name: await getName(userId),
+    time,
+    rat: rat as "positive" | "negative", // Cast rat to the expected type
+  };
+  if (temperature) covidStatusEntry.temperature = temperature;
+  if (symptoms) covidStatusEntry.symptoms = symptoms;
+
   if (
     !(
       await db("covid").coll.updateOne(
         { date, chatId },
         {
           $push: {
-            status: <CovidStatus>{
-              id: userId,
-              name: await getName(userId),
-              time,
-              rat,
-              ...(temperature && { temperature }),
-              ...(symptoms && { symptoms }),
-            },
+            status: covidStatusEntry,
           },
         },
       )
     ).matchedCount
-  )
-    await db("covid").coll.insertOne(<Covid>{
+  ) {
+    const newCovidEntry: Covid = {
       date,
       chatId,
-      status: [
-        {
-          id: userId,
-          name: await getName(userId),
-          time,
-          rat,
-          temperature,
-          ...(symptoms && { symptoms }),
-        },
-      ],
-    });
+      status: [covidStatusEntry],
+    };
+    await db("covid").coll.insertOne(newCovidEntry);
+  }
 
-  await client.sendMessage(chatId, "Covid status has been updated.");
+  await sendLocalized(client, msg, "covid.report.success");
 };
 
 const command: Command = {
-  name: "Covid",
-  description: "Report / get covid status",
+  name: "covid.name",
+  description: "covid.description",
   command: "!covid",
   commandType: "plugin",
   isDependent: false,
-  help: `*covid*\n\nReport / get covid status.. \n\n*!covid [rat result] [temperature] [symptoms]*\n\n*!covid status [date]*\n\nDate should be in format 'YYYY-MM-DD'.\n\nDate defaults to today's date if not provided.`,
+  help: "covid.help",
   execute,
   public: true,
 };

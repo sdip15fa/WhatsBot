@@ -1,3 +1,4 @@
+import { sendLocalized } from "../helpers/localizedMessenger.js";
 //jshint esversion:8
 import whatsapp, { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
@@ -10,7 +11,7 @@ const execute = async (client: Client, msg: Message) => {
     const attachmentData = await quotedMsg
       .downloadMedia()
       .then((media) => media)
-      .catch(() => null);
+      .catch((): null => null); // Explicit return type for catch
     if (!attachmentData) {
       return;
     }
@@ -23,19 +24,22 @@ const execute = async (client: Client, msg: Message) => {
           attachmentData.filename,
         ),
       );
-    } catch {}
+    } catch (e) {
+      console.error("Failed to send media:", e);
+      // await sendLocalized(client, msg, "media.send_error");
+    }
   } else {
-    await client.sendMessage(chatId, `🙇‍♂️ *Error*\n\n` + "```No media found```");
+    await sendLocalized(client, msg, "media.no_media");
   }
 };
 
 const command: Command = {
   name: "Get media",
-  description: "Get media from message",
+  description: "media.description",
   command: "!media",
   commandType: "plugin",
   isDependent: false,
-  help: `*Get media*\n\nGet media from message (especially stickers)\n\nReply a message with *!media* to get the media of that message.`,
+  help: "media.help",
   execute,
   public: true,
 };

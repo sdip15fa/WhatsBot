@@ -1,3 +1,8 @@
+import {
+  getGroupLanguage,
+  sendLocalized,
+} from "../helpers/localizedMessenger.js";
+import { getString } from "../helpers/i18n.js";
 import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
 
@@ -51,19 +56,25 @@ const execute = async (_client: Client, msg: Message, args: string[]) => {
     ? (await msg.getQuotedMessage()).body
     : args.join();
   if (!question) {
-    return msg.reply("Please ask a question!");
+    return sendLocalized(_client, msg, "eight_ball.no_question");
   }
-  msg.reply(`8ball says:
-${responses[Math.floor(Math.random() * responses.length)]}`);
+  const targetLang = await getGroupLanguage(msg);
+  const responseKey = `eight_ball.response_${
+    Math.floor(Math.random() * responses.length) + 1
+  }`;
+  const localizedResponse = getString(responseKey, targetLang);
+  msg.reply(
+    `${getString("eight_ball.prefix", targetLang)}\n${localizedResponse}`,
+  );
 };
 
 const command: Command = {
   name: "8ball", //name of the module
-  description: "Ask 8ball", // short description of what this command does
+  description: "eight_ball.description", // short description of what this command does
   command: "!8ball", //command with prefix. Ex command: '!test'
   commandType: "plugin", //
   isDependent: false, //whether this command is related/dependent to some other command
-  help: "Ask 8ball a question.\n\n!8ball [question]", // a string descring how to use this command Ex = help : 'To use this command type !test arguments'
+  help: "eight_ball.help", // a string descring how to use this command Ex = help : 'To use this command type !test arguments'
   public: true,
   execute,
 };

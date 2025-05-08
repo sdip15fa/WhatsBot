@@ -1,6 +1,7 @@
 //jshint esversion:8
 import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
+import { sendLocalized } from "../helpers/localizedMessenger.js";
 
 function isValidTimeZone(tz: string) {
   if (!tz) {
@@ -26,18 +27,13 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     const date = new Date(
       (isValidTimeZone(args[0]) ? args[1] : args[0]) || new Date(),
     );
-    await client.sendMessage(
-      chatId,
-      `Time in ${timeZone}:
-${date.toLocaleString("en-UK", {
-  timeZone,
-})}
-
-ISO:
-\`\`\`${date.toISOString()}\`\`\``,
-    );
+    await sendLocalized(client, msg, "time.success", {
+      timeZone,
+      localTime: date.toLocaleString("en-UK", { timeZone }),
+      isoTime: date.toISOString(),
+    });
   } catch {
-    return await client.sendMessage(chatId, "An error occured.");
+    return await sendLocalized(client, msg, "time.error");
   }
 };
 
@@ -47,7 +43,7 @@ const command: Command = {
   command: "!time",
   commandType: "plugin",
   isDependent: false,
-  help: `*Time*\n\nQuery time in specific time zone.\n\n!time [timezone] [time]\n\nTimezone e.g. UTC, Asia/Hong_Kong\n\nTime must be an ISO datetime string`,
+  help: "time.help",
   execute,
   public: true,
 };

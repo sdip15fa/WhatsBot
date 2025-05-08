@@ -3,6 +3,7 @@
 import axios from "../helpers/axios.js";
 import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
+import { sendLocalized } from "../helpers/localizedMessenger.js";
 
 async function getPrice(cryptoCode: string) {
   cryptoCode = cryptoCode.toUpperCase();
@@ -27,39 +28,42 @@ async function getPrice(cryptoCode: string) {
     });
 }
 const execute = async (client: Client, msg: Message, args: string[]) => {
-  const data = await getPrice(args[0]);
   const chatId = (await msg.getChat()).id._serialized;
-  if (data == "error") {
-    await client.sendMessage(
-      chatId,
-      `🙇‍♂️ *Error*\n\n` +
-        "```Something unexpected happened while fetching Cryptocurrency Price```",
-    );
+
+  if (!args[0]) {
+    return await sendLocalized(client, msg, "crypto.no_argument");
   }
-  if (data == "unsupported") {
-    await client.sendMessage(
-      chatId,
-      `🙇‍♂️ *Error*\n\n` +
-        "```Support for this CryptoCurrency is not yet added```",
-    );
-  } else if (data instanceof Object) {
+
+  const data = await getPrice(args[0]); // Declare data with const after the check
+
+  if (data == "error") {
+    await sendLocalized(client, msg, "crypto.errorFetching");
+  } else if (data == "unsupported") {
+    await sendLocalized(client, msg, "crypto.unsupported");
+  } else if (
+    typeof data === "object" &&
+    data !== null &&
+    "name" in data &&
+    "price" in data
+  ) {
     const date = new Date().toLocaleString("en-US", {
       timeZone: "Asia/Kolkata",
     });
-    await client.sendMessage(
-      chatId,
-      `Price of *${data.name}* as of ${date} is *₹ ${data.price}*`,
-    );
+    await sendLocalized(client, msg, "crypto.price", {
+      name: data.name,
+      date: date,
+      price: data.price,
+    });
   }
 };
 
 const command: Command = {
-  name: "Crypto Currency",
-  description: "Gets price info for requested crypto currency",
+  name: "crypto",
+  description: "crypto.description",
   command: "!crypto",
   commandType: "plugin",
   isDependent: false,
-  help: `*Crypto Currency*\n\nGet current price of cryptocurrency. \n\n*!crypto [crypto-code]*\n`,
+  help: "crypto.help",
   execute,
   public: true,
 };

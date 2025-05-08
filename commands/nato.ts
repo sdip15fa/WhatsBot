@@ -1,3 +1,8 @@
+import {
+  getGroupLanguage,
+  sendLocalized,
+} from "../helpers/localizedMessenger.js";
+import { getString } from "../helpers/i18n.js";
 //jshint esversion:8
 import natoPad from "nato-pad";
 import { Client, Message } from "whatsapp-web.js";
@@ -9,28 +14,30 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   const quotedMsg = msg.hasQuotedMsg && (await msg.getQuotedMessage());
 
   if (!args.length && !quotedMsg.body) {
-    return client.sendMessage(chatId, "Please provide text to transform!");
+    return sendLocalized(client, msg, "nato.no_text");
   }
 
   const text = args.join(" ") || quotedMsg.body;
 
   if (text.length > 50) {
-    return client.sendMessage(chatId, "Text too long.");
+    return sendLocalized(client, msg, "nato.text_too_long");
   }
 
   await client.sendMessage(
     chatId,
-    `NATO: ${natoPad(args.join(" ") || quotedMsg.body)}`,
+    getString("nato.response", await getGroupLanguage(msg), {
+      text: natoPad(args.join(" ") || quotedMsg.body),
+    }),
   );
 };
 
 const command: Command = {
   name: "Nato",
-  description: "Transform text to nato alphabets",
+  description: "nato.description",
   command: "!nato",
   commandType: "plugin",
   isDependent: false,
-  help: `*Nato*\n\nTransform text to nato alphabets\n\n!nato [text]`,
+  help: "nato.help",
   execute,
   public: true,
 };

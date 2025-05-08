@@ -1,3 +1,4 @@
+import { sendLocalized } from "../helpers/localizedMessenger.js";
 // Import necessary modules and dependencies
 import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
@@ -8,20 +9,17 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
 
   if (!config.cf_worker.url) {
-    return client.sendMessage(
-      chatId,
-      "Sorry, cf worker url not specified in the environment variable.",
-    );
+    return sendLocalized(client, msg, "evilllama.no_cf_worker_url");
   }
 
   // Extract the text from the user's message
   const quotedMsg = msg.hasQuotedMsg && (await msg.getQuotedMessage());
 
   if (!args.length && !quotedMsg.body) {
-    return client.sendMessage(chatId, "Please provide prompt to evilllama!");
+    return sendLocalized(client, msg, "evilllama.no_prompt");
   }
 
-  const text = args.join(" ") || quotedMsg.body;
+  const text = args.join(" ") || (quotedMsg && quotedMsg.body);
   const messages: { role: "system" | "user" | "assistant"; content: string }[] =
     [];
 
@@ -106,13 +104,24 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
 
     // Send the response back to the user
     try {
-      await msg.reply(`EvilLlama: ${response.data.response}`);
-    } catch (error) {
-      console.error(error);
-      await client.sendMessage(chatId, `EvilLlama: ${response.data.response}`);
+      await sendLocalized(client, msg, "evilllama.response", {
+        response: response.data.response,
+      });
+    } catch (sendError) {
+      console.error("Failed to send EvilLlama response:", sendError);
+      // Attempt to send a simpler message if the original send fails
+      await client
+        .sendMessage(msg.to, `EvilLlama: ${response.data.response}`)
+        .catch((altSendError) => {
+          console.error(
+            "Failed to send alternative EvilLlama response:",
+            altSendError,
+          );
+        });
     }
-  } catch {
-    await client.sendMessage(chatId, "LLaMA generation failed.");
+  } catch (generationError) {
+    console.error("EvilLlama generation failed:", generationError);
+    await sendLocalized(client, msg, "evilllama.generation_failed");
   }
 
   // Optionally, you can handle conversation history or context here
@@ -122,11 +131,11 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
 
 const command: Command = {
   name: "evilllama",
-  description: "Ask EvilLlama",
+  description: "evilllama.description",
   command: "!evilllama",
   commandType: "plugin",
   isDependent: false,
-  help: `*EvilLlama*\n\nAsk EvilLlama\n\n!evilllama [text]`,
+  help: "evilllama.help",
   execute,
   public: true,
 };

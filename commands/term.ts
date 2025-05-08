@@ -3,15 +3,16 @@
 import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
 import { exec } from "child_process";
+import { sendLocalized } from "../helpers/localizedMessenger.js";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   exec(args.join(" "), async (error, stdout, stderr) => {
     if (error) {
-      await client.sendMessage(msg.to, "*whatsbot~:* ```" + error + "```");
+      await sendLocalized(client, msg, "term.error", { error });
     } else if (stderr) {
-      await client.sendMessage(msg.to, "*whatsbot~:* ```" + stderr + "```");
+      await sendLocalized(client, msg, "term.stderr", { stderr });
     } else {
-      await client.sendMessage(msg.to, "*whatsbot~:* ```" + stdout + "```");
+      await sendLocalized(client, msg, "term.stdout", { stdout });
     }
   });
 };
@@ -22,7 +23,7 @@ const command: Command = {
   command: "!term",
   commandType: "plugin",
   isDependent: false,
-  help: "*Terminal*\n\nYou can execute any command with this.\n\n*!term [command]*\nTo execute a command. Ex: ```!term cd ./temp/```",
+  help: "term.help",
   execute,
   public: false,
 };

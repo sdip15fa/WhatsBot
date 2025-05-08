@@ -1,3 +1,4 @@
+import { sendLocalized } from "../helpers/localizedMessenger.js";
 // Import necessary modules and dependencies
 import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
@@ -8,20 +9,17 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
 
   if (!config.cf_worker.url) {
-    return client.sendMessage(
-      chatId,
-      "Sorry, cf worker url not specified in the environment variable.",
-    );
+    return sendLocalized(client, msg, "llama.no_cf_worker_url");
   }
 
   // Extract the text from the user's message
   const quotedMsg = msg.hasQuotedMsg && (await msg.getQuotedMessage());
 
   if (!args.length && !quotedMsg.body) {
-    return client.sendMessage(chatId, "Please provide prompt to llama!");
+    return sendLocalized(client, msg, "llama.no_prompt");
   }
 
-  const text = args.join(" ") || quotedMsg.body;
+  const text = args.join(" ") || (quotedMsg && quotedMsg.body);
   const messages: { role: "system" | "user" | "assistant"; content: string }[] =
     [];
 
@@ -100,13 +98,23 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
 
     // Send the response back to the user
     try {
-      await msg.reply(`Llama: ${response.data.response}`);
-    } catch (error) {
-      console.error(error);
-      await client.sendMessage(chatId, `Llama: ${response.data.response}`);
+      await sendLocalized(client, msg, "llama.response", {
+        response: response.data.response,
+      });
+    } catch (sendError) {
+      console.error("Failed to send Llama response:", sendError);
+      await client
+        .sendMessage(msg.to, `Llama: ${response.data.response}`)
+        .catch((altSendError) => {
+          console.error(
+            "Failed to send alternative Llama response:",
+            altSendError,
+          );
+        });
     }
-  } catch {
-    await client.sendMessage(chatId, "LLaMA generation failed.");
+  } catch (generationError) {
+    console.error("Llama generation failed:", generationError);
+    await sendLocalized(client, msg, "llama.generation_failed");
   }
 
   // Optionally, you can handle conversation history or context here
@@ -116,11 +124,11 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
 
 const command: Command = {
   name: "llama",
-  description: "Ask Llama",
+  description: "llama.description",
   command: "!llama",
   commandType: "plugin",
   isDependent: false,
-  help: `*Llama*\n\nAsk Llama\n\n!llama [text]`,
+  help: "llama.help",
   execute,
   public: true,
 };

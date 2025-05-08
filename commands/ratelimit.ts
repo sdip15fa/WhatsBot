@@ -1,3 +1,8 @@
+import {
+  getGroupLanguage,
+  sendLocalized,
+} from "../helpers/localizedMessenger.js";
+import { getString } from "../helpers/i18n.js";
 import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
 import db from "../db/index.js";
@@ -6,17 +11,17 @@ import db from "../db/index.js";
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat())?.id._serialized;
   if (!args[0]) {
-    return client.sendMessage(
-      chatId,
-      `Rate limit is ${
-        (await db("chats").coll.findOne({ chatId }))?.ratelimit ?? true
-          ? "enabled"
-          : "disabled"
-      }.`,
-    );
+    const targetLang = await getGroupLanguage(msg);
+    const isEnabled =
+      (await db("chats").coll.findOne({ chatId }))?.ratelimit ?? true;
+    return sendLocalized(client, msg, "ratelimit.status", {
+      status: isEnabled
+        ? getString("enabled", targetLang)
+        : getString("disabled", targetLang),
+    });
   }
   if (!["true", "false"].includes(args[0])) {
-    return client.sendMessage(chatId, "Only true or false is accepted.");
+    return sendLocalized(client, msg, "ratelimit.invalid_argument");
   }
   if (
     !(
@@ -33,17 +38,21 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   }
   return client.sendMessage(
     chatId,
-    `Rate limit changed to ${JSON.parse(args[0])}.`,
+    getString("ratelimit.changed", await getGroupLanguage(msg), {
+      status: JSON.parse(args[0])
+        ? getString("enabled", await getGroupLanguage(msg))
+        : getString("disabled", await getGroupLanguage(msg)),
+    }),
   );
 };
 
 const command: Command = {
   name: "Rate limit", //name of the module
-  description: "Enable / disable rate limit.", // short description of what this command does
+  description: "ratelimit.description", // short description of what this command does
   command: "!ratelimit", //command with prefix. Ex command: '!test'
   commandType: "admin", //
   isDependent: false, //whether this command is related/dependent to some other command
-  help: "*Rate limit*\n\nEnable/disable rate limit\n\n!ratelimit [true|false]", // a string descring how to use this command Ex = help : 'To use this command type !test arguments'
+  help: "ratelimit.help", // a string descring how to use this command Ex = help : 'To use this command type !test arguments'
   public: false,
   execute,
 };

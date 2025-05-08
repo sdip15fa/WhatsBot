@@ -28,6 +28,7 @@ COPY ./package.json ./yarn.lock ./
 RUN yarn install --production
 
 COPY --from=build /app/dist ./
+COPY ./locales ./locales
 
 VOLUME ["/app/data"]
 

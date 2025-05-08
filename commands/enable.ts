@@ -1,3 +1,4 @@
+import { sendLocalized } from "../helpers/localizedMessenger.js";
 import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
 import db from "../db/index.js";
@@ -13,18 +14,18 @@ const execute = async (client: Client, msg: Message) => {
       )
     ).matchedCount
   ) {
-    return await client.sendMessage(chatId, "Bot is not disabled.");
+    return await sendLocalized(client, msg, "enable.not_disabled");
   }
-  return client.sendMessage(chatId, "Bot enabled.");
+  return sendLocalized(client, msg, "enable.success");
 };
 
 const command: Command = {
   name: "Enable", //name of the module
-  description: "Enable the bot in this chat", // short description of what this command does
+  description: "enable.description", // short description of what this command does
   command: "!enable", //command with prefix. Ex command: '!test'
   commandType: "admin", //
   isDependent: false, //whether this command is related/dependent to some other command
-  help: "Type !enable in the chat to enable the bot", // a string descring how to use this command Ex = help : 'To use this command type !test arguments'
+  help: "enable.help", // a string descring how to use this command Ex = help : 'To use this command type !test arguments'
   public: false,
   execute,
 };

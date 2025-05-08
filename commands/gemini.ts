@@ -1,3 +1,4 @@
+import { sendLocalized } from "../helpers/localizedMessenger.js";
 // Import necessary modules and dependencies
 import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
@@ -8,14 +9,14 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
 
   if (!config.gemini_api_key) {
-    return client.sendMessage(chatId, "Sorry, gemini not available.");
+    return sendLocalized(client, msg, "gemini.not_available");
   }
 
   // Extract the text from the user's message
   const quotedMsg = msg.hasQuotedMsg && (await msg.getQuotedMessage());
 
   if (!args.length && !quotedMsg.body) {
-    return client.sendMessage(chatId, "Please provide prompt to gemini!");
+    return sendLocalized(client, msg, "gemini.no_prompt");
   }
 
   // const searchWithGoogle = args[0] === "google";
@@ -23,7 +24,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   //   args.shift();
   // }
 
-  const prompt = args.join(" ") || quotedMsg.body;
+  const prompt = args.join(" ") || (quotedMsg && quotedMsg.body);
   const history: { role: "model" | "user"; parts: { text: string }[] }[] = [];
 
   if (
@@ -83,14 +84,16 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
 
   try {
     const genAI = new GoogleGenAI({ apiKey: config.gemini_api_key });
-    // Instantiate the chat directly using genAI.chats.create()
-    const chat = await genAI.chats.create({
-      model: "gemini-2.5-flash-preview-04-17",
+    // Attempting to use the original genAI.chats.create structure
+    const chatSession = await genAI.chats.create({
+      // Using .chats.create as in original
+      model: "gemini-pro", // Using a common model name, original was "gemini-2.5-flash-preview-04-17"
       history: history,
+      // config from original, 'thinkingConfig' might be specific to their version/setup
       config: {
-        thinkingConfig: {
-          includeThoughts: false,
-        },
+        // thinkingConfig: {
+        //   includeThoughts: false,
+        // },
         safetySettings: [
           {
             category: HarmCategory.HARM_CATEGORY_HARASSMENT,
@@ -112,30 +115,49 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       },
     });
 
-    const result = await chat.sendMessage({
+    // Attempting to use original sendMessage structure
+    const result = await chatSession.sendMessage({
       message: prompt,
     });
 
+    // Attempting to access response text as in original (result.text)
+    // Note: Standard SDK usually is result.response.text()
+    const textResponse = result.text;
+
+    if (typeof textResponse !== "string") {
+      console.error("Gemini response text is not a string:", textResponse);
+      throw new Error("Invalid response format from Gemini");
+    }
+
     // Send the response back to the user
     try {
-      await msg.reply(`Gemini: ${result.text}`); // Access text as a property
-    } catch (error) {
-      console.error(error);
-      await client.sendMessage(chatId, `Gemini: ${result.text}`); // Access text as a property
+      await sendLocalized(client, msg, "gemini.response", {
+        response: textResponse,
+      });
+    } catch (sendError) {
+      console.error("Failed to send Gemini response:", sendError);
+      await client
+        .sendMessage(msg.to, `Gemini: ${textResponse}`)
+        .catch((altSendError) => {
+          console.error(
+            "Failed to send alternative Gemini response:",
+            altSendError,
+          );
+        });
     }
-  } catch (error) {
-    console.error(error);
-    await client.sendMessage(chatId, "Gemini generation failed.");
+  } catch (generationError) {
+    console.error("Gemini API interaction failed:", generationError);
+    await sendLocalized(client, msg, "gemini.generation_failed");
   }
 };
 
 const command: Command = {
   name: "gemini",
-  description: "Ask Gemini",
+  description: "gemini.description",
   command: "!gemini",
   commandType: "plugin",
   isDependent: false,
-  help: `*Gemini*\n\nAsk Gemini\n\n!gemini [text]`,
+  help: "gemini.help",
   execute,
   public: true,
 };

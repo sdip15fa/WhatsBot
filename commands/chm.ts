@@ -3,6 +3,7 @@ import { Command } from "../types/command.js";
 import { passages } from "../helpers/dsechin.js";
 import { ObjectId } from "mongodb";
 import db from "../db/index.js";
+import { sendLocalized } from "../helpers/localizedMessenger.js";
 
 interface GameState {
   passageName: string;
@@ -78,10 +79,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   switch (args[0]) {
     case "start": {
       if (await gameCollection.findOne(query)) {
-        return await client.sendMessage(
-          chatId,
-          "A game is already in progress. Type !chm delete to delete the current game.",
-        );
+        return await sendLocalized(client, msg, "chm.start.game_in_progress");
       }
       let maskedParagraph: string;
       let passageName =
@@ -92,7 +90,9 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         passages[passageName][
           Math.floor(Math.random() * passages[passageName].length)
         ];
-      while (!maskedParagraph) {
+      let retries = 0;
+      const MAX_RETRIES = 20; // Prevent infinite loop
+      while (!maskedParagraph && retries < MAX_RETRIES) {
         passageName =
           Object.keys(passages)[
             Math.floor(Math.random() * Object.keys(passages).length)
@@ -103,7 +103,14 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
           ];
 
         maskedParagraph = maskParagraph(paragraph);
+        retries++;
       }
+
+      if (!maskedParagraph) {
+        // Handle the case where masking failed after MAX_RETRIES
+        return await sendLocalized(client, msg, "chm.start.mask_fail");
+      }
+
       const numCharactersRemoved =
         paragraph.length - maskedParagraph.replace(/_/g, "").length;
       const gameState: GameState = {
@@ -115,40 +122,39 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       };
       const gameDoc: GameDocument = { ...query, gameState };
       await gameCollection.insertOne(gameDoc);
-      await client.sendMessage(
-        chatId,
-        `I have removed ${numCharactersRemoved} Chinese characters from a passage in "${passageName}". Here's the masked paragraph:\n\n\`\`\`${maskedParagraph}\`\`\`\n\nSend \`\`\`!chm [character]\`\`\` to guess.`,
-      );
+      await sendLocalized(client, msg, "chm.start.success", {
+        numCharactersRemoved,
+        passageName,
+        maskedParagraph,
+      });
       break;
     }
     case "delete": {
       const game = (await gameCollection.findOne(query)) as GameDocument;
       if (game) {
         await gameCollection.deleteOne(query);
-        return await client.sendMessage(
-          chatId,
-          `Game deleted. The original paragraph was: "${game.gameState.paragraph}".`,
-        );
+        return await sendLocalized(client, msg, "chm.delete.success", {
+          paragraph: game.gameState.paragraph,
+        });
       }
-      return await client.sendMessage(chatId, "No games ongoing!");
+      return await sendLocalized(client, msg, "chm.delete.no_game");
     }
 
     default: {
       const gameDoc = (await gameCollection.findOne(query)) as GameDocument;
       if (!gameDoc) {
-        await client.sendMessage(
-          chatId,
-          "Use ```!chm start``` to start a new game.",
-        );
+        await sendLocalized(client, msg, "chm.guess.no_game");
         return;
       }
       const gameState = gameDoc.gameState;
       const { paragraph, maskedParagraph, guessedCharacters } = gameState;
       const guess = args[0];
       if (!guess || guess.length !== 1 || !chineseRegExp.test(guess)) {
+        const underscoreMatch = maskedParagraph.match(/_/g);
         if (
           guess.length !== 1 &&
-          guess.length === maskedParagraph.match(/_/g).length
+          underscoreMatch &&
+          guess.length === underscoreMatch.length
         ) {
           if (
             maskedParagraph.replace(
@@ -156,30 +162,20 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
               guess,
             ) === paragraph
           ) {
-            await client.sendMessage(
-              chatId,
-              `Congratulations! You won! The original paragraph was: "${paragraph}".`,
-            );
+            await sendLocalized(client, msg, "chm.guess.win", { paragraph });
             await gameCollection.deleteOne(query);
             return;
           } else {
-            return await client.sendMessage(
-              chatId,
-              "Sorry, the guess was incorrect.",
-            );
+            return await sendLocalized(client, msg, "chm.guess.incorrect_word");
           }
         }
-        await client.sendMessage(
-          chatId,
-          "Please enter a valid Chinese character.",
-        );
+        await sendLocalized(client, msg, "chm.guess.invalid_character");
         return;
       }
       if (guessedCharacters.includes(guess)) {
-        await client.sendMessage(
-          chatId,
-          `You already guessed "${guess}". Try another character.`,
-        );
+        await sendLocalized(client, msg, "chm.guess.already_guessed", {
+          guess,
+        });
         return;
       }
       guessedCharacters.push(guess);
@@ -191,9 +187,11 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
           .some((v, i) => v === guess && maskedParagraph[i] === "_");
 
       if (!correctGuess) {
-        return await client.sendMessage(
-          chatId,
-          `Sorry, "${guess}" is not the correct character.`,
+        return await sendLocalized(
+          client,
+          msg,
+          "chm.guess.incorrect_character",
+          { guess },
         );
       }
 
@@ -206,32 +204,27 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         }
       }
       if (newMaskedParagraph === paragraph) {
-        await client.sendMessage(
-          chatId,
-          `Congratulations! You won! The original paragraph was: "${paragraph}".`,
-        );
+        await sendLocalized(client, msg, "chm.guess.win", { paragraph });
         await gameCollection.deleteOne(query);
         return;
       }
       gameState.maskedParagraph = newMaskedParagraph;
       gameState.guessedCharacters = guessedCharacters;
       await gameCollection.updateOne(query, { $set: { gameState } });
-      await client.sendMessage(
-        chatId,
-        `Good guess! Here's the updated paragraph:\n\n\`\`\`${newMaskedParagraph}\`\`\`\n\n Send !chm [character] to guess.`,
-      );
+      await sendLocalized(client, msg, "chm.guess.correct_character", {
+        newMaskedParagraph,
+      });
     }
   }
 };
 
 const command: Command = {
-  name: "chm",
+  name: "chm.name",
   command: "!chm",
-  description:
-    "Play a game where you guess missing characters in a Chinese paragraph!",
+  description: "chm.description",
   commandType: "plugin",
   isDependent: false,
-  help: `*Chinese Game*\n\nPlay a game where you guess missing characters in a Chinese paragraph. Start a new game with !chm start and guess characters with !chm [character].\n\n*Commands*\n\n!chm start\n!chm delete`,
+  help: "chm.help",
   execute,
   public: true,
 };

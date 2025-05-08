@@ -3,13 +3,18 @@
 import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
 import axios from "../helpers/axios.js";
+import {
+  sendLocalized,
+  getGroupLanguage,
+} from "../helpers/localizedMessenger.js";
+import { getString } from "../helpers/i18n.js";
 
 async function getTrackingDetails(
   trackingService: string,
   trackingNumber: string,
+  lang: "en" | "yue",
 ) {
-  let statusString =
-    "Unable to get information for your shipment. Please check the tracking id or try again later!";
+  let statusString = getString("courier.error.generic", lang);
   return axios
     .get(`https://sjcourierapi.deta.dev/${trackingService}/${trackingNumber}`)
     .then(async function (response) {
@@ -18,8 +23,18 @@ async function getTrackingDetails(
         const status = data.result;
         if (status == "successful") {
           const dktInfo = data.dktInfo[0];
-          console.log(dktInfo);
-          statusString = `Your shipment having docket number ${dktInfo.dktno} booked from ${dktInfo.bookingStation} to ${dktInfo.deliveryStation} by ${dktInfo.consigneeName} is having current status of ${dktInfo.docketStatus}.\nIt is scheduled to be delivered to ${dktInfo.ReceiversName} on or before ${dktInfo.assuredDlyDate}.`;
+          // console.log(dktInfo);
+          statusString = getString("courier.gati.success", lang, {
+            dktno: dktInfo.dktno,
+            bookingStation: dktInfo.bookingStation,
+            deliveryStation: dktInfo.deliveryStation,
+            consigneeName: dktInfo.consigneeName,
+            docketStatus: dktInfo.docketStatus,
+            receiversName: dktInfo.ReceiversName,
+            assuredDlyDate: dktInfo.assuredDlyDate,
+          });
+        } else {
+          statusString = getString("courier.gati.fail", lang);
         }
       } else if (trackingService == "ekart") {
         try {
@@ -27,13 +42,28 @@ async function getTrackingDetails(
           if (merchant != null) {
             const merchantName = merchant == "FKMP" ? "Flipkart" : merchant;
             const reachedNearestHub = data.reachedNearestHub
-              ? "has reached nearest hub"
-              : "is yet to reach nearest hub";
-            statusString = `Your shipment having tracking number ${trackingNumber} booked from ${data.sourceCity} to ${data.destinationCity} by ${merchantName} ${reachedNearestHub}.\nYour shipment is expected to be delivered to ${data.receiverName} on or before ${data.expectedDeliveryDate}.`;
+              ? getString("courier.ekart.reached_hub", lang)
+              : getString("courier.ekart.yet_to_reach_hub", lang);
+            statusString = getString("courier.ekart.success", lang, {
+              trackingNumber,
+              sourceCity: data.sourceCity,
+              destinationCity: data.destinationCity,
+              merchantName,
+              reachedNearestHub,
+              receiverName: data.receiverName,
+              expectedDeliveryDate: data.expectedDeliveryDate,
+            });
+          } else {
+            statusString = getString("courier.ekart.fail", lang);
           }
         } catch (error) {
-          console.log(error);
+          // console.log(error);
+          statusString = getString("courier.error.generic", lang);
         }
+      } else {
+        statusString = getString("courier.error.unsupported_service", lang, {
+          trackingService,
+        });
       }
       const out = {
         status: statusString,
@@ -41,35 +71,59 @@ async function getTrackingDetails(
       return out;
     })
     .catch(function (error) {
-      console.log(error);
-      return { status: "error" };
+      // console.log(error);
+      return { status: getString("courier.error.fetch_failed", lang) };
     });
 }
 const execute = async (client: Client, msg: Message, args: string[]) => {
-  const chatId = (await msg.getChat()).id._serialized;
-  const data = await getTrackingDetails(args[0], args[1]);
-  if (data.status === "error") {
-    await client.sendMessage(
-      chatId,
-      `🙇‍♂️ *Error*\n\n` +
-        "```Something unexpected happened while fetching the courier details.```",
+  const userLanguage = await getGroupLanguage(msg);
+  const data = await getTrackingDetails(args[0], args[1], userLanguage);
+
+  // Define the specific error messages we're looking for
+  const fetchFailedError = getString(
+    "courier.error.fetch_failed",
+    userLanguage,
+  );
+  const unsupportedServiceErrorTemplate = getString(
+    "courier.error.unsupported_service",
+    userLanguage,
+    { trackingService: args[0] },
+  );
+  // Check against the exact error messages if possible, or a significant unique portion
+  const unsupportedServiceErrorCheck =
+    unsupportedServiceErrorTemplate.substring(
+      0,
+      unsupportedServiceErrorTemplate.indexOf("{trackingService}") > 0
+        ? unsupportedServiceErrorTemplate.indexOf("{trackingService}")
+        : unsupportedServiceErrorTemplate.length,
     );
+
+  if (data.status === fetchFailedError) {
+    await sendLocalized(client, msg, "courier.error.fetch_failed");
+  } else if (
+    data.status.startsWith(unsupportedServiceErrorCheck) &&
+    data.status.includes(args[0])
+  ) {
+    await sendLocalized(client, msg, "courier.error.unsupported_service", {
+      trackingService: args[0],
+    });
+  } else if (data.status === getString("courier.error.generic", userLanguage)) {
+    // Handle generic error
+    await sendLocalized(client, msg, "courier.error.generic");
   } else {
-    await client.sendMessage(
-      chatId,
-      `🙇‍♂️ *Courier/Shipment Details*\n\n` + "```" + data.status + "```",
-    );
+    await sendLocalized(client, msg, "courier.details", {
+      status: data.status,
+    });
   }
 };
 
 const command: Command = {
-  name: "Courier",
-  description:
-    "Get courier details from multiple providers. Currently supports: Gati Express and Ekart",
+  name: "courier.name",
+  description: "courier.description",
   command: "!courier",
   commandType: "plugin",
   isDependent: false,
-  help: `*courier*\n\nGet information about your couriers and shipments. \n\n*!courier [courier-name] [tracking-id]*\n\nSupported: Ekart, Gati`,
+  help: "courier.help",
   execute,
   public: true,
 };

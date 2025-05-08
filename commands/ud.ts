@@ -2,6 +2,7 @@
 import dictionary from "ud-api";
 import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
+import { sendLocalized } from "../helpers/localizedMessenger.js";
 
 async function ud(term: string) {
   try {
@@ -15,24 +16,13 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
   const data = await ud(args.join(" "));
   if (data == "error") {
-    await client.sendMessage(
-      chatId,
-      `🙇‍♂️ *Error*\n\n` +
-        "```Something Unexpected Happened while Lookup on Urban Dictionary```",
-    );
+    await sendLocalized(client, msg, "ud.error");
   } else if (typeof data !== "string") {
-    await client.sendMessage(
-      chatId,
-      "*Term:* ```" +
-        args.join(" ") +
-        "```\n\n" +
-        "*Definition:* ```" +
-        data[0].definition +
-        "```\n\n" +
-        "*Example:* ```" +
-        data[0].example +
-        "```",
-    );
+    await sendLocalized(client, msg, "ud.success", {
+      term: args.join(" "),
+      definition: data[0].definition,
+      example: data[0].example,
+    });
   }
 };
 
@@ -42,7 +32,7 @@ const command: Command = {
   command: "!ud",
   commandType: "plugin",
   isDependent: false,
-  help: `*Urban Dictionary*\n\nUrban Dictionary is a crowdsourced online dictionary for slang words and phrases.\n\n*!ud [Word]*\nto search a word using Urban Dictionary`,
+  help: "ud.help",
   execute,
   public: true,
 };

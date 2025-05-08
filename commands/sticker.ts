@@ -1,3 +1,8 @@
+import {
+  getGroupLanguage,
+  sendLocalized,
+} from "../helpers/localizedMessenger.js";
+import { getString } from "../helpers/i18n.js";
 //jshint esversion:8
 import whatsapp, { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
@@ -9,12 +14,12 @@ const execute = async (client: Client, msg: Message) => {
     (await msg
       .getQuotedMessage()
       .then((msg) => msg)
-      .catch(() => null)) || msg;
+      .catch((): null => null)) || msg; // Explicit return type
   if (message.hasMedia) {
     const attachmentData = await message
       .downloadMedia()
       .then((media) => media)
-      .catch(() => null);
+      .catch((): null => null); // Explicit return type
     if (!attachmentData) {
       return;
     }
@@ -29,23 +34,26 @@ const execute = async (client: Client, msg: Message) => {
         { sendMediaAsSticker: true },
       );
     } catch {
-      await client.sendMessage(chatId, "Sending sticker failed.");
+      await client.sendMessage(
+        chatId,
+        getString("sticker.send_failed", await getGroupLanguage(msg)),
+      );
     }
   } else {
     await client.sendMessage(
       chatId,
-      `🙇‍♂️ *Error*\n\n` + "```No image found to make a Sticker```",
+      getString("sticker.no_image", await getGroupLanguage(msg)),
     );
   }
 };
 
 const command: Command = {
   name: "Sticker Maker",
-  description: "generates sticker from image",
+  description: "sticker.description",
   command: "!sticker",
   commandType: "plugin",
   isDependent: false,
-  help: `*Sticker Maker*\n\nCreate sticker from Image.\n\nReply an image with *!sticker* to get a sticker of that image.`,
+  help: "sticker.help",
   execute,
   public: true,
 };

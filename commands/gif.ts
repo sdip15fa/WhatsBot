@@ -1,3 +1,4 @@
+import { sendLocalized } from "../helpers/localizedMessenger.js";
 //jshint esversion:8
 import whatsapp, { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
@@ -9,22 +10,22 @@ const execute = async (client: Client, msg: Message) => {
     (await msg
       .getQuotedMessage()
       .then((msg) => msg)
-      .catch(() => null)) || msg;
+      .catch((): null => null)) || msg; // Explicit return type for catch
   if (message.hasMedia) {
     const attachmentData = (await message
       .downloadMedia()
       .then((media) => media)
-      .catch(() => null)) as whatsapp.MessageMedia;
+      .catch((): null => null)) as whatsapp.MessageMedia; // Explicit return type for catch
     if (!attachmentData) {
       return;
     }
 
     if (!["video", "image"].includes(attachmentData.mimetype.split("/")[0])) {
-      return await client.sendMessage(chatId, "File type incompatible.");
+      return await sendLocalized(client, msg, "gif.incompatible_type");
     }
 
     if (attachmentData.filesize > 1000 * 1000 * 10) {
-      return await client.sendMessage(chatId, "File too large.");
+      return await sendLocalized(client, msg, "gif.file_too_large");
     }
 
     let gif: whatsapp.MessageMedia;
@@ -32,30 +33,28 @@ const execute = async (client: Client, msg: Message) => {
     try {
       gif = await toGIF(attachmentData);
     } catch {
-      return await client.sendMessage(
-        chatId,
-        "Error converting the media to GIF.",
-      );
+      return await sendLocalized(client, msg, "gif.conversion_error");
     }
 
     try {
       await client.sendMessage(chatId, gif);
-    } catch {}
+    } catch (e) {
+      console.error("Failed to send GIF:", e);
+      // Optionally send a localized error message
+      // await sendLocalized(client, msg, "gif.send_error");
+    }
   } else {
-    await client.sendMessage(
-      chatId,
-      `🙇‍♂️ *Error*\n\n` + "```No media found to make a GIF image```",
-    );
+    await sendLocalized(client, msg, "gif.no_media");
   }
 };
 
 const command: Command = {
   name: "GIF Maker",
-  description: "generates GIF from media",
+  description: "gif.description",
   command: "!gif",
   commandType: "plugin",
   isDependent: false,
-  help: `*GIF Maker*\n\nCreate GIF from media.\n\nReply a media with *!sticker* to get a sticker of that media.`,
+  help: "gif.help",
   execute,
   public: true,
 };

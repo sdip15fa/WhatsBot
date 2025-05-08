@@ -4,6 +4,7 @@ import { Command } from "../types/command.js";
 import { agenda } from "../helpers/agenda.js";
 import { countMessage } from "../helpers/count.js";
 import { getDate } from "../helpers/date.js";
+import { sendLocalized } from "../helpers/localizedMessenger.js";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const chat = await msg.getChat();
@@ -27,12 +28,13 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
           skipImmediate: true,
         },
       );
-      return await client.sendMessage(
-        chatId,
-        "Subscribed! Message counts will be sent at 23:59 every day.",
-      );
+      return await sendLocalized(client, msg, "count.subscribe.success");
     } else {
-      return await client.sendMessage(chatId, "Already subscribed!");
+      return await sendLocalized(
+        client,
+        msg,
+        "count.subscribe.already_subscribed",
+      );
     }
   }
 
@@ -49,9 +51,13 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         name: "send count",
         "data.groupId": chatId,
       });
-      return await client.sendMessage(chatId, "Unsubscribed!");
+      return await sendLocalized(client, msg, "count.unsubscribe.success");
     } else {
-      return await client.sendMessage(chatId, "Not subscribed!");
+      return await sendLocalized(
+        client,
+        msg,
+        "count.unsubscribe.not_subscribed",
+      );
     }
   }
 
@@ -59,19 +65,17 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     ? args[0]
     : getDate();
 
-  await client.sendMessage(
-    chatId,
-    await countMessage(chatId, chat.name || "", date),
-  );
+  const messageCountResult = await countMessage(chatId, chat.name || "", date);
+  await client.sendMessage(chatId, messageCountResult); // countMessage already returns a formatted string
 };
 
 const command: Command = {
-  name: "Count",
-  description: "Get count of messages in the chat",
+  name: "count.name",
+  description: "count.description",
   command: "!count",
   commandType: "plugin",
   isDependent: false,
-  help: `*count*\n\nGet number of messages in the chat. \n\n*!count [date]*\n\nDate should be in format 'YYYY-MM-DD'.\n\nDate defaults to today's date if not provided. Use subscribe or unsubscribe as date to subscribe or unsubscribe.`,
+  help: "count.help",
   execute,
   public: true,
 };

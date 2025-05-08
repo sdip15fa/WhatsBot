@@ -5,6 +5,11 @@ const { MessageMedia } = whatsapp;
 import axios from "../helpers/axios.js";
 import formatNum from "../helpers/formatNum.js";
 import processImage from "../helpers/processImage.js";
+import {
+  getGroupLanguage,
+  sendLocalized,
+} from "../helpers/localizedMessenger.js"; // Added getGroupLanguage
+import { getString } from "../helpers/i18n.js"; // Added getString
 
 async function youtube(url: string) {
   try {
@@ -42,34 +47,39 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   }
 
   if (data == "error") {
-    await client.sendMessage(
-      chatId,
-      `🙇‍♂️ *Error*\n\n` +
-        "```Something Unexpected Happened to fetch the YouTube video```",
+    await sendLocalized(client, msg, "yt.error");
+  } else if (typeof data !== "string" && data.image) {
+    // Ensure data.image is not null
+    const localizedCaption = getString(
+      "yt.success",
+      await getGroupLanguage(msg),
+      {
+        title: data.title,
+        views: data.views,
+        likes: data.likes,
+        comments: data.comments,
+      },
     );
-  } else if (typeof data !== "string") {
+    const media = new MessageMedia(
+      data.image.mimetype,
+      data.image.data,
+      data.image.filename,
+    );
     try {
-      await client.sendMessage(
-        chatId,
-        new MessageMedia(
-          data.image.mimetype,
-          data.image.data,
-          data.image.filename,
-        ),
-        {
-          caption:
-            `*${data.title}*\n\nViews: ` +
-            "```" +
-            data.views +
-            "```\nLikes: " +
-            "```" +
-            data.likes +
-            "```\nComments: " +
-            "```" +
-            data.comments,
-        },
-      );
-    } catch {}
+      await client.sendMessage(chatId, media, { caption: localizedCaption });
+    } catch (e) {
+      console.error("Failed to send YouTube info with media:", e);
+      // await sendLocalized(client, msg, "yt.send_error");
+    }
+  } else if (typeof data !== "string" && !data.image) {
+    // Handle case where data is valid but image is null (e.g. send text only)
+    await sendLocalized(client, msg, "yt.success_no_image", {
+      // Assuming a new localization key for this
+      title: data.title,
+      views: data.views,
+      likes: data.likes,
+      comments: data.comments,
+    });
   }
 };
 
@@ -79,7 +89,7 @@ const command: Command = {
   command: "!yt",
   commandType: "plugin",
   isDependent: false,
-  help: `*Youtube*\n\nGet info of a Youtube video with this command.\n\n*!yt [Youtube-Link]*\nor,\nReply a message with *!yt* to get info.`,
+  help: "yt.help",
   execute,
   public: true,
 };

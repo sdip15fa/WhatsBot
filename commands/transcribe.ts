@@ -5,6 +5,7 @@ import config from "../config.js";
 import axios from "../helpers/axios.js";
 import FormData from "form-data";
 import mime from "mime-to-extensions";
+import { sendLocalized } from "../helpers/localizedMessenger.js";
 
 interface TranscriptionInfo {
   language: string;
@@ -43,25 +44,19 @@ const execute = async (client: Client, msg: Message) => {
   const quotedMsg = await msg.getQuotedMessage();
 
   if (!config.cf_worker.url) {
-    return client.sendMessage(
-      chatId,
-      "Sorry, cf worker url not specified in the environment variable.",
-    );
+    return sendLocalized(client, msg, "transcribe.cf_worker_url_not_specified");
   }
 
   if (quotedMsg.hasMedia) {
     const attachmentData: whatsapp.MessageMedia = await quotedMsg
       .downloadMedia()
       .then((media) => media)
-      .catch(() => null);
+      .catch((): null => null); // Already has explicit null, this is fine.
     if (!attachmentData) {
       return;
     }
     if (!attachmentData.mimetype.startsWith("audio")) {
-      await client.sendMessage(
-        chatId,
-        `🙇‍♂️ *Error*\n\n` + "```Media is not audio```",
-      );
+      await sendLocalized(client, msg, "transcribe.media_not_audio");
     }
 
     const username = config.cf_worker.username;
@@ -72,7 +67,6 @@ const execute = async (client: Client, msg: Message) => {
     );
     const authHeader = `Basic ${encodedCredentials}`;
 
-    
     const form = new FormData();
     form.append("audio", Buffer.from(attachmentData.data, "base64"), {
       filename: `audio.${mime.extension(attachmentData.mimetype)}`,
@@ -89,12 +83,11 @@ const execute = async (client: Client, msg: Message) => {
       },
     );
 
-    await client.sendMessage(
-      chatId,
-      `*Transcription*\n\n` + (result.data.text || ""),
-    );
+    await sendLocalized(client, msg, "transcribe.success", {
+      text: result.data.text || "",
+    });
   } else {
-    await client.sendMessage(chatId, `🙇‍♂️ *Error*\n\n` + "```No media found```");
+    await sendLocalized(client, msg, "transcribe.no_media");
   }
 };
 
@@ -104,7 +97,7 @@ const command: Command = {
   command: "!transcribe",
   commandType: "plugin",
   isDependent: false,
-  help: `*Transcribe audio*\n\nReply an audio message with !transcribe.`,
+  help: "transcribe.help",
   execute,
   public: true,
 };

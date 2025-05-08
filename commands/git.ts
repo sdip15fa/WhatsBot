@@ -21,7 +21,12 @@ async function downloadzip(url: string, name: string) {
   }
 }
 
-async function gitinfo(url: string) {
+import {
+  getGroupLanguage,
+  sendLocalized,
+} from "../helpers/localizedMessenger.js";
+import { getString } from "../helpers/i18n.js";
+async function gitinfo(url: string, msg: Message) {
   let repo;
   try {
     repo = {
@@ -33,7 +38,7 @@ async function gitinfo(url: string) {
   } catch (err) {
     return {
       status: false,
-      msg: "This is not a valid Github repository url.",
+      msg: "git.invalid_url",
     };
   }
 
@@ -41,15 +46,22 @@ async function gitinfo(url: string) {
     const repodata = (
       await axios.get(`https://api.github.com/repos/${repo.user}/${repo.repo}`)
     ).data;
+    const targetLang = await getGroupLanguage(msg);
 
     return {
       status: true,
       msg: `*${repodata.name}* - _${
         repodata.description ? repodata.description : ""
-      }_\n\nAuthor: ${repodata.owner.login}\nTotal Stars: ${
+      }_\n\n${getString("git.author", targetLang)}: ${
+        repodata.owner.login
+      }\n${getString("git.total_stars", targetLang)}: ${
         repodata.stargazers_count
-      }\nTotal Forks: ${repodata.forks}\nLicense: ${
-        repodata.license ? repodata.license.name : "No License"
+      }\n${getString("git.total_forks", targetLang)}: ${
+        repodata.forks
+      }\n${getString("git.license", targetLang)}: ${
+        repodata.license
+          ? repodata.license.name
+          : getString("git.no_license", targetLang)
       }`,
       data: await downloadzip(
         `https://github.com/${repo.user}/${repo.repo}/archive/${repodata.default_branch}.zip`,
@@ -59,13 +71,13 @@ async function gitinfo(url: string) {
   } catch (err) {
     return {
       status: false,
-      msg: "This repository is not available. Maybe this is not a public repository.",
+      msg: "git.repo_not_available",
     };
   }
 }
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
-  const data = await gitinfo(args[0]);
+  const data = await gitinfo(args[0], msg);
   if (data.status) {
     if (data.data.status) {
       try {
@@ -77,24 +89,31 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
             data.data.filename,
           ),
         );
-      } catch {}
+      } catch (e) {
+        console.error("Failed to send git zip file:", e);
+        // await sendLocalized(client, msg, "git.send_zip_error");
+      }
     }
     await client.sendMessage(msg.to, data.msg);
   } else {
+    const errorPrefix = getString(
+      "git.error_prefix",
+      await getGroupLanguage(msg),
+    );
     await client.sendMessage(
       msg.to,
-      `🙇‍♂️ *Error*\n\n` + "```" + data.msg + "```",
+      `🙇‍♂️ *${errorPrefix}*\n\n` + "```" + data.msg + "```",
     );
   }
 };
 
 const command: Command = {
   name: "Git Info",
-  description: "gets information for requested git repo",
+  description: "git.description",
   command: "!git",
   commandType: "plugin",
   isDependent: false,
-  help: `*Github*\n\nGet a github repository in zip format with it's details.\n\nSend a message with *!git [Github-Url]* to execute.`,
+  help: "git.help",
   execute,
   public: false,
 };

@@ -1,13 +1,10 @@
+import { sendLocalized } from "../helpers/localizedMessenger.js";
 import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
 
 const execute = async (client: Client, msg: Message) => {
-  const chatId = (await msg.getChat()).id._serialized;
   if (!msg.hasQuotedMsg) {
-    return await client.sendMessage(
-      chatId,
-      "Please reply to a message to delete.",
-    );
+    return await sendLocalized(client, msg, "delete.no_quoted_msg");
   }
 
   const quote = await msg.getQuotedMessage();
@@ -16,17 +13,17 @@ const execute = async (client: Client, msg: Message) => {
     await quote.delete(true);
     await msg.delete(true);
   } catch {
-    await client.sendMessage(chatId, "Something went wrong while deleting.");
+    await sendLocalized(client, msg, "delete.error");
   }
 };
 
 const command: Command = {
   name: "Delete",
-  description: "Delete a message for everyone",
+  description: "delete.description",
   command: "!delete",
   commandType: "plugin",
   isDependent: false,
-  help: `*Delete*\n\nDelete a message for everyone.\n\nReply a message with *!delete* to delete`,
+  help: "delete.help",
   execute,
   public: false,
 };

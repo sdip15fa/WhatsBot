@@ -1,3 +1,8 @@
+import {
+  getGroupLanguage,
+  sendLocalized,
+} from "../helpers/localizedMessenger.js";
+import { getString } from "../helpers/i18n.js";
 import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
 import dictionary from "../helpers/dict.js";
@@ -5,37 +10,46 @@ import dictionary from "../helpers/dict.js";
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
   if (!args[0]) {
-    return await client.sendMessage(chatId, "Please provide an argument.");
+    return await sendLocalized(client, msg, "dict.no_argument");
   }
 
   const definition = await dictionary(args.join(" "));
 
   if (typeof definition === "object" && "status" in definition) {
-    await client.sendMessage(
-      chatId,
+    await sendLocalized(
+      client,
+      msg,
+      definition.status ? "dict.error_with_status" : "dict.unknown_error",
       definition.status
-        ? `${definition.status} ${definition.title}`
-        : "An unknown error occurred.",
+        ? { status: definition.status, title: definition.title }
+        : {},
     );
   } else {
+    const targetLang = await getGroupLanguage(msg);
     await client.sendMessage(
       chatId,
       `*${definition.word}*
 ${
   definition.phonetics?.length
-    ? `\n*Phonetics*
+    ? `\n*${getString("dict.phonetics", targetLang)}*
 
 ${definition.phonetics
   ?.map(
     (phonetic, index) =>
-      `${index + 1}.${phonetic.text ? `\nText: ${phonetic.text}` : ""}${
-        phonetic.audio ? `\nAudio: ${phonetic.audio}` : ""
+      `${index + 1}.${
+        phonetic.text
+          ? `\n${getString("dict.text", targetLang)}: ${phonetic.text}`
+          : ""
+      }${
+        phonetic.audio
+          ? `\n${getString("dict.audio", targetLang)}: ${phonetic.audio}`
+          : ""
       }`,
   )
   ?.join("\n\n")}\n`
     : ""
 }
-*Meanings*
+*${getString("dict.meanings", targetLang)}*
 
 ${definition.meanings
   ?.map(
@@ -47,17 +61,17 @@ ${meaning.definitions
     (def, index) =>
       `${index + 1}. ${def?.definition}${
         def?.example
-          ? `\n_Example_:
+          ? `\n_${getString("dict.example", targetLang)}_:
 ${def?.example}`
           : ""
       }${
         def?.synonyms?.length
-          ? `\n_Synonyms_
+          ? `\n_${getString("dict.synonyms", targetLang)}_
 ${def?.synonyms?.map((synonym) => `- ${synonym}`)?.join("\n")}`
           : ""
       }${
-        def.antonyms.length
-          ? `\n_Antonyms_
+        def.antonyms?.length
+          ? `\n_${getString("dict.antonyms", targetLang)}_
 ${def?.antonyms?.map((antonym) => `- ${antonym}`)?.join("\n")}`
           : ""
       }`,
@@ -66,7 +80,7 @@ ${def?.antonyms?.map((antonym) => `- ${antonym}`)?.join("\n")}`
   )
   ?.join("\n\n")}${
         definition?.origin
-          ? `\n\n*Origin*:
+          ? `\n\n*${getString("dict.origin", targetLang)}*:
 ${definition?.origin}`
           : ""
       }`,
@@ -76,11 +90,11 @@ ${definition?.origin}`
 
 const command: Command = {
   name: "Dictionary",
-  description: "Get word definition",
+  description: "dict.description",
   command: "!dict",
   commandType: "plugin",
   isDependent: false,
-  help: `*Dictionary*\n\nLookup a word's definition with this command.\n\n*!dict [word]*\nTo check a word`,
+  help: "dict.help",
   execute,
   public: true,
 };

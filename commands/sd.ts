@@ -1,3 +1,8 @@
+import {
+  getGroupLanguage,
+  sendLocalized,
+} from "../helpers/localizedMessenger.js";
+import { getString } from "../helpers/i18n.js";
 // Import necessary modules and dependencies
 import whatsapp, { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
@@ -11,7 +16,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   if (!config.cf_worker.url) {
     return client.sendMessage(
       chatId,
-      "Sorry, cf worker url not specified in the environment variable.",
+      getString("sd.no_cf_worker_url", await getGroupLanguage(msg)),
     );
   }
 
@@ -19,7 +24,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   const quotedMsg = msg.hasQuotedMsg && (await msg.getQuotedMessage());
 
   if (!args.length && !quotedMsg.body) {
-    return client.sendMessage(chatId, "Please provide a prompt!");
+    return sendLocalized(client, msg, "sd.no_prompt");
   }
 
   const prompt = args.join(" ") || quotedMsg.body;
@@ -56,11 +61,13 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       console.error(error);
       try {
         await client.sendMessage(chatId, media);
-      } catch {}
+      } catch (e) {
+        console.error("Failed to send SD image via client.sendMessage:", e);
+      }
     }
   } catch (error) {
     console.error(error);
-    await client.sendMessage(chatId, "Stable Diffusion generation failed.");
+    await sendLocalized(client, msg, "sd.generation_failed");
   }
 
   // Optionally, you can handle conversation history or context here
@@ -70,11 +77,11 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
 
 const command: Command = {
   name: "sd",
-  description: "Text-to-image using stable diffusion",
+  description: "sd.description",
   command: "!sd",
   commandType: "plugin",
   isDependent: false,
-  help: `*SD*\n\nGenerate an image\n\n!sd [text]`,
+  help: "sd.help",
   execute,
   public: true,
 };

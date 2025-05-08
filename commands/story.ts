@@ -1,3 +1,8 @@
+import {
+  getGroupLanguage,
+  sendLocalized,
+} from "../helpers/localizedMessenger.js";
+import { getString } from "../helpers/i18n.js";
 //jshint esversion:8
 import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
@@ -10,13 +15,10 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     case "add": {
       const text = args[1];
       if (!text) {
-        return await client.sendMessage(chatId, "Please provide a word!");
+        return await sendLocalized(client, msg, "story.add.no_word");
       }
       if (text.length > 15) {
-        return await client.sendMessage(
-          chatId,
-          "Word is too long (maximum is 15 characters)",
-        );
+        return await sendLocalized(client, msg, "story.add.word_too_long");
       }
       if (Number(args[2])) {
         if (
@@ -27,11 +29,13 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
             )
           ).matchedCount
         ) {
-          return await client.sendMessage(chatId, "Story not found.");
+          return await sendLocalized(client, msg, "story.not_found");
         } else {
           return await client.sendMessage(
             chatId,
-            `Story updated: added \`\`\`${text}\`\`\``,
+            getString("story.add.success", await getGroupLanguage(msg), {
+              word: text,
+            }),
           );
         }
       }
@@ -43,7 +47,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
           )
         ).matchedCount
       ) {
-        await db("story").coll.insertOne(<Story>{
+        const newStory: Story = {
           id:
             ((
               (await db("story")
@@ -57,11 +61,14 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
           story: [text],
           createdAt: new Date(),
           lastModified: new Date(),
-        });
+        };
+        await db("story").coll.insertOne(newStory);
       }
       await client.sendMessage(
         chatId,
-        `Story updated: added \`\`\`${text}\`\`\``,
+        getString("story.add.success", await getGroupLanguage(msg), {
+          word: text,
+        }),
       );
       break;
     }
@@ -73,24 +80,28 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       if (story) {
         await client.sendMessage(
           chatId,
-          `${Number(args[1]) ? `Story ${Number(args[1])}` : "Current story"}:
-${story.story.join(" ")}`,
+          getString("story.see.success", await getGroupLanguage(msg), {
+            id: Number(args[1])
+              ? Number(args[1])
+              : getString(
+                  "story.see.current_label",
+                  await getGroupLanguage(msg),
+                ),
+            content: story.story.join(" "),
+          }),
         );
       } else {
-        await client.sendMessage(chatId, "Story doesn't exist.");
+        await sendLocalized(client, msg, "story.not_found");
       }
       break;
     }
     case "new": {
       const text = args[1];
       if (!text) {
-        return await client.sendMessage(chatId, "Please provide a word!");
+        return await sendLocalized(client, msg, "story.new.no_word");
       }
       if (text.length > 15) {
-        return await client.sendMessage(
-          chatId,
-          "Word is too long (maximum is 15 characters)",
-        );
+        return await sendLocalized(client, msg, "story.new.word_too_long");
       }
 
       await db("story").coll.updateMany(
@@ -98,7 +109,7 @@ ${story.story.join(" ")}`,
         { $set: { current: false } },
       );
 
-      await db("story").coll.insertOne(<Story>{
+      const newStoryFromNewCommand: Story = {
         id:
           ((
             (await db("story")
@@ -112,11 +123,14 @@ ${story.story.join(" ")}`,
         story: [text],
         createdAt: new Date(),
         lastModified: new Date(),
-      });
+      };
+      await db("story").coll.insertOne(newStoryFromNewCommand);
 
       await client.sendMessage(
         chatId,
-        `New story created: \`\`\`${text}\`\`\``,
+        getString("story.new.success", await getGroupLanguage(msg), {
+          word: text,
+        }),
       );
       break;
     }
@@ -128,26 +142,34 @@ ${story.story.join(" ")}`,
         .limit(10)
         .toArray()) as Story[];
       if (!stories.length) {
-        return await client.sendMessage(chatId, "No stories found.");
+        return await sendLocalized(client, msg, "story.list.no_stories");
       }
+      const targetLang = await getGroupLanguage(msg);
       await client.sendMessage(
+        // Removed duplicate client.sendMessage
         chatId,
-        `Stories:
-
-${stories
-  .map((story) => {
-    return `${story.id}${story.current ? " (Current)" : ""}:
-Created: ${new Date(story.createdAt).toLocaleString("en-UK", {
-      timeZone: process.env.TZ,
-    })}
-Last modified: ${new Date(story.lastModified).toLocaleString("en-UK", {
-      timeZone: process.env.TZ,
-    })}
-Content: ${story.story.filter((_v, i) => i < 10).join(" ")}${
-      story.story.length > 10 ? "..." : ""
-    }`;
-  })
-  .join("\n\n")}`,
+        getString("story.list.success", targetLang, {
+          stories: stories
+            .map((story) => {
+              return `${story.id}${
+                story.current
+                  ? getString("story.list.current_label", targetLang)
+                  : ""
+              }:\n${getString("story.list.created", targetLang)}: ${new Date(
+                story.createdAt,
+              ).toLocaleString("en-UK", {
+                timeZone: process.env.TZ,
+              })}\n${getString(
+                "story.list.last_modified",
+                targetLang,
+              )}: ${new Date(story.lastModified).toLocaleString("en-UK", {
+                timeZone: process.env.TZ,
+              })}\n${getString("story.list.content", targetLang)}: ${story.story
+                .filter((_v, i) => i < 10)
+                .join(" ")}${story.story.length > 10 ? "..." : ""}`;
+            })
+            .join("\n\n"),
+        }),
       );
       break;
     }
@@ -164,10 +186,12 @@ Content: ${story.story.filter((_v, i) => i < 10).join(" ")}${
           );
           await client.sendMessage(
             chatId,
-            `Current story set to ${Number(args[1])}`,
+            getString("story.current.success", await getGroupLanguage(msg), {
+              id: Number(args[1]),
+            }),
           );
         } else {
-          await client.sendMessage(chatId, "Story doesn't exist!");
+          await sendLocalized(client, msg, "story.not_found");
         }
       } else {
         const id = (
@@ -178,14 +202,18 @@ Content: ${story.story.filter((_v, i) => i < 10).join(" ")}${
         )?.id;
         await client.sendMessage(
           chatId,
-          id ? `Current story id: ${id}` : "No stories yet.",
+          id
+            ? getString("story.current.status", await getGroupLanguage(msg), {
+                id: id,
+              })
+            : getString("story.list.no_stories", await getGroupLanguage(msg)),
         );
       }
       break;
     }
     case "pop": {
       if (!msg.fromMe) {
-        return await client.sendMessage(chatId, "You can't do that.");
+        return await sendLocalized(client, msg, "story.owner_only");
       }
       if (
         !(
@@ -202,32 +230,31 @@ Content: ${story.story.filter((_v, i) => i < 10).join(" ")}${
       ) {
         return await client.sendMessage(
           chatId,
-          "Nothing was removed. Please check.",
+          getString("story.pop.nothing_removed", await getGroupLanguage(msg)),
         );
       }
-      await client.sendMessage(chatId, "Last word removed.");
+      await sendLocalized(client, msg, "story.pop.success");
       break;
     }
     case "remove": {
       if (!msg.fromMe) {
-        return await client.sendMessage(chatId, "You can't do that.");
+        return await sendLocalized(client, msg, "story.remove.not_allowed");
       }
       if (
         !(await db("story").coll.deleteOne({ chatId, id: Number(args[1]) }))
           .deletedCount
       ) {
-        return await client.sendMessage(
-          chatId,
-          "Nothing was removed. Please check.",
-        );
+        return await sendLocalized(client, msg, "story.remove.nothing_removed");
       }
-      await client.sendMessage(chatId, `Story ${Number(args[1])} removed.`);
+      await sendLocalized(client, msg, "story.remove.success", {
+        id: Number(args[1]),
+      });
       break;
     }
     default: {
       await client.sendMessage(
         chatId,
-        `Use \`\`\`!help story\`\`\` for syntax.`,
+        getString("story.help_syntax", await getGroupLanguage(msg)),
       );
       break;
     }
@@ -236,11 +263,11 @@ Content: ${story.story.filter((_v, i) => i < 10).join(" ")}${
 
 const command: Command = {
   name: "Story",
-  description: "One word story",
+  description: "story.description",
   command: "!story",
   commandType: "plugin",
   isDependent: false,
-  help: `*Story*\n\nOne word story. See the commands.\n\n*Commands*\n\n!story add [one word] [id]\n!story new [one word]\n!story see [id]\n!story list [page]\n!story current [id]\n\n*Owner Only*\n\n!story pop [id]\n!story remove [id]`,
+  help: "story.help",
   execute,
   public: true,
 };

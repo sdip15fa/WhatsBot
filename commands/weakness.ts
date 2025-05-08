@@ -1,13 +1,16 @@
 import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
 import { weakness } from "../helpers/weakness.js";
+import { sendLocalized } from "../helpers/localizedMessenger.js";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
   if (!args[0]) {
-    return await client.sendMessage(chatId, "Please provide an argument.");
+    return await sendLocalized(client, msg, "weakness.no_argument");
   }
-  await client.sendMessage(chatId, weakness(args[0]));
+  await sendLocalized(client, msg, "weakness.success", {
+    weakness_text: weakness(args[0]),
+  });
 };
 
 const command: Command = {
@@ -16,7 +19,7 @@ const command: Command = {
   command: "!weakness",
   commandType: "plugin",
   isDependent: false,
-  help: `*Weakness*\n\nLookup a pokemon's weaknesses with this command.\n\n*!weakness [pokemon]*\nTo check a pokemon`,
+  help: "weakness.help",
   execute,
   public: true,
 };

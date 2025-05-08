@@ -4,6 +4,7 @@ import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
 import config from "../config.js";
 import tr_languages from "../helpers/tr_languages.js";
+import { sendLocalized } from "../helpers/localizedMessenger.js";
 
 async function translator(langReq: string, text: string) {
   let lang: string;
@@ -40,22 +41,14 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   }
 
   if (data == "error") {
-    await client.sendMessage(
-      msg.to,
-      `🙇‍♂️ *Error*\n\n` + "```Something Unexpected Happened while translate```",
-    );
+    await sendLocalized(client, msg, "tr.error");
   } else if (typeof data !== "string") {
-    await client.sendMessage(
-      (await msg.getChat()).id._serialized,
-      `*Original (${data.ori_lang}) :* ` +
-        "```" +
-        data.original +
-        "```\n\n" +
-        `*Translation (${data.trans_lang}) :* ` +
-        "```" +
-        data.translated +
-        "```",
-    );
+    await sendLocalized(client, msg, "tr.success", {
+      ori_lang: data.ori_lang,
+      original: data.original,
+      trans_lang: data.trans_lang,
+      translated: data.translated,
+    });
   }
 };
 

@@ -3,8 +3,13 @@
 //TODO: fix it
 import whatsapp, { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
-const { MessageMedia } = whatsapp;
 import axios from "../helpers/axios.js";
+import {
+  sendLocalized,
+  getGroupLanguage,
+} from "../helpers/localizedMessenger.js";
+import { getString } from "../helpers/i18n.js";
+const { MessageMedia } = whatsapp;
 
 async function carbon(text: string) {
   const respoimage = await axios
@@ -15,9 +20,7 @@ async function carbon(text: string) {
       )}&theme=darcula&backgroundColor=rgba(36, 75, 115)`,
       { responseType: "arraybuffer" },
     )
-    .catch(() => {
-      return null;
-    });
+    .catch((): null => null);
 
   if (!respoimage) {
     return null;
@@ -32,46 +35,48 @@ async function carbon(text: string) {
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   let data;
+  let textToCarbon = args.join(" ");
 
   if (msg.hasQuotedMsg) {
     const quotedMsg = await msg.getQuotedMessage();
-    data = await carbon(quotedMsg.body);
-    msg = quotedMsg;
+    textToCarbon = quotedMsg.body;
+    data = await carbon(textToCarbon);
   } else {
-    data = await carbon(args.join(" "));
+    data = await carbon(textToCarbon);
   }
 
   if (!data) {
-    await client.sendMessage(
-      msg.to,
-      `🙇‍♂️ *Error*\n\n` +
-        "```Something Unexpected Happened to create the Carbon.```",
-    );
+    await sendLocalized(client, msg, "carbon.error");
   } else {
     try {
+      const userLanguage = await getGroupLanguage(msg);
+      const caption = getString("carbon.caption", userLanguage, {
+        text: textToCarbon,
+      });
       await client.sendMessage(
         msg.to,
         new MessageMedia(data.mimetype, data.data, data.filename),
         {
-          caption:
-            `Carbon for 👇\n` +
-            "```" +
-            msg.body.replace("!carbon ", "") +
-            "```",
+          caption: caption,
         },
       );
-    } catch {}
+    } catch (e) {
+      console.error("Failed to send carbon image:", e);
+      // Optionally, send a localized error message to the user
+      // await sendLocalized(client, msg, "carbon.send_error");
+    }
   }
 };
 
 const command: Command = {
-  name: "Carbon",
-  description: "Creates a carbon.now.sh image from text",
+  name: "carbon.name",
+  description: "carbon.description",
   command: "!carbon",
   commandType: "plugin",
   isDependent: false,
-  help: `*Carbon*\n\nGenerate beautiful image with carbon.now.sh. Just send the text it will generate an image for you.\n\n*!carbon [Text]*\nor,\nReply a message with *!carbon* to Create`,
+  help: "carbon.help",
   execute,
+  public: true,
 };
 
 export default command;

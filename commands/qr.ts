@@ -1,3 +1,8 @@
+import {
+  getGroupLanguage,
+  sendLocalized,
+} from "../helpers/localizedMessenger.js";
+import { getString } from "../helpers/i18n.js";
 //jshint esversion:8
 import whatsapp, { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
@@ -28,18 +33,25 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     await client.sendMessage(
       (await msg.getChat()).id._serialized,
       new MessageMedia(data.mimetype, data.data, data.filename),
-      { caption: `QR code for 👇\n` + "```" + msg.body + "```" },
+      {
+        caption: getString("qr.caption", await getGroupLanguage(msg), {
+          text: msg.body,
+        }),
+      },
     );
-  } catch {}
+  } catch (e) {
+    console.error("Failed to send QR code:", e);
+    // await sendLocalized(client, msg, "qr.send_error");
+  }
 };
 
 const command: Command = {
   name: "QR generator",
-  description: "Generates QR for given text",
+  description: "qr.description",
   command: "!qr",
   commandType: "plugin",
   isDependent: false,
-  help: "`*QR generator*\n\nGenerate QR code with this module. Just send the text it will generate QR Code image for you.\n\n*!qr [Text]*\nor,\nReply a message with *!qr* to Create`",
+  help: "qr.help",
   execute,
   public: true,
 };

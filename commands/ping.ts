@@ -2,8 +2,11 @@
 
 import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
+import { sendLocalized } from "../helpers/localizedMessenger.js";
 
-const execute = (client: Client, msg: Message) => msg.reply("pong");
+const execute = async (client: Client, msg: Message) => {
+  await sendLocalized(client, msg, "PING_RESPONSE");
+};
 
 const command: Command = {
   name: "Ping",

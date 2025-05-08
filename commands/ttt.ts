@@ -4,6 +4,7 @@ import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
 import { ObjectId } from "mongodb";
 import db from "../db/index.js";
+import { sendLocalized } from "../helpers/localizedMessenger.js";
 
 interface GameState {
   board: string[][];
@@ -24,10 +25,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     const size = parseInt(args[1]) || 3;
 
     if (size < 3 || size > 10) {
-      client.sendMessage(
-        chatId,
-        "Invalid board size. Please choose a size between 3 and 10.",
-      );
+      sendLocalized(client, msg, "ttt.invalid_board_size");
       return;
     }
 
@@ -35,10 +33,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     const existingGame = await gameCollection.findOne({ chatId });
 
     if (existingGame) {
-      client.sendMessage(
-        chatId,
-        "A game is already in progress. Use `!ttt reset` to reset the current game.",
-      );
+      sendLocalized(client, msg, "ttt.game_in_progress");
       return;
     }
 
@@ -46,8 +41,8 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     const gameDoc: GameDocument = { chatId, gameState };
 
     await gameCollection.insertOne(gameDoc);
-    client.sendMessage(chatId, "New Tic Tac Toe game started.");
-    await printBoard(client, chatId);
+    sendLocalized(client, msg, "ttt.start_success");
+    await printBoard(client, msg);
     return;
   }
 
@@ -55,19 +50,13 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     const gameCollection = db("ttt").coll;
 
     await gameCollection.deleteOne({ chatId });
-    client.sendMessage(
-      chatId,
-      "Game reset. Start a new game with `!ttt start`.",
-    );
+    sendLocalized(client, msg, "ttt.reset_success");
     return;
   }
 
   const gameDoc = await getGameDoc(chatId);
   if (!gameDoc) {
-    client.sendMessage(
-      chatId,
-      "No Tic Tac Toe game in progress. Start a new game with `!ttt start`.",
-    );
+    sendLocalized(client, msg, "ttt.no_game_in_progress");
     return;
   }
 
@@ -86,18 +75,12 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       rowIndex >= board.length ||
       columnIndex >= board.length
     ) {
-      client.sendMessage(
-        chatId,
-        "Invalid move. Please provide valid row and column indices.",
-      );
+      sendLocalized(client, msg, "ttt.invalid_move_indices");
       return;
     }
 
     if (board[rowIndex][columnIndex] !== " ") {
-      client.sendMessage(
-        chatId,
-        "Invalid move. The selected cell is already occupied.",
-      );
+      sendLocalized(client, msg, "ttt.invalid_move_occupied");
       return;
     }
 
@@ -105,17 +88,17 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     gameState.currentPlayer = currentPlayer === "X" ? "O" : "X";
 
     await updateGameState(chatId, gameState);
-    await printBoard(client, chatId);
+    await printBoard(client, msg);
 
     const winner = getWinner(board);
     if (winner) {
-      client.sendMessage(chatId, `Player ${winner} wins! Game over.`);
+      sendLocalized(client, msg, "ttt.win", { winner });
       await resetGame(chatId);
       return;
     }
 
     if (isBoardFull(board)) {
-      client.sendMessage(chatId, "It's a draw! Game over.");
+      sendLocalized(client, msg, "ttt.draw");
       await resetGame(chatId);
       return;
     }
@@ -123,10 +106,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     return;
   }
 
-  client.sendMessage(
-    chatId,
-    "Invalid command. Use `!ttt start` to start a new game or `!ttt play [row] [column]` to make a move.",
-  );
+  sendLocalized(client, msg, "ttt.invalid_command");
 };
 
 const getInitialGameState = (size: number): GameState => {
@@ -148,13 +128,11 @@ const getInitialGameState = (size: number): GameState => {
   };
 };
 
-const printBoard = async (client: Client, chatId: string) => {
+const printBoard = async (client: Client, msg: Message) => {
+  const chatId = (await msg.getChat()).id._serialized;
   const gameDoc = await getGameDoc(chatId);
   if (!gameDoc) {
-    client.sendMessage(
-      chatId,
-      "No Tic Tac Toe game in progress. Start a new game with `!ttt start`.",
-    );
+    sendLocalized(client, msg, "ttt.no_game_in_progress");
     return;
   }
 
@@ -163,13 +141,13 @@ const printBoard = async (client: Client, chatId: string) => {
 
   let boardString = "";
   for (let i = 0; i < board.length; i++) {
-    boardString += board[i].join(" | ") + "\n";
+    boardString += board[i].join(" | ") + "\\n";
     if (i < board.length - 1) {
-      boardString += "--".repeat(board[i].length * 2 - 1) + "\n";
+      boardString += "--".repeat(board[i].length * 2 - 1) + "\\n";
     }
   }
 
-  client.sendMessage(chatId, "Current game state:\n" + boardString);
+  sendLocalized(client, msg, "ttt.current_game_state", { board: boardString });
 };
 
 const getGameDoc = async (chatId: string): Promise<GameDocument | null> => {
@@ -230,12 +208,7 @@ const command: Command = {
   description: "Play a game of Tic-Tac-Toe!",
   commandType: "plugin",
   isDependent: false,
-  help: `*Tic-Tac-Toe Game Commands*:
-  • Start a game: \`!ttt start [size]\` (default size is 3 if not provided)
-  • Make a move: \`!ttt move [row] [column]\`
-  • Reset the game: \`!ttt reset\`
-  • Help: \`!ttt help\`
-  `,
+  help: "ttt.help",
   execute,
   public: true,
 };

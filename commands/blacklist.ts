@@ -3,140 +3,148 @@
 import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
 import db from "../db/index.js";
+import {
+  sendLocalized,
+  getGroupLanguage,
+} from "../helpers/localizedMessenger.js";
+import { getString } from "../helpers/i18n.js";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
-  const chatId = (await msg.getChat()).id._serialized;
-
   const chatsCollection = db("chats").coll;
+  const userLanguage = await getGroupLanguage(msg);
 
   switch (args[0]) {
     case "add": {
       if (!args[1] && !msg.hasQuotedMsg) {
-        return await client.sendMessage(
-          chatId,
-          `Please provide a word to add to the blacklist.`,
+        return await sendLocalized(
+          client,
+          msg,
+          "blacklist.add.no_word_or_media",
         );
       }
       const quotedMsg = await msg.getQuotedMessage();
-      if (quotedMsg.hasMedia && quotedMsg.mediaKey) {
-        const chatDoc = await chatsCollection.findOne({ chatId });
+      if (quotedMsg && quotedMsg.hasMedia && quotedMsg.mediaKey) {
+        const chatDoc = await chatsCollection.findOne({ chatId: msg.from });
         if (!chatDoc) {
           await chatsCollection.insertOne({
-            chatId,
+            chatId: msg.from,
             blacklist_media: [quotedMsg.mediaKey],
           });
         } else {
           await chatsCollection.updateOne(
-            { chatId },
+            { chatId: msg.from },
             { $push: { blacklist_media: quotedMsg.mediaKey } },
           );
         }
-        return await client.sendMessage(
-          chatId,
-          `The media has been added to the blacklist.`,
-        );
+        return await sendLocalized(client, msg, "blacklist.add.media_success");
       }
       args.shift();
       let word = args.join(" ").toLowerCase();
-      if (!word.trim()) {
+      if (!word.trim() && quotedMsg && quotedMsg.body) {
         word = quotedMsg.body.toLowerCase();
       }
       if (!word.trim()) {
-        return await client.sendMessage(
-          chatId,
-          `Please provide a word to add to the blacklist.`,
+        return await sendLocalized(
+          client,
+          msg,
+          "blacklist.add.no_word_or_media",
         );
       }
-      const chatDoc = await chatsCollection.findOne({ chatId });
+      const chatDoc = await chatsCollection.findOne({ chatId: msg.from });
       if (!chatDoc) {
         await chatsCollection.insertOne({
-          chatId,
+          chatId: msg.from,
           blacklist: [word],
         });
       } else {
         await chatsCollection.updateOne(
-          { chatId },
+          { chatId: msg.from },
           { $push: { blacklist: word } },
         );
       }
-      await client.sendMessage(
-        chatId,
-        `The word "${word}" has been added to the blacklist.`,
-      );
+      await sendLocalized(client, msg, "blacklist.add.word_success", { word });
       break;
     }
     case "remove": {
       if (msg.hasQuotedMsg) {
         const quotedMsg = await msg.getQuotedMessage();
-        if (quotedMsg.mediaKey) {
+        if (quotedMsg && quotedMsg.mediaKey) {
           await chatsCollection.updateOne(
-            { chatId },
+            { chatId: msg.from },
             { $pull: { blacklist_media: quotedMsg.mediaKey } },
           );
-          return await client.sendMessage(
-            chatId,
-            "The media has been removed from the blacklist.",
+          return await sendLocalized(
+            client,
+            msg,
+            "blacklist.remove.media_success",
           );
         }
       }
       if (!args[1]) {
-        return await client.sendMessage(
-          chatId,
-          `Please provide a word to remove from the blacklist.`,
+        return await sendLocalized(
+          client,
+          msg,
+          "blacklist.remove.no_word_or_media",
         );
       }
       args.shift();
       const word = args.join(" ").toLowerCase();
       await chatsCollection.updateOne(
-        { chatId },
+        { chatId: msg.from },
         { $pull: { blacklist: word } },
       );
-      await client.sendMessage(
-        chatId,
-        `The word "${word}" has been removed from the blacklist.`,
-      );
+      await sendLocalized(client, msg, "blacklist.remove.word_success", {
+        word,
+      });
       break;
     }
     case "removeall": {
       await chatsCollection.updateOne(
-        { chatId },
+        { chatId: msg.from },
         { $unset: { blacklist: 1, blacklist_media: 1 } },
       );
-      return await client.sendMessage(chatId, "All blacklist items removed.");
+      return await sendLocalized(client, msg, "blacklist.removeall.success");
       break;
     }
     case "list": {
-      const chatDoc = await chatsCollection.findOne({ chatId });
-      if (!chatDoc || !chatDoc.blacklist || !chatDoc.blacklist.length) {
-        return await client.sendMessage(
-          chatId,
-          `There are no words in the blacklist.`,
-        );
+      const chatDoc = await chatsCollection.findOne({ chatId: msg.from });
+      if (
+        !chatDoc ||
+        ((!chatDoc.blacklist || chatDoc.blacklist.length === 0) &&
+          (!chatDoc.blacklist_media || chatDoc.blacklist_media.length === 0))
+      ) {
+        return await sendLocalized(client, msg, "blacklist.list.empty");
       }
-      const wordList = chatDoc.blacklist.join(", ");
-      await client.sendMessage(
-        chatId,
-        `The following words are in the blacklist: ${wordList}.`,
-      );
+      let message = "";
+      if (chatDoc.blacklist && chatDoc.blacklist.length > 0) {
+        const wordList = chatDoc.blacklist.join(", ");
+        message += getString("blacklist.list.words", userLanguage, {
+          wordList,
+        });
+      }
+      if (chatDoc.blacklist_media && chatDoc.blacklist_media.length > 0) {
+        if (message) message += "\n";
+        message += getString("blacklist.list.media", userLanguage, {
+          mediaCount: chatDoc.blacklist_media.length,
+        });
+      }
+      await client.sendMessage(msg.from, message); // Send combined message
       break;
     }
     default: {
-      await client.sendMessage(
-        chatId,
-        `*Blacklist*\n\nManage a blacklist of words in a specific group.\n\n*Commands*\n\n!blacklist add [word]\n!blacklist remove [word]\n!blacklist list\n\n*How to Use*\n\nUse !blacklist add [word] to add a word to the blacklist. Use !blacklist remove [word] to remove a word from the blacklist. Use !blacklist list to see the current blacklist.\n\nNote: add and remove are only available to me`,
-      );
+      await sendLocalized(client, msg, "blacklist.help");
       break;
     }
   }
 };
 
 const command: Command = {
-  name: "blacklist",
+  name: "blacklist.name",
   command: "!blacklist",
-  description: "Manage a blacklist of words in a specific group.",
+  description: "blacklist.description",
   commandType: "plugin",
   isDependent: false,
-  help: `*Blacklist*\n\nManage a blacklist of words in a specific group.\n\n*Commands*\n\n!blacklist add [word]\n!blacklist remove [word]\n!blacklist list\n\n*How to Use*\n\nUse !blacklist add [word] to add a word to the blacklist. Use !blacklist remove [word] to remove a word from the blacklist. Use !blacklist list to see the current blacklist.`,
+  help: "blacklist.help",
   execute,
   public: false,
 };

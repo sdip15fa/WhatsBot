@@ -1,3 +1,8 @@
+import {
+  getGroupLanguage,
+  sendLocalized,
+} from "../helpers/localizedMessenger.js";
+import { getString } from "../helpers/i18n.js";
 //jshint esversion:8
 // Coded by Sumanjay (https://github.com/cyberboysumanjay)
 import axios from "../helpers/axios.js";
@@ -36,7 +41,7 @@ export async function getShortURL(input: string) {
       };
     })
     .catch(function (err) {
-      console.log(err.response.data);
+      // console.log(err.response.data);
       return "error";
     });
 }
@@ -53,8 +58,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   if (data == "error") {
     await client.sendMessage(
       chatId,
-      `🙇‍♂️ *Error*\n\n` +
-        "```Please make sure the entered URL is in correct format.```",
+      getString("shorten.error", await getGroupLanguage(msg)),
     );
   } else if (typeof data !== "string") {
     await client.sendMessage(chatId, data.short);
@@ -63,11 +67,11 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
 
 const command: Command = {
   name: "Shorten Link",
-  description: "Get shortend link for the given url",
+  description: "shorten.description",
   command: "!shorten",
   commandType: "plugin",
   isDependent: false,
-  help: `*Shorten Link*\n\nCreates short URL for any valid URL. \n\n*!shorten [valid-url]*\n`,
+  help: "shorten.help",
   execute,
   public: true,
 };

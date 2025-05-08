@@ -1,15 +1,16 @@
 import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
+import { sendLocalized } from "../helpers/localizedMessenger.js";
 
 //jshint esversion:8
 const execute = async (client: Client, msg: Message) => {
   client.sendPresenceAvailable();
-  msg.reply("```" + "I will be online from now." + "```");
+  await sendLocalized(client, msg, "awake.success");
 };
 
 const command: Command = {
-  name: "Awake",
-  description: "Stay online always !",
+  name: "awake.name",
+  description: "awake.description",
   command: "!awake",
   commandType: "plugin",
   isDependent: false,

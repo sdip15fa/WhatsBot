@@ -1,3 +1,8 @@
+import {
+  getGroupLanguage,
+  sendLocalized,
+} from "../helpers/localizedMessenger.js";
+import { getString } from "../helpers/i18n.js";
 //jshint esversion:8
 import whatsapp, { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
@@ -6,13 +11,16 @@ const { MessageMedia } = whatsapp;
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const count = Number(args.shift());
   if (isNaN(count)) {
-    await client.sendMessage(msg.to, `🙇‍♂️ *Error*\n\n` + "```Invalid count```");
+    await client.sendMessage(
+      msg.to,
+      getString("spam.invalid_count", await getGroupLanguage(msg)),
+    );
     return 0;
   }
   if (count <= 0) {
     await client.sendMessage(
       msg.to,
-      `🙇‍♂️ *Error*\n\n` + "```Count can't be zero.```",
+      getString("spam.zero_count", await getGroupLanguage(msg)),
     );
     return 0;
   }
@@ -24,7 +32,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       const media = await quotedMsg
         .downloadMedia()
         .then((media) => media)
-        .catch(() => null);
+        .catch((): null => null); // Explicit return type for catch
       let sticker = false;
       if (quotedMsg.type == "sticker" && media) sticker = true;
 
@@ -35,7 +43,11 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
             new MessageMedia(media.mimetype, media.data, media.filename),
             { sendMediaAsSticker: sticker },
           );
-        } catch {}
+        } catch (e) {
+          console.error("Failed to send spam message with media:", e);
+          // Optionally, add a small delay here if sending too fast causes issues
+          // await new Promise(resolve => setTimeout(resolve, 200));
+        }
       }
     } else {
       for (let i = 0; i < count; i++)
@@ -48,7 +60,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     } else {
       await client.sendMessage(
         msg.to,
-        "```No text found for spamming!!! Please read !help spam.```",
+        getString("spam.no_text", await getGroupLanguage(msg)),
       );
     }
   }
@@ -56,11 +68,11 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
 
 const command: Command = {
   name: "Spam",
-  description: "spams a certain message for given number of times",
+  description: "spam.description",
   command: "!spam",
   commandType: "plugin",
   isDependent: false,
-  help: `*Spam*\n\nSpam Messages. \n\n*!spam [count text]*\nOR\nreply *!spam [count]* to any message`,
+  help: "spam.help",
   execute,
   public: false,
 };

@@ -1,3 +1,8 @@
+import {
+  getGroupLanguage,
+  sendLocalized,
+} from "../helpers/localizedMessenger.js";
+import { getString } from "../helpers/i18n.js";
 import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
 
@@ -52,18 +57,25 @@ const execute = async (_client: Client, msg: Message) => {
     "Why did the rabbit get kicked out of the movie theater? He was caught hare-handed!",
     "What do you call a dog that's a good dancer? A paw-some dancer!",
   ];
-  const joke = jokes[Math.floor(Math.random() * jokes.length)];
+  const targetLang = await getGroupLanguage(msg);
+  const jokeKey = `joke.response_${
+    Math.floor(Math.random() * jokes.length) + 1
+  }`;
+  const localizedJoke = getString(jokeKey, targetLang);
   try {
-    msg.reply(joke);
-  } catch {}
+    msg.reply(localizedJoke);
+  } catch (e) {
+    console.error("Failed to send joke:", e);
+    // await sendLocalized(_client, msg, "joke.send_error");
+  }
 };
 const command: Command = {
   name: "joke", //name of the module
-  description: "Get a random (not-funny-ai-generated) joke", // short description of what this command does
+  description: "joke.description", // short description of what this command does
   command: "!joke", //command with prefix. Ex command: '!test'
   commandType: "plugin", //
   isDependent: false, //whether this command is related/dependent to some other command
-  help: "Get a random joke.\n\n!joke", // a string descring how to use this command Ex = help : 'To use this command type!test arguments'
+  help: "joke.help", // a string descring how to use this command Ex = help : 'To use this command type!test arguments'
   public: true,
   execute,
 };

@@ -1,32 +1,32 @@
 import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
 import scalc from "scalc";
+import { sendLocalized } from "../helpers/localizedMessenger.js";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
-  const chatId = (await msg.getChat()).id._serialized;
   if (!args[0]) {
-    return await client.sendMessage(chatId, "Please provide an argument.");
+    return await sendLocalized(client, msg, "calc.no_argument");
   }
 
   try {
-    const result = scalc(args.join(" "));
-    return await client.sendMessage(
-      chatId,
-      `${args.join(" ")}
-= ${result}`,
-    );
+    const expression = args.join(" ");
+    const result = scalc(expression);
+    return await sendLocalized(client, msg, "calc.success", {
+      expression,
+      result,
+    });
   } catch {
-    return await client.sendMessage(chatId, "An error occured.");
+    return await sendLocalized(client, msg, "calc.error");
   }
 };
 
 const command: Command = {
-  name: "Calculator",
-  description: "Calculate an expression",
+  name: "calc.name",
+  description: "calc.description",
   command: "!calc",
   commandType: "plugin",
   isDependent: false,
-  help: `*Calculator*\n\nCalculate an expression with this command.\n\n*!calc [expression]*\nTo calculate an expression.\n\n*!calc <expression>*\nTo calculate an expression.\n\nExample: !calc sin(90) + PI`,
+  help: "calc.help",
   execute,
   public: true,
 };

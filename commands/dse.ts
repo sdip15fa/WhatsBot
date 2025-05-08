@@ -54,68 +54,87 @@ const timetable: { [key: string]: string } = {
 };
 
 // Function to calculate duration before the start of an examination paper
-function timeUntilExam(paper: string) {
-  // If no paper is specified, find the paper with the closest starting time
-  if (!paper?.trim()) {
-    let earliestTime = Infinity;
-    let earliestPaper = "";
+function timeUntilExam(paper: string | null): string | null {
+  const now = new Date();
+  let targetPaperKey: string | null = null;
+
+  if (paper?.trim()) {
+    const trimmedPaper = paper
+      .trim()
+      .split(" ")
+      .map((v) => v.trim())
+      .join(" ");
+
+    let match = Object.keys(timetable).find(
+      (v) => v.toLowerCase() === trimmedPaper.toLowerCase(),
+    );
+
+    if (!match) {
+      const paperWithSuffix = trimmedPaper + " 1";
+      match = Object.keys(timetable).find(
+        (v) => v.toLowerCase() === paperWithSuffix.toLowerCase(),
+      );
+    }
+    if (match) {
+      targetPaperKey = match;
+    }
+  } else {
+    // Find the next upcoming exam
+    let closestFutureTime = Infinity;
+    let nextUpcomingPaper: string | null = null;
     for (const [key, value] of Object.entries(timetable)) {
       const startTime = new Date(value);
-      if (startTime < new Date() && startTime.getTime() < earliestTime) {
-        earliestTime = startTime.getTime();
-        earliestPaper = key;
+      if (startTime > now && startTime.getTime() < closestFutureTime) {
+        closestFutureTime = startTime.getTime();
+        nextUpcomingPaper = key;
       }
     }
-    paper = earliestPaper;
+    if (nextUpcomingPaper) {
+      targetPaperKey = nextUpcomingPaper;
+    } else {
+      // If no future exams, find the most recent past one to indicate all are over
+      let mostRecentPastTime = 0;
+      let lastPastPaper: string | null = null;
+      for (const [key, value] of Object.entries(timetable)) {
+        const startTime = new Date(value);
+        if (startTime <= now && startTime.getTime() > mostRecentPastTime) {
+          mostRecentPastTime = startTime.getTime();
+          lastPastPaper = key;
+        }
+      }
+      targetPaperKey = lastPastPaper;
+    }
   }
 
-  paper = paper
-    .trim()
-    .split(" ")
-    .map((v) => v.trim())
-    .join(" ");
-
-  let match = Object.keys(timetable).find(
-    (v) => v.toLowerCase() === paper.toLowerCase(),
-  );
-
-  if (!match) {
-    paper = paper.trim() + " 1";
-    match = Object.keys(timetable).find(
-      (v) => v.toLowerCase() === paper.toLowerCase(),
-    );
-  }
-  if (!match) {
-    return null;
+  if (!targetPaperKey) {
+    return null; // No matching paper found or timetable is empty/invalid
   }
 
-  // Calculate the duration until the start of the examination paper
-  const currentTime = new Date();
-  const startTime = new Date(timetable[match]);
-  const duration = startTime.getTime() - currentTime.getTime();
+  const paperDisplayName = targetPaperKey;
+  const startTime = new Date(timetable[targetPaperKey]);
+  const duration = startTime.getTime() - now.getTime();
   const isPast = duration < 0;
 
-  // Format the duration using humanize-duration
   const formattedDuration = humanizeDuration(Math.abs(duration), {
     units: ["d", "h", "m"],
     round: true,
   });
 
   if (isPast) {
-    return `HKDSE *${paper}* examination was: ${formattedDuration} ago`;
+    return `HKDSE *${paperDisplayName}* examination was: ${formattedDuration} ago`;
   } else {
-    return `Time until HKDSE *${paper}* examination: ${formattedDuration}`;
+    return `Time until HKDSE *${paperDisplayName}* examination: ${formattedDuration}`;
   }
 }
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
-  const paper = args.join(" ");
-  const eta = timeUntilExam(paper.trim() ? paper : null);
+  const paperArg = args.join(" ");
+  const eta = timeUntilExam(paperArg.trim() ? paperArg : null);
   if (!eta) {
     return client.sendMessage(
       chatId,
-      "No such paper found. Use !help dse to see the available papers.",
+      "No such paper found or all exams are over. Use !help dse to see the available papers.",
     );
   }
   return client.sendMessage(chatId, eta);

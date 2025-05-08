@@ -1,31 +1,46 @@
 //jshint esversion:8
 import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
+import { getString } from "../helpers/i18n.js";
+import {
+  sendLocalized,
+  getGroupLanguage,
+} from "../helpers/localizedMessenger.js"; // Assuming owner chat is treated as a group for language
 
-const execute = async (client: Client, _msg: Message, args: string[]) => {
+const execute = async (client: Client, msg: Message, args: string[]) => {
   const page = Number(args[0]) || 1;
   const chats = (await client.getChats()).filter(
     (_v, index) => index < page * 20 && index >= (page - 1) * 20,
   );
-  await client.sendMessage(
-    process.env.WTS_OWNER_ID,
-    `Chats:
-${chats
-  .map(
-    (chat, index) =>
-      `${index + 1}. ${chat.name} \`\`\`${chat.id._serialized}\`\`\``,
-  )
-  .join("\n")}`,
-  );
+
+  const ownerLanguage = await getGroupLanguage(msg); // Get owner's language
+
+  const chatListMessage = getString("chatlist.list", ownerLanguage, {
+    chatList: chats
+      .map(
+        (chat, index) =>
+          `${index + 1}. ${chat.name} \`\`\`${chat.id._serialized}\`\`\``,
+      )
+      .join("\n"),
+  });
+
+  await sendLocalized(client, msg, "chatlist.list", {
+    chatList: chats
+      .map(
+        (chat, index) =>
+          `${index + 1}. ${chat.name} \`\`\`${chat.id._serialized}\`\`\``,
+      )
+      .join("\n"),
+  });
 };
 
 const command: Command = {
-  name: "Chat list",
-  description: "Get a list of chats",
+  name: "chatlist.name",
+  description: "chatlist.description",
   command: "!chatlist",
   commandType: "plugin",
   isDependent: false,
-  help: `*Get a list of chats.* \n\n*!chatlist [page]*\n\nTwenty chats are shown in a page.`,
+  help: "chatlist.help",
   execute,
   public: false,
 };

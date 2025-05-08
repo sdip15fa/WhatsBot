@@ -1,3 +1,8 @@
+import {
+  getGroupLanguage,
+  sendLocalized,
+} from "../helpers/localizedMessenger.js";
+import { getString } from "../helpers/i18n.js";
 import { Client, Message } from "whatsapp-web.js";
 import { commands } from "./index.js";
 import { Command } from "../types/command.js";
@@ -5,52 +10,79 @@ import { Command } from "../types/command.js";
 //jshint esversion:8
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
+  const targetLang = await getGroupLanguage(msg);
   if (!args.length) {
-    let adminHelp = "🔱 *Administration*\n\n";
-    let infoHelp = "🔱 *Info*\n\n";
-    let pluginHelp = "🔱 *Plugins*\n\n";
+    let adminHelp = `🔱 *${getString("help.category.admin", targetLang)}*\n\n`;
+    let infoHelp = `🔱 *${getString("help.category.info", targetLang)}*\n\n`;
+    let pluginHelp = `🔱 *${getString(
+      "help.category.plugins",
+      targetLang,
+    )}*\n\n`;
     commands.forEach((command: Command) => {
       if (!command.isDependent) {
+        const description = getString(command.description, targetLang);
+        const isPublic = command.public
+          ? getString("help.public.yes", targetLang)
+          : getString("help.public.no", targetLang);
         if (command.commandType === "admin")
-          adminHelp += `⭐ *${command.name} (${command.command})*  - ${
-            command.description
-          } (public: ${command.public ? "yes" : "no"})\n`;
+          adminHelp += `⭐ *${command.name} (${
+            command.command
+          })*  - ${description} (${getString(
+            "help.public_label",
+            targetLang,
+          )}: ${isPublic})\n`;
         if (command.commandType === "info")
-          infoHelp += `⭐ *${command.name} (${command.command})*  - ${
-            command.description
-          } (public: ${command.public ? "yes" : "no"})\n`;
+          infoHelp += `⭐ *${command.name} (${
+            command.command
+          })*  - ${description} (${getString(
+            "help.public_label",
+            targetLang,
+          )}: ${isPublic})\n`;
         if (command.commandType === "plugin")
-          pluginHelp += `⭐ *${command.name} (${command.command})*  - ${
-            command.description
-          } (public: ${command.public ? "yes" : "no"})\n`;
+          pluginHelp += `⭐ *${command.name} (${
+            command.command
+          })*  - ${description} (${getString(
+            "help.public_label",
+            targetLang,
+          )}: ${isPublic})\n`;
       }
     });
-    const help = `Welcome to KK park!\n\n${adminHelp}\n${infoHelp}\n${pluginHelp}\n${
-      commands.get("help").help
-    }`;
+    const help = `${getString(
+      "help.welcome",
+      targetLang,
+    )}\n\n${adminHelp}\n${infoHelp}\n${pluginHelp}\n${getString(
+      commands.get("help").help,
+      targetLang,
+    )}`;
     await client.sendMessage(chatId, help);
   } else if (commands.has(args[0])) {
+    const command = commands.get(args[0]);
+    const helpText = getString(command.help, targetLang);
+    const isPublic = command.public
+      ? getString("help.public.yes", targetLang)
+      : getString("help.public.no", targetLang);
     await client.sendMessage(
       chatId,
-      `${commands.get(args[0]).help}\n\npublic: ${
-        commands.get(args[0]).public ? "yes" : "no"
-      }`,
+      `${helpText}\n\n${getString(
+        "help.public_label",
+        targetLang,
+      )}: ${isPublic}`,
     );
   } else {
     await client.sendMessage(
       chatId,
-      `No command with the name *${args[0]}*...`,
+      getString("help.command_not_found", targetLang, { command: args[0] }),
     );
   }
 };
 
 const command: Command = {
   name: "help",
-  description: "get information about available commands",
+  description: "help.description",
   command: "!help",
   commandType: "info",
   isDependent: false,
-  help: "To get more info use ```!help [command]```. Ex: ```!help ping```",
+  help: "help.help",
   execute,
   public: true,
 };

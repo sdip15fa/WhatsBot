@@ -1,3 +1,8 @@
+import {
+  getGroupLanguage,
+  sendLocalized,
+} from "../helpers/localizedMessenger.js";
+import { getString } from "../helpers/i18n.js";
 //jshint esversion:8
 import config from "../config.js";
 import axios from "../helpers/axios.js";
@@ -9,18 +14,43 @@ import whatsapp, {
 } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
 
-async function get(battery: BatteryInfo, phn_info: ClientInfoPhone) {
+async function get(
+  battery: BatteryInfo,
+  phn_info: ClientInfoPhone,
+  msg: Message,
+) {
   let batttxt;
 
   if (battery.plugged) {
-    batttxt = `${battery.battery}% (Charging)`;
+    batttxt = `${battery.battery}% (${getString(
+      "start.charging",
+      await getGroupLanguage(msg),
+    )})`;
   } else {
     batttxt = `${battery.battery}%`;
   }
 
   return {
     msg:
-      `*Whatsbot*\n\nThis chat is Powered By *Whatsbot*\n\n*Battery:* ${batttxt}\n*Device:* ${phn_info.device_manufacturer} ${phn_info.device_model}\n*WA Version:* ${phn_info.wa_version}\n*Pmpermit:* ${config.pmpermit_enabled}\n\n*Official Repository Url 👇*\n` +
+      `*${getString(
+        "start.whatsbot",
+        await getGroupLanguage(msg),
+      )}*\n\n${getString(
+        "start.powered_by",
+        await getGroupLanguage(msg),
+      )}\n\n*${getString(
+        "start.battery",
+        await getGroupLanguage(msg),
+      )}*: ${batttxt}\n*${getString(
+        "start.device",
+        await getGroupLanguage(msg),
+      )}*: ${phn_info.device_manufacturer} ${
+        phn_info.device_model
+      }\n*${getString("start.wa_version", await getGroupLanguage(msg))}*: ${
+        phn_info.wa_version
+      }\n*${getString("start.pmpermit", await getGroupLanguage(msg))}*: ${
+        config.pmpermit_enabled
+      }\n\n*${getString("start.repo_url", await getGroupLanguage(msg))} 👇*\n` +
       "```https://github.com/tuhinpal/WhatsBot```",
     mimetype: "image/jpeg",
     data: Buffer.from(
@@ -38,6 +68,7 @@ const execute = async (client: Client, msg: Message) => {
   const startdata = await get(
     await client.info.getBatteryStatus(),
     client.info.phone,
+    msg,
   );
   try {
     await client.sendMessage(
@@ -49,16 +80,19 @@ const execute = async (client: Client, msg: Message) => {
       ),
       { caption: startdata.msg },
     );
-  } catch {}
+  } catch (e) {
+    console.error("Failed to send start message:", e);
+    // await sendLocalized(client, msg, "start.send_error");
+  }
 };
 
 const command: Command = {
   name: "Start",
-  description: "Get device, client and bot info",
+  description: "start.description",
   command: "!start",
   commandType: "info",
   isDependent: false,
-  help: "Get information about your WhatsBot",
+  help: "start.help",
   execute,
   public: false,
 };
