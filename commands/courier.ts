@@ -12,7 +12,7 @@ import { getString } from "../helpers/i18n.js";
 async function getTrackingDetails(
   trackingService: string,
   trackingNumber: string,
-  lang: "en" | "yue",
+  lang: "en" | "yue" | "ja",
 ) {
   let statusString = getString("courier.error.generic", lang);
   return axios

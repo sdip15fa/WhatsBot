@@ -25,7 +25,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
           ? getString("help.public.yes", targetLang)
           : getString("help.public.no", targetLang);
         if (command.commandType === "admin")
-          adminHelp += `⭐ *${command.name} (${
+          adminHelp += `⭐ *${getString(command.name, targetLang)} (${
             command.command
           })*  - ${description} (${getString(
             "help.public_label",
@@ -39,7 +39,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
             targetLang,
           )}: ${isPublic})\n`;
         if (command.commandType === "plugin")
-          pluginHelp += `⭐ *${command.name} (${
+          pluginHelp += `⭐ *${getString(command.name, targetLang)} (${
             command.command
           })*  - ${description} (${getString(
             "help.public_label",

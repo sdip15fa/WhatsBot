@@ -6,11 +6,11 @@ const COLLECTION_NAME = "groupLangSettings";
 /**
  * Sets or updates the language preference for a group.
  * @param groupId The ID of the group.
- * @param targetLanguage The target language ('yue' or 'en').
+ * @param targetLanguage The target language ('yue', 'en', or 'ja').
  */
 export async function setGroupLanguage(
   groupId: string,
-  targetLanguage: "yue" | "en",
+  targetLanguage: "yue" | "en" | "ja",
 ): Promise<void> {
   const { coll } = db(COLLECTION_NAME);
   await coll.updateOne(
@@ -26,11 +26,11 @@ export async function setGroupLanguage(
 /**
  * Gets the language preference for a group.
  * @param groupId The ID of the group.
- * @returns The target language ('yue' or 'en') or null if not set.
+ * @returns The target language ('yue', 'en', or 'ja') or null if not set.
  */
 export async function getGroupLanguage(
   groupId: string,
-): Promise<"yue" | "en" | null> {
+): Promise<"yue" | "en" | "ja" | null> {
   const { coll } = db(COLLECTION_NAME);
   const setting = await coll.findOne<IGroupLangSetting>({ groupId });
   return setting ? setting.targetLanguage : null;

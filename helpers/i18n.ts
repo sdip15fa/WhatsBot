@@ -2,11 +2,12 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 
-type Language = "en" | "yue";
+type Language = "en" | "yue" | "ja";
 type Translations = Record<string, string>;
 const translations: Record<Language, Translations> = {
   en: {},
   yue: {},
+  ja: {},
 };
 
 // Determine the correct directory for locales
@@ -36,6 +37,18 @@ function loadTranslations(): void {
     // Fallback to English if Cantonese loading fails
     translations.yue = { GENERAL_ERROR: "發生意外錯誤。廣東話語言檔案遺失。" };
   }
+
+  try {
+    const jaData = fs.readFileSync(path.join(localesDir, "ja.json"), "utf-8");
+    translations.ja = JSON.parse(jaData);
+  } catch (error) {
+    console.error("Failed to load ja.json:", error);
+    // Fallback to English if Japanese loading fails
+    translations.ja = {
+      GENERAL_ERROR:
+        "予期せぬエラーが発生しました。日本語のロケールファイルが見つかりません。",
+    };
+  }
 }
 
 // Load translations at startup
@@ -44,7 +57,7 @@ loadTranslations();
 /**
  * Gets a localized string.
  * @paratargetLangm key The key of the string to retrieve.
- * @param lang The target language ('yue' or 'en').
+ * @param lang The target language ('yue', 'en', or 'ja').
  * @param params Optional parameters to interpolate into the string.
  *   Example: { name: "World" } for a string like "Hello, {name}!"
  * @returns The localized and interpolated string. Falls back to English if key not found in target lang,

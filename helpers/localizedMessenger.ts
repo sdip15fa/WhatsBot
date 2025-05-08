@@ -3,7 +3,7 @@ import { getGroupLanguage as getGroupLanguageFromDB } from "./groupLangSettingsD
 import { getString } from "./i18n.js";
 import config from "../config.js"; // For default bot language
 
-type Language = "en" | "yue";
+type Language = "en" | "yue" | "ja";
 
 /**
  * Gets the language preference for a group chat.

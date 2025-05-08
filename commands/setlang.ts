@@ -31,16 +31,29 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   if (action === "clear") {
     await clearGroupLanguage(chat.id._serialized);
     await sendLocalized(client, msg, "SETLANG_CLEARED");
-  } else if (action === "yue" || action === "en") {
-    const langToSet = action as "yue" | "en";
+  } else if (action === "yue" || action === "en" || action === "ja") {
+    const langToSet = action as "yue" | "en" | "ja";
     await setGroupLanguage(chat.id._serialized, langToSet);
-    const langName = langToSet === "yue" ? "Cantonese (yue)" : "English (en)"; // This part might also need localization if keys are granular
+    let langName = "";
+    if (langToSet === "yue") {
+      langName = "Cantonese (yue)";
+    } else if (langToSet === "en") {
+      langName = "English (en)";
+    } else {
+      langName = "Japanese (ja)";
+    }
     await sendLocalized(client, msg, "SETLANG_SUCCESS", { language: langName });
   } else if (action === "status") {
     const currentLang = await getGroupLanguage(chat.id._serialized);
     if (currentLang) {
-      const langName =
-        currentLang === "yue" ? "Cantonese (yue)" : "English (en)";
+      let langName = "";
+      if (currentLang === "yue") {
+        langName = "Cantonese (yue)";
+      } else if (currentLang === "en") {
+        langName = "English (en)";
+      } else {
+        langName = "Japanese (ja)";
+      }
       await sendLocalized(client, msg, "SETLANG_STATUS_SET", {
         language: langName,
       });
@@ -56,10 +69,10 @@ const command: Command = {
   name: "Set Group Language",
   command: "!setlang",
   description:
-    "Sets the preferred language for bot responses in this group (Cantonese or English).",
+    "Sets the preferred language for bot responses in this group (Cantonese, English, or Japanese).",
   commandType: "admin", // Or 'plugin' if 'admin' isn't a defined type, adjust as needed
   isDependent: false,
-  help: `*Set Group Language*\n\nSets the preferred language for bot responses in this group.\n\n_Usage:_\n!setlang yue - Set to Cantonese\n!setlang en - Set to English\n!setlang clear - Clear preference (use default bot language)\n!setlang status - Show current group language setting\n\n*Only group admins can use this command.*`,
+  help: `*Set Group Language*\n\nSets the preferred language for bot responses in this group.\n\n_Usage:_\n!setlang yue - Set to Cantonese\n!setlang en - Set to English\n!setlang ja - Set to Japanese\n!setlang clear - Clear preference (use default bot language)\n!setlang status - Show current group language setting\n\n*Only group admins can use this command.*`,
   execute,
   public: true, // This command is public, but execution logic checks for admin
 };
