@@ -56,7 +56,6 @@ export function getString(
   params?: Record<string, any>,
 ): string {
   let str = translations[lang]?.[key] || translations.en?.[key] || key;
-  console.log(lang, str, translations);
 
   if (params) {
     for (const paramKey in params) {
