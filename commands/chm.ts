@@ -22,46 +22,53 @@ interface GameDocument {
 const chineseRegExp =
   /[\u4E00-\u9FCC\u3400-\u4DB5\uFA0E\uFA0F\uFA11\uFA13\uFA14\uFA1F\uFA21\uFA23\uFA24\uFA27-\uFA29]|[\ud840-\ud868][\udc00-\udfff]|\ud869[\udc00-\uded6\udf00-\udfff]|[\ud86a-\ud86c][\udc00-\udfff]|\ud86d[\udc00-\udf34\udf40-\udfff]|\ud86e[\udc00-\udc1d]/;
 
-const maskParagraph = (paragraph: string): string => {
+const maskParagraph = (paragraph: string): string | null => {
   const chineseCharacters = paragraph.match(
     /[\u4E00-\u9FCC\u3400-\u4DB5\uFA0E\uFA0F\uFA11\uFA13\uFA14\uFA1F\uFA21\uFA23\uFA24\uFA27-\uFA29]|[\ud840-\ud868][\udc00-\udfff]|\ud869[\udc00-\uded6\udf00-\udfff]|[\ud86a-\ud86c][\udc00-\udfff]|\ud86d[\udc00-\udf34\udf40-\udfff]|\ud86e[\udc00-\udc1d]/g,
   );
-  let length = Math.floor(Math.random() * 6) + 2;
-  let charactersToRemove = Math.min(length, chineseCharacters.length);
+
+  // If no Chinese characters found, return null
+  if (!chineseCharacters || chineseCharacters.length === 0) {
+    return null;
+  }
+
+  const length = Math.floor(Math.random() * 6) + 2;
+  const charactersToRemove = Math.min(length, chineseCharacters.length);
   let start = Math.floor(
-    Math.random() * (chineseCharacters.length - charactersToRemove + 1),
+    Math.random() * (paragraph.length - charactersToRemove + 1),
   );
   let cont = true;
-  for (let i = 0; i < 10; i++) {
-    for (let i = start; i < start + charactersToRemove; i++) {
-      if (!chineseRegExp.test(paragraph[i])) {
-        if (i - start > 1) {
-          length = i - start;
-          charactersToRemove = length;
-          cont = false;
-        }
+
+  for (let retryCount = 0; retryCount < 10; retryCount++) {
+    // Find a valid sequence of Chinese characters
+    let validSequence = true;
+    for (let j = start; j < start + charactersToRemove; j++) {
+      if (j >= paragraph.length || !chineseRegExp.test(paragraph[j])) {
+        validSequence = false;
         break;
       }
-      if (i === start + charactersToRemove - 1) {
-        cont = false;
-      }
     }
-    if (cont === false) {
+
+    if (validSequence) {
+      cont = false;
       break;
     } else {
+      // Try a different starting position
       start = Math.floor(
-        Math.random() * (chineseCharacters.length - charactersToRemove + 1),
+        Math.random() * (paragraph.length - charactersToRemove + 1),
       );
     }
-    if (i === 9) {
+
+    if (retryCount === 9) {
       return null;
     }
   }
+
   const end = start + charactersToRemove;
 
   let masked = "";
   for (let i = 0; i < paragraph.length; i++) {
-    if (i >= start && i < end) {
+    if (i >= start && i < end && chineseRegExp.test(paragraph[i])) {
       masked += "_";
     } else {
       masked += paragraph[i];
