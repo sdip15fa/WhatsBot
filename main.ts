@@ -36,8 +36,18 @@ export const dcClient = new DCClient({
 export const wtsClient = new WTSClient({
   puppeteer: {
     headless: true,
-    args: ["--no-sandbox"],
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-gpu",
+      "--window-size=1920,1080",
+    ],
     executablePath: "/usr/bin/chromium",
+    defaultViewport: {
+      width: 1920,
+      height: 1080,
+    },
   },
   authStrategy: new whatsapp.LocalAuth({ clientId: "whatsbot" }),
 });
@@ -690,9 +700,14 @@ https://faq.whatsapp.com/1417269125743673
     console.log("starting...");
     wtsClient.initialize();
     setInterval(() => {
-      wtsClient.pupPage?.screenshot().then((screenshot) => {
-        writeFileSync("screenshot.png", screenshot as string, "base64");
-      });
+      wtsClient.pupPage
+        ?.screenshot({
+          fullPage: true,
+          type: "png",
+        })
+        .then((screenshot) => {
+          writeFileSync("screenshot.png", screenshot as string, "base64");
+        });
     }, 30000);
     if (process.env.DISCORD_TOKEN) {
       dcClient.login(process.env.DISCORD_TOKEN).then(() => {
