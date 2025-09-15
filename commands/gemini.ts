@@ -87,7 +87,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     // Attempting to use the original genAI.chats.create structure
     const chatSession = await genAI.chats.create({
       // Using .chats.create as in original
-      model: "gemini-2.5-flash-preview-04-17",
+      model: "gemini-2.5-flash",
       history: history,
       // config from original, 'thinkingConfig' might be specific to their version/setup
       config: {
