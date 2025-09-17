@@ -27,3 +27,9 @@ session.secure
 /docker/data
 /docker/wtstodis-data
 .aider*
+memory-bank
+docker/.env*
+docker/whatsbot-data
+docker/screenshot*
+docker/*.txt
+python

@@ -15,11 +15,17 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   // Extract the text from the user's message
   const quotedMsg = msg.hasQuotedMsg && (await msg.getQuotedMessage());
 
-  if (!args.length && !quotedMsg.body) {
+  if (!args.length && !quotedMsg?.body) {
     return sendLocalized(client, msg, "evilllama.no_prompt");
   }
 
-  const text = args.join(" ") || (quotedMsg && quotedMsg.body);
+  let contextText = "";
+  if (quotedMsg?.body) {
+    contextText = `Context from quoted message: ${quotedMsg.body}\n\n`;
+  }
+
+  const userPrompt = args.join(" ");
+  const text = contextText + userPrompt;
   const messages: { role: "system" | "user" | "assistant"; content: string }[] =
     [];
 

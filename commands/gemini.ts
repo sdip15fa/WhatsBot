@@ -1,9 +1,10 @@
 import { sendLocalized } from "../helpers/localizedMessenger.js";
 // Import necessary modules and dependencies
-import { Client, Message } from "whatsapp-web.js";
+import whatsapp, { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
 import config from "../config.js";
-import { GoogleGenAI, HarmBlockThreshold, HarmCategory } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
+const { MessageMedia } = whatsapp;
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
@@ -12,19 +13,38 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     return sendLocalized(client, msg, "gemini.not_available");
   }
 
-  // Extract the text from the user's message
+  // Extract the text from the user's message and check for media
   const quotedMsg = msg.hasQuotedMsg && (await msg.getQuotedMessage());
+  const hasMedia = msg.hasMedia || (quotedMsg && quotedMsg.hasMedia);
 
-  if (!args.length && !quotedMsg.body) {
+  if (!args.length && !quotedMsg?.body && !hasMedia) {
     return sendLocalized(client, msg, "gemini.no_prompt");
   }
 
-  // const searchWithGoogle = args[0] === "google";
-  // if (searchWithGoogle) {
-  //   args.shift();
-  // }
+  let contextText = "";
+  if (quotedMsg?.body) {
+    contextText = `Context from quoted message: ${quotedMsg.body}\n\n`;
+  }
 
-  const prompt = args.join(" ") || (quotedMsg && quotedMsg.body);
+  const userPrompt = args.join(" ");
+  const prompt =
+    contextText +
+    (userPrompt || (hasMedia ? "What do you see in this image?" : ""));
+
+  // Handle image input
+  let imageData = null;
+  if (hasMedia) {
+    const mediaMsg = msg.hasMedia ? msg : quotedMsg;
+    const attachmentData = await mediaMsg.downloadMedia().catch(() => null);
+    if (attachmentData && attachmentData.mimetype.startsWith("image/")) {
+      imageData = {
+        inlineData: {
+          data: attachmentData.data,
+          mimeType: attachmentData.mimetype,
+        },
+      };
+    }
+  }
   const history: { role: "model" | "user"; parts: { text: string }[] }[] = [];
 
   if (
@@ -84,45 +104,22 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
 
   try {
     const genAI = new GoogleGenAI({ apiKey: config.gemini_api_key });
-    // Attempting to use the original genAI.chats.create structure
-    const chatSession = await genAI.chats.create({
-      // Using .chats.create as in original
+
+    // Build content array for the request
+    const contentParts = [];
+
+    if (imageData) {
+      contentParts.push(imageData);
+    }
+    contentParts.push(prompt);
+
+    // Use the new SDK structure
+    const response = await genAI.models.generateContent({
       model: "gemini-2.5-flash",
-      history: history,
-      // config from original, 'thinkingConfig' might be specific to their version/setup
-      config: {
-        // thinkingConfig: {
-        //   includeThoughts: false,
-        // },
-        safetySettings: [
-          {
-            category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-            threshold: HarmBlockThreshold.BLOCK_NONE,
-          },
-          {
-            category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-            threshold: HarmBlockThreshold.BLOCK_NONE,
-          },
-          {
-            category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-            threshold: HarmBlockThreshold.BLOCK_NONE,
-          },
-          {
-            category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-            threshold: HarmBlockThreshold.BLOCK_NONE,
-          },
-        ],
-      },
+      contents: contentParts,
     });
 
-    // Attempting to use original sendMessage structure
-    const result = await chatSession.sendMessage({
-      message: prompt,
-    });
-
-    // Attempting to access response text as in original (result.text)
-    // Note: Standard SDK usually is result.response.text()
-    const textResponse = result.text;
+    const textResponse = response.text;
 
     if (typeof textResponse !== "string") {
       console.error("Gemini response text is not a string:", textResponse);

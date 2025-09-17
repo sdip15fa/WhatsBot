@@ -244,6 +244,46 @@ export default {
 			});
 		}
 
+		if (path === '/gpt') {
+			const prompt = params.get('prompt');
+			let messages: { role: 'user' | 'system' | 'assistant'; content: string }[] = [];
+			try {
+				messages = JSON.parse(decodeURIComponent(params.get('messages')) || '[]');
+			} catch {
+				return new BadRequestException('Messages must be a valid JSON array.');
+			}
+
+			const chat = {
+				messages: [
+					{
+						role: 'system',
+						content: 'You are a helpful AI assistant. Be concise and accurate in your responses.',
+					},
+				],
+			};
+			if (messages?.length) {
+				chat.messages = [...chat.messages, ...messages];
+			} else {
+				chat.messages.push({
+					role: 'user',
+					content: prompt,
+				});
+			}
+			let response: { response: string };
+			for (let i = 5; i > 0; i--) {
+				try {
+					response = await env.AI.run('@cf/openai/gpt-oss-120b', chat);
+					break;
+				} catch {
+					if (i === 1) {
+						return new FailedException('Failed to generate after five tries.');
+					}
+				}
+			}
+
+			return Response.json(response);
+		}
+
 		if (path === '/m2m') {
 			const text = params.get('text');
 			const source_lang = params.get('source');
