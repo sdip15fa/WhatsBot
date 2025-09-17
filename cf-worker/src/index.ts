@@ -269,7 +269,7 @@ export default {
 					content: prompt,
 				});
 			}
-			let response: { response: string };
+			let response: { response: string } | undefined;
 			for (let i = 5; i > 0; i--) {
 				try {
 					response = await env.AI.run('@cf/openai/gpt-oss-120b', chat);
@@ -279,6 +279,10 @@ export default {
 						return new FailedException('Failed to generate after five tries.');
 					}
 				}
+			}
+
+			if (!response) {
+				return new FailedException('Failed to generate response.');
 			}
 
 			return Response.json(response);
