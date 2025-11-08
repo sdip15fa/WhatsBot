@@ -4,6 +4,10 @@ import whatsapp, { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
 import config from "../config.js";
 import { GoogleGenAI } from "@google/genai";
+import {
+  getConversationHistory,
+  addMessageToHistory,
+} from "../helpers/conversationHistory.js";
 const { MessageMedia } = whatsapp;
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
@@ -45,9 +49,24 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       };
     }
   }
+
+  // Get conversation history from MongoDB
+  const conversationHistory = await getConversationHistory(chatId, "gemini");
+
   const history: { role: "model" | "user"; parts: { text: string }[] }[] = [];
 
-  if (
+  // Use persistent history if available
+  if (conversationHistory.length > 0) {
+    conversationHistory.forEach((msg) => {
+      const role = msg.role === "user" ? "user" : "model";
+      history.push({
+        role,
+        parts: [{ text: msg.content }],
+      });
+    });
+  }
+  // Fallback to old quote-based history for backward compatibility
+  else if (
     args.length &&
     msg.hasQuotedMsg &&
     quotedMsg.fromMe &&
@@ -113,10 +132,11 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     }
     contentParts.push(prompt);
 
-    // Use the new SDK structure
+    // Use the new SDK structure with history
     const response = await genAI.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-2.0-flash-exp",
       contents: contentParts,
+      ...(history.length > 0 && { history }),
     });
 
     const textResponse = response.text;
@@ -125,6 +145,20 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       console.error("Gemini response text is not a string:", textResponse);
       throw new Error("Invalid response format from Gemini");
     }
+
+    // Save user message and assistant response to persistent history
+    await addMessageToHistory(chatId, "gemini", {
+      role: "user",
+      content: prompt,
+      timestamp: Date.now(),
+      ...(imageData && { imageData }),
+    });
+
+    await addMessageToHistory(chatId, "gemini", {
+      role: "model",
+      content: textResponse,
+      timestamp: Date.now(),
+    });
 
     // Send the response back to the user
     try {

@@ -81,6 +81,7 @@ import countdown from "./countdown.js";
 import everyone from "./everyone.js";
 import groupinfo from "./groupinfo.js";
 import userinfo from "./userinfo.js";
+import ai from "./ai.js";
 import { Command } from "../types/command.js";
 
 export const commands = new Map<string, Command>();
@@ -168,3 +169,4 @@ commands.set(countdown.command.slice(1), countdown);
 commands.set(everyone.command.slice(1), everyone);
 commands.set(groupinfo.command.slice(1), groupinfo);
 commands.set(userinfo.command.slice(1), userinfo);
+commands.set(ai.command.slice(1), ai);

@@ -565,5 +565,11 @@
   "groupinfo.help": "*Group Info*\n\nGet detailed information about the current group.\n\n*Usage:*\n!groupinfo",
   "userinfo.error": "Error fetching user information.",
   "userinfo.description": "Get information about a user",
-  "userinfo.help": "*User Info*\n\nGet information about a user.\n\n*Usage:*\n!userinfo - Get your own info\nReply to a message with !userinfo - Get info about that user\nMention someone with !userinfo - Get info about mentioned user"
+  "userinfo.help": "*User Info*\n\nGet information about a user.\n\n*Usage:*\n!userinfo - Get your own info\nReply to a message with !userinfo - Get info about that user\nMention someone with !userinfo - Get info about mentioned user",
+  "cleargpt.success": "{model} conversation history cleared successfully.",
+  "cleargpt.no_history": "No conversation history found for {model}.",
+  "ai.no_argument": "Please provide a command. Usage: !ai [clear|history|export|stats|models|help]",
+  "ai.invalid_command": "Invalid command. Use: clear, history, export, stats, models, or help",
+  "ai.description": "AI conversation context manager",
+  "ai.help": "*AI Context Manager*\n\nManage your AI conversation history.\n\n*Commands:*\n!ai clear [model|all] - Clear conversation history\n!ai history [model] - View conversation history\n!ai export [model] - Export conversation as text\n!ai stats - Show conversation statistics\n!ai models - List available AI models\n!ai help - Show this help\n\n*Models:* gpt, gemini, llama, ds, evilllama\n\n*Examples:*\n!ai clear gpt - Clear GPT history\n!ai history gemini - View Gemini history\n!ai stats - Show all statistics"
 }

@@ -1,9 +1,14 @@
 import { sendLocalized } from "../helpers/localizedMessenger.js";
 // Import necessary modules and dependencies
-import { Client, Message } from "whatsapp-web.js";
+import whatsapp, { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
 import config from "../config.js";
 import axios from "../helpers/axios.js";
+import {
+  getConversationHistory,
+  addMessageToHistory,
+} from "../helpers/conversationHistory.js";
+const { MessageMedia } = whatsapp;
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
@@ -12,10 +17,11 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     return sendLocalized(client, msg, "gpt.no_cf_worker_url");
   }
 
-  // Extract the text from the user's message
+  // Extract the text from the user's message and check for media
   const quotedMsg = msg.hasQuotedMsg && (await msg.getQuotedMessage());
+  const hasMedia = msg.hasMedia || (quotedMsg && quotedMsg.hasMedia);
 
-  if (!args.length && !quotedMsg?.body) {
+  if (!args.length && !quotedMsg?.body && !hasMedia) {
     return sendLocalized(client, msg, "gpt.no_prompt");
   }
 
@@ -25,12 +31,45 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   }
 
   const userPrompt = args.join(" ");
-  const text = contextText + userPrompt;
+  const text =
+    contextText +
+    (userPrompt || (hasMedia ? "What do you see in this image?" : ""));
 
-  const messages: { role: "system" | "user" | "assistant"; content: string }[] =
+  // Handle image input for vision support
+  let imageData = null;
+  let imageBase64 = null;
+  if (hasMedia) {
+    const mediaMsg = msg.hasMedia ? msg : quotedMsg;
+    const attachmentData = await mediaMsg.downloadMedia().catch(() => null);
+    if (attachmentData && attachmentData.mimetype.startsWith("image/")) {
+      imageBase64 = attachmentData.data;
+      imageData = {
+        inlineData: {
+          data: attachmentData.data,
+          mimeType: attachmentData.mimetype,
+        },
+      };
+    }
+  }
+
+  // Get conversation history from MongoDB
+  const conversationHistory = await getConversationHistory(chatId, "gpt");
+
+  const messages: { role: "system" | "user" | "assistant"; content: string | any }[] =
     [];
 
-  if (
+  // Use persistent history if available
+  if (conversationHistory.length > 0) {
+    conversationHistory.forEach((msg) => {
+      const role = msg.role === "user" ? "user" : "assistant";
+      messages.push({
+        role,
+        content: msg.content,
+      });
+    });
+  }
+  // Fallback to old quote-based history for backward compatibility
+  else if (
     args.length &&
     msg.hasQuotedMsg &&
     quotedMsg.fromMe &&
@@ -77,6 +116,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       }
     }
   }
+
   const username = config.cf_worker.username;
   const password = config.cf_worker.password;
 
@@ -86,21 +126,43 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   const authHeader = `Basic ${encodedCredentials}`;
 
   try {
-    // Call GPT model with the obtained text
+    // Prepare request parameters
+    const requestParams: any = {
+      ...(!messages?.length && !imageBase64 && { prompt: text }),
+      ...(messages?.length && {
+        messages: encodeURIComponent(JSON.stringify(messages)),
+      }),
+      ...(imageBase64 && {
+        image: imageBase64,
+        prompt: text,
+      }),
+    };
+
+    // Call GPT model with vision support if image is present
     const response = await axios.get<{ response: string }>(
       `${config.cf_worker.url}gpt`,
       {
-        params: {
-          ...(!messages?.length && { prompt: text }),
-          ...(messages?.length && {
-            messages: encodeURIComponent(JSON.stringify(messages)),
-          }),
-        },
+        params: requestParams,
         headers: {
           Authorization: authHeader,
         },
       },
     );
+
+    // Save user message and assistant response to persistent history
+    await addMessageToHistory(chatId, "gpt", {
+      role: "user",
+      content: text,
+      timestamp: Date.now(),
+      ...(imageData && { imageData }),
+    });
+
+    await addMessageToHistory(chatId, "gpt", {
+      role: "assistant",
+      content: response.data.response,
+      timestamp: Date.now(),
+    });
+
     // Send the response back to the user
     try {
       await sendLocalized(client, msg, "gpt.response", {
@@ -121,10 +183,6 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     console.error("GPT generation failed:", generationError);
     await sendLocalized(client, msg, "gpt.generation_failed");
   }
-
-  // Optionally, you can handle conversation history or context here
-
-  // Optionally, update the last execution timestamp in your database
 };
 
 const command: Command = {
