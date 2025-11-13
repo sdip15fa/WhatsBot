@@ -568,8 +568,8 @@
   "userinfo.help": "*User Info*\n\nGet information about a user.\n\n*Usage:*\n!userinfo - Get your own info\nReply to a message with !userinfo - Get info about that user\nMention someone with !userinfo - Get info about mentioned user",
   "cleargpt.success": "{model} conversation history cleared successfully.",
   "cleargpt.no_history": "No conversation history found for {model}.",
-  "ai.no_argument": "Please provide a command. Usage: !ai [clear|history|export|stats|models|help]",
-  "ai.invalid_command": "Invalid command. Use: clear, history, export, stats, models, or help",
-  "ai.description": "AI conversation context manager",
-  "ai.help": "*AI Context Manager*\n\nManage your AI conversation history.\n\n*Commands:*\n!ai clear [model|all] - Clear conversation history\n!ai history [model] - View conversation history\n!ai export [model] - Export conversation as text\n!ai stats - Show conversation statistics\n!ai models - List available AI models\n!ai help - Show this help\n\n*Models:* gpt, gemini, llama, ds, evilllama\n\n*Examples:*\n!ai clear gpt - Clear GPT history\n!ai history gemini - View Gemini history\n!ai stats - Show all statistics"
+  "ai.no_argument": "Please provide a command or prompt.\n\nUsage: !ai [prompt] or !ai [model] [prompt]\nManagement: !ai [clear|history|export|stats|models|use|help]",
+  "ai.invalid_command": "Invalid command. Use: clear, history, export, stats, models, use, help, or provide a prompt.",
+  "ai.description": "Unified AI assistant with multiple models",
+  "ai.help": "*AI - Unified Assistant*\n\n*Chat with AI:*\n!ai [prompt] - Use default model\n!ai gemini [prompt] - Use Gemini\n!ai gpt [prompt] - Use GPT\n!ai llama [prompt] - Use Llama\n!ai ds [prompt] - Use DeepSeek\n!ai evilllama [prompt] - Use EvilLlama\n\n*Model Management:*\n!ai use [model] - Set default model\n!ai models - List all models\n\n*Conversation Management:*\n!ai clear [model|all] - Clear history\n!ai history [model] - View history\n!ai export [model] - Export conversation\n!ai stats - Show statistics\n\n*Features:*\n✓ Persistent conversation memory\n✓ Vision support (Gemini, GPT)\n✓ Automatic context retention\n✓ Per-chat model preferences\n\n*Examples:*\n!ai What is quantum computing?\n!ai gemini Explain this image\n!ai use gpt\n!ai clear all"
 }
