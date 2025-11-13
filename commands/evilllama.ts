@@ -4,6 +4,10 @@ import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
 import config from "../config.js";
 import axios from "../helpers/axios.js";
+import {
+  getConversationHistory,
+  addMessageToHistory,
+} from "../helpers/conversationHistory.js";
 
 const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
@@ -26,10 +30,25 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
 
   const userPrompt = args.join(" ");
   const text = contextText + userPrompt;
+
+  // Get conversation history from MongoDB
+  const conversationHistory = await getConversationHistory(chatId, "evilllama");
+
   const messages: { role: "system" | "user" | "assistant"; content: string }[] =
     [];
 
-  if (
+  // Use persistent history if available
+  if (conversationHistory.length > 0) {
+    conversationHistory.forEach((msg) => {
+      const role = msg.role === "user" ? "user" : "assistant";
+      messages.push({
+        role,
+        content: msg.content,
+      });
+    });
+  }
+  // Fallback to old quote-based history for backward compatibility
+  else if (
     args.length &&
     msg.hasQuotedMsg &&
     quotedMsg.fromMe &&
@@ -108,6 +127,19 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
       },
     );
 
+    // Save user message and assistant response to persistent history
+    await addMessageToHistory(chatId, "evilllama", {
+      role: "user",
+      content: text,
+      timestamp: Date.now(),
+    });
+
+    await addMessageToHistory(chatId, "evilllama", {
+      role: "assistant",
+      content: response.data.response,
+      timestamp: Date.now(),
+    });
+
     // Send the response back to the user
     try {
       await sendLocalized(client, msg, "evilllama.response", {
@@ -129,10 +161,6 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     console.error("EvilLlama generation failed:", generationError);
     await sendLocalized(client, msg, "evilllama.generation_failed");
   }
-
-  // Optionally, you can handle conversation history or context here
-
-  // Optionally, update the last execution timestamp in your database
 };
 
 const command: Command = {

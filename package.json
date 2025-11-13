@@ -47,6 +47,7 @@
     "chatgpt": "^5.0.10",
     "chess.js": "^1.0.0-beta.6",
     "child_process": "^1.0.2",
+    "chrono-node": "^2.9.0",
     "decode-uri-component": "^0.2.1",
     "discord.js": "^14.7.1",
     "dotenv": "^16.0.3",

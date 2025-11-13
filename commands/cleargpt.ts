@@ -1,19 +1,40 @@
 //jshint esversion:8
 import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
-import db from "../db/index.js";
 import { sendLocalized } from "../helpers/localizedMessenger.js";
+import { clearConversation } from "../helpers/conversationHistory.js";
 
-const execute = async (client: Client, msg: Message) => {
+const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
 
-  await db("gpt").coll.deleteOne({ id: chatId });
+  // Get model name from args, default to "gpt"
+  const model = args[0]?.toLowerCase() || "gpt";
 
-  await sendLocalized(client, msg, "cleargpt.success");
+  const validModels = ["gpt", "gemini", "llama", "ds", "evilllama"];
+
+  if (!validModels.includes(model)) {
+    await msg.reply(
+      `Invalid model. Valid models: ${validModels.join(", ")}\n\nUsage: !cleargpt [model]`
+    );
+    return;
+  }
+
+  // Clear conversation history for the specified model
+  const deletedCount = await clearConversation(chatId, model);
+
+  if (deletedCount > 0) {
+    await sendLocalized(client, msg, "cleargpt.success", {
+      model: model.toUpperCase(),
+    });
+  } else {
+    await sendLocalized(client, msg, "cleargpt.no_history", {
+      model: model.toUpperCase(),
+    });
+  }
 };
 
 const command: Command = {
-  name: "cleargpt.name",
+  name: "cleargpt",
   description: "cleargpt.description",
   command: "!cleargpt",
   commandType: "plugin",

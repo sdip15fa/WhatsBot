@@ -69,6 +69,19 @@ import joke from "./joke.js";
 import evilllama from "./evilllama.js";
 import ds from "./ds.js";
 import setlang from "./setlang.js"; // Added import for setlang
+import reminder from "./reminder.js";
+import poll from "./poll.js";
+import base64 from "./base64.js";
+import hash from "./hash.js";
+import morse from "./morse.js";
+import randomfact from "./randomfact.js";
+import news from "./news.js";
+import meme from "./meme.js";
+import countdown from "./countdown.js";
+import everyone from "./everyone.js";
+import groupinfo from "./groupinfo.js";
+import userinfo from "./userinfo.js";
+import ai from "./ai.js";
 import { Command } from "../types/command.js";
 
 export const commands = new Map<string, Command>();
@@ -144,3 +157,16 @@ commands.set(joke.command.slice(1), joke);
 commands.set(evilllama.command.slice(1), evilllama);
 commands.set(ds.command.slice(1), ds);
 commands.set(setlang.command.slice(1), setlang); // Added setlang to the map
+commands.set(reminder.command.slice(1), reminder);
+commands.set(poll.command.slice(1), poll);
+commands.set(base64.command.slice(1), base64);
+commands.set(hash.command.slice(1), hash);
+commands.set(morse.command.slice(1), morse);
+commands.set(randomfact.command.slice(1), randomfact);
+commands.set(news.command.slice(1), news);
+commands.set(meme.command.slice(1), meme);
+commands.set(countdown.command.slice(1), countdown);
+commands.set(everyone.command.slice(1), everyone);
+commands.set(groupinfo.command.slice(1), groupinfo);
+commands.set(userinfo.command.slice(1), userinfo);
+commands.set(ai.command.slice(1), ai);
