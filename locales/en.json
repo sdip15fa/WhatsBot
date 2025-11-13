@@ -400,7 +400,7 @@
   "start.help": "*Start*\n\nGet information about the bot.\n\n!start",
   "pick.help": "*Pick*\n\nRandomly pick one from a list of options.\n\n!pick [option1] [option2] ...\nOr,\nReply to a message with options separated by spaces and type !pick",
   "story.help": "*Story*\n\nCollaboratively write stories word by word.\n\n*Commands*\n\n!story add [word] - Add a word to the current story.\n!story see [id] - View a story by its ID (defaults to current story).\n!story new [word] - Start a new story, adding the first word.\n!story list [page] - List recent stories (defaults to first page).\n!story current [id] - Set a story as the current story.\n!story pop [id] - Remove the last word from a story (owner only).\n!story remove [id] - Remove a story by its ID (owner only).",
-  "shorten.help": "*Shorten URL*\n\nShorten a given URL.\n\n!shorten [url]\nOr,\nReply to a message with a URL and type !shorten",
+  "shorten.help": "*Shorten URL*\n\nShorten a given URL with optional custom suffix.\n\n!shorten [url]\n!shorten [url] [custom-suffix]\nOr,\nReply to a message with a URL and type !shorten\nReply to a message with a URL and type !shorten [custom-suffix]",
   "nick.help": "*Nickname*\n\nSet a nickname for yourself.\n\n!nick [nickname]",
   "nopm.help": "*Disallow PM*\n\nDisallow personal messaging for a contact.\n\n!nopm [contact]",
   "schedule.help": "*Schedule Message*\n\nSchedule a message to be sent later.\n\n!schedule [date and time] [chat ID(s)]\nOr,\nReply to a message and type !schedule [date and time] [chat ID(s)]\n\nDate and time format e.g.: 'tomorrow at 10am' or 'next Monday 2pm'\nChat ID(s) are optional, defaults to current chat ID if not provided.",

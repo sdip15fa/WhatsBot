@@ -376,7 +376,7 @@
   "spam.description": "發送一個訊息多次。",
   "spam.help": "*Spam*\n\n發送一個訊息多次。\n\n!spam [次數] [文字]\n或者，\n引用一個訊息再打 !spam [次數]",
   "shorten.description": "縮短一個網址。",
-  "shorten.help": "*縮短網址*\n\n縮短一個網址。\n\n!shorten [網址]\n或者，\n引用一個有網址嘅訊息再打 !shorten",
+  "shorten.help": "*縮短網址*\n\n縮短一個網址，可以選擇自訂後綴。\n\n!shorten [網址]\n!shorten [網址] [自訂後綴]\n或者，\n引用一個有網址嘅訊息再打 !shorten\n引用一個有網址嘅訊息再打 !shorten [自訂後綴]",
   "media.description": "由引用嘅訊息拎取媒體。",
   "media.help": "*拎取媒體*\n\n由引用嘅訊息拎取媒體。\n\n引用一個有媒體嘅訊息再打 !media",
   "ttt.no_game_in_progress": "冇Tic Tac Toe遊戲進行緊。用 `!ttt start` 嚟開始新遊戲。",

@@ -9,7 +9,15 @@ import axios from "../helpers/axios.js";
 import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
 
-export async function getShortURL(input: string) {
+export async function getShortURL(input: string, customSuffix?: string) {
+  const requestBody: any = {
+    target: input,
+  };
+
+  if (customSuffix) {
+    requestBody.customurl = customSuffix;
+  }
+
   return axios
     .post<{
       address: string;
@@ -24,9 +32,7 @@ export async function getShortURL(input: string) {
       visit_count: number;
     }>(
       `https://${process.env.KUTT_DOMAIN}/api/v2/links`,
-      {
-        target: input,
-      },
+      requestBody,
       {
         headers: {
           "X-API-KEY": process.env.KUTT_API_KEY,
@@ -50,9 +56,14 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   const chatId = (await msg.getChat()).id._serialized;
   if (msg.hasQuotedMsg) {
     const quotedMsg = await msg.getQuotedMessage();
-    data = await getShortURL(quotedMsg.body);
+    // If args[0] is provided when replying, use it as custom suffix
+    const customSuffix = args[0];
+    data = await getShortURL(quotedMsg.body, customSuffix);
   } else {
-    data = await getShortURL(args[0]);
+    // args[0] is the URL, args[1] is the optional custom suffix
+    const url = args[0];
+    const customSuffix = args[1];
+    data = await getShortURL(url, customSuffix);
   }
 
   if (data == "error") {
