@@ -1,12 +1,12 @@
 //jshint esversion:6
 
-import { Client, Message } from "whatsapp-web.js";
+import { Client, Message, GroupChat, Contact } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
 import { sendLocalized } from "../helpers/localizedMessenger.js";
 
 const execute = async (client: Client, msg: Message) => {
   try {
-    let targetContact;
+    let targetContact: Contact;
 
     // Check if replying to someone
     if (msg.hasQuotedMsg) {
@@ -14,7 +14,9 @@ const execute = async (client: Client, msg: Message) => {
       targetContact = await quotedMsg.getContact();
     } else if (msg.mentionedIds && msg.mentionedIds.length > 0) {
       // Check if someone is mentioned
-      targetContact = await client.getContactById(msg.mentionedIds[0]._serialized);
+      targetContact = await client.getContactById(
+        (msg.mentionedIds[0] as any)._serialized || msg.mentionedIds[0],
+      );
     } else {
       // Get info about the sender
       targetContact = await msg.getContact();
@@ -25,16 +27,23 @@ const execute = async (client: Client, msg: Message) => {
     infoMessage += `*Name:* ${targetContact.pushname || "N/A"}\n`;
     infoMessage += `*Number:* ${targetContact.number}\n`;
     infoMessage += `*ID:* \`${targetContact.id._serialized}\`\n`;
-    infoMessage += `*Is Business:* ${targetContact.isBusiness ? "Yes" : "No"}\n`;
-    infoMessage += `*Is Enterprise:* ${targetContact.isEnterprise ? "Yes" : "No"}\n`;
-    infoMessage += `*Is My Contact:* ${targetContact.isMyContact ? "Yes" : "No"}\n`;
+    infoMessage += `*Is Business:* ${
+      targetContact.isBusiness ? "Yes" : "No"
+    }\n`;
+    infoMessage += `*Is Enterprise:* ${
+      targetContact.isEnterprise ? "Yes" : "No"
+    }\n`;
+    infoMessage += `*Is My Contact:* ${
+      targetContact.isMyContact ? "Yes" : "No"
+    }\n`;
     infoMessage += `*Is Blocked:* ${targetContact.isBlocked ? "Yes" : "No"}\n`;
 
     // If in group, show group-specific info
     if (chat.isGroup) {
-      const participants = chat.participants || [];
+      const groupChat = chat as GroupChat;
+      const participants = groupChat.participants || [];
       const participant = participants.find(
-        (p) => p.id._serialized === targetContact.id._serialized
+        (p: any) => p.id._serialized === targetContact.id._serialized,
       );
 
       if (participant) {

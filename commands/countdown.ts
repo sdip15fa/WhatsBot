@@ -3,7 +3,7 @@
 import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
 import { sendLocalized } from "../helpers/localizedMessenger.js";
-import chrono from "chrono-node";
+import * as chrono from "chrono-node";
 
 interface Countdown {
   name: string;
@@ -63,7 +63,9 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     countdowns.get(chat.id._serialized)!.push(countdown);
 
     await msg.reply(
-      `✅ Countdown added!\n\n*${eventName}*\n📅 ${eventDate.toLocaleString()}\n⏱️ ${formatTimeLeft(eventDate)}`
+      `✅ Countdown added!\n\n*${eventName}*\n📅 ${eventDate.toLocaleString()}\n⏱️ ${formatTimeLeft(
+        eventDate,
+      )}`,
     );
     return;
   }
@@ -113,7 +115,9 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
 
     const cd = chatCountdowns[index];
     await msg.reply(
-      `⏱️ *${cd.name}*\n\n📅 ${cd.date.toLocaleString()}\n⏱️ ${formatTimeLeft(cd.date)}`
+      `⏱️ *${cd.name}*\n\n📅 ${cd.date.toLocaleString()}\n⏱️ ${formatTimeLeft(
+        cd.date,
+      )}`,
     );
     return;
   }
