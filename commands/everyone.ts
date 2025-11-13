@@ -1,6 +1,6 @@
 //jshint esversion:6
 
-import { Client, Message } from "whatsapp-web.js";
+import { Client, Message, GroupChat } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
 import { sendLocalized } from "../helpers/localizedMessenger.js";
 
@@ -13,16 +13,16 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   }
 
   try {
-    const participants = chat.participants || [];
+    const groupChat = chat as GroupChat;
+    const participants = groupChat.participants || [];
     const message = args.join(" ") || "Hey everyone!";
 
     // Create mention list
-    const mentions = [];
+    const mentions: string[] = [];
     let mentionText = `${message}\n\n`;
 
     for (const participant of participants) {
-      const contact = await client.getContactById(participant.id._serialized);
-      mentions.push(contact);
+      mentions.push(participant.id._serialized);
       mentionText += `@${participant.id.user} `;
     }
 

@@ -3,7 +3,7 @@
 import { Client, Message } from "whatsapp-web.js";
 import { Command } from "../types/command.js";
 import { sendLocalized } from "../helpers/localizedMessenger.js";
-import chrono from "chrono-node";
+import * as chrono from "chrono-node";
 
 interface Reminder {
   chatId: string;
@@ -78,7 +78,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     try {
       await client.sendMessage(
         chat.id._serialized,
-        `⏰ *Reminder*\n\n${reminderMessage}`
+        `⏰ *Reminder*\n\n${reminderMessage}`,
       );
 
       // Remove from reminders list
@@ -105,7 +105,7 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
   reminders.get(chat.id._serialized)!.push(reminder);
 
   await msg.reply(
-    `✅ Reminder set for ${reminderDate.toLocaleString()}\n\n${reminderMessage}`
+    `✅ Reminder set for ${reminderDate.toLocaleString()}\n\n${reminderMessage}`,
   );
 };
 

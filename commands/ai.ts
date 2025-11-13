@@ -31,7 +31,7 @@ async function setDefaultModel(chatId: string, model: string): Promise<void> {
     await db("ai_settings").coll.updateOne(
       { chatId },
       { $set: { defaultModel: model, updatedAt: Date.now() } },
-      { upsert: true }
+      { upsert: true },
     );
   } catch (error) {
     console.error("Error setting default model:", error);
@@ -45,10 +45,11 @@ async function executeGemini(
   prompt: string,
   chatId: string,
   hasMedia: boolean,
-  mediaMsg?: Message
-) {
+  mediaMsg?: Message,
+): Promise<string> {
   if (!config.gemini_api_key) {
-    return sendLocalized(client, msg, "gemini.not_available");
+    await sendLocalized(client, msg, "gemini.not_available");
+    return "";
   }
 
   let imageData = null;
@@ -112,10 +113,11 @@ async function executeGPT(
   prompt: string,
   chatId: string,
   hasMedia: boolean,
-  mediaMsg?: Message
-) {
+  mediaMsg?: Message,
+): Promise<string> {
   if (!config.cf_worker.url) {
-    return sendLocalized(client, msg, "gpt.no_cf_worker_url");
+    await sendLocalized(client, msg, "gpt.no_cf_worker_url");
+    return "";
   }
 
   let imageBase64 = null;
@@ -134,7 +136,8 @@ async function executeGPT(
   }
 
   const conversationHistory = await getConversationHistory(chatId, "gpt");
-  const messages: { role: "system" | "user" | "assistant"; content: string }[] = [];
+  const messages: { role: "system" | "user" | "assistant"; content: string }[] =
+    [];
 
   if (conversationHistory.length > 0) {
     conversationHistory.forEach((msg) => {
@@ -145,7 +148,9 @@ async function executeGPT(
 
   const username = config.cf_worker.username;
   const password = config.cf_worker.password;
-  const encodedCredentials = Buffer.from(`${username}:${password}`).toString("base64");
+  const encodedCredentials = Buffer.from(`${username}:${password}`).toString(
+    "base64",
+  );
   const authHeader = `Basic ${encodedCredentials}`;
 
   const requestParams: any = {
@@ -158,7 +163,7 @@ async function executeGPT(
 
   const response = await axios.get<{ response: string }>(
     `${config.cf_worker.url}gpt`,
-    { params: requestParams, headers: { Authorization: authHeader } }
+    { params: requestParams, headers: { Authorization: authHeader } },
   );
 
   await addMessageToHistory(chatId, "gpt", {
@@ -181,14 +186,16 @@ async function executeLlama(
   client: Client,
   msg: Message,
   prompt: string,
-  chatId: string
-) {
+  chatId: string,
+): Promise<string> {
   if (!config.cf_worker.url) {
-    return sendLocalized(client, msg, "llama.no_cf_worker_url");
+    await sendLocalized(client, msg, "llama.no_cf_worker_url");
+    return "";
   }
 
   const conversationHistory = await getConversationHistory(chatId, "llama");
-  const messages: { role: "system" | "user" | "assistant"; content: string }[] = [];
+  const messages: { role: "system" | "user" | "assistant"; content: string }[] =
+    [];
 
   if (conversationHistory.length > 0) {
     conversationHistory.forEach((msg) => {
@@ -199,21 +206,20 @@ async function executeLlama(
 
   const username = config.cf_worker.username;
   const password = config.cf_worker.password;
-  const encodedCredentials = Buffer.from(`${username}:${password}`).toString("base64");
+  const encodedCredentials = Buffer.from(`${username}:${password}`).toString(
+    "base64",
+  );
   const authHeader = `Basic ${encodedCredentials}`;
 
-  const response = await axios.get<{ response: string }>(
-    config.cf_worker.url,
-    {
-      params: {
-        ...(!messages?.length && { prompt }),
-        ...(messages?.length && {
-          messages: encodeURIComponent(JSON.stringify(messages)),
-        }),
-      },
-      headers: { Authorization: authHeader },
-    }
-  );
+  const response = await axios.get<{ response: string }>(config.cf_worker.url, {
+    params: {
+      ...(!messages?.length && { prompt }),
+      ...(messages?.length && {
+        messages: encodeURIComponent(JSON.stringify(messages)),
+      }),
+    },
+    headers: { Authorization: authHeader },
+  });
 
   await addMessageToHistory(chatId, "llama", {
     role: "user",
@@ -234,14 +240,16 @@ async function executeDeepSeek(
   client: Client,
   msg: Message,
   prompt: string,
-  chatId: string
-) {
+  chatId: string,
+): Promise<string> {
   if (!config.cf_worker.url) {
-    return sendLocalized(client, msg, "ds.no_cf_worker_url");
+    await sendLocalized(client, msg, "ds.no_cf_worker_url");
+    return "";
   }
 
   const conversationHistory = await getConversationHistory(chatId, "ds");
-  const messages: { role: "system" | "user" | "assistant"; content: string }[] = [];
+  const messages: { role: "system" | "user" | "assistant"; content: string }[] =
+    [];
 
   if (conversationHistory.length > 0) {
     conversationHistory.forEach((msg) => {
@@ -252,7 +260,9 @@ async function executeDeepSeek(
 
   const username = config.cf_worker.username;
   const password = config.cf_worker.password;
-  const encodedCredentials = Buffer.from(`${username}:${password}`).toString("base64");
+  const encodedCredentials = Buffer.from(`${username}:${password}`).toString(
+    "base64",
+  );
   const authHeader = `Basic ${encodedCredentials}`;
 
   const response = await axios.get<{ response: string }>(
@@ -265,7 +275,7 @@ async function executeDeepSeek(
         }),
       },
       headers: { Authorization: authHeader },
-    }
+    },
   );
 
   await addMessageToHistory(chatId, "ds", {
@@ -287,14 +297,16 @@ async function executeEvilLlama(
   client: Client,
   msg: Message,
   prompt: string,
-  chatId: string
-) {
+  chatId: string,
+): Promise<string> {
   if (!config.cf_worker.url) {
-    return sendLocalized(client, msg, "evilllama.no_cf_worker_url");
+    await sendLocalized(client, msg, "evilllama.no_cf_worker_url");
+    return "";
   }
 
   const conversationHistory = await getConversationHistory(chatId, "evilllama");
-  const messages: { role: "system" | "user" | "assistant"; content: string }[] = [];
+  const messages: { role: "system" | "user" | "assistant"; content: string }[] =
+    [];
 
   if (conversationHistory.length > 0) {
     conversationHistory.forEach((msg) => {
@@ -305,22 +317,21 @@ async function executeEvilLlama(
 
   const username = config.cf_worker.username;
   const password = config.cf_worker.password;
-  const encodedCredentials = Buffer.from(`${username}:${password}`).toString("base64");
+  const encodedCredentials = Buffer.from(`${username}:${password}`).toString(
+    "base64",
+  );
   const authHeader = `Basic ${encodedCredentials}`;
 
-  const response = await axios.get<{ response: string }>(
-    config.cf_worker.url,
-    {
-      params: {
-        ...(!messages?.length && { prompt }),
-        ...(messages?.length && {
-          messages: encodeURIComponent(JSON.stringify(messages)),
-        }),
-        evil: true,
-      },
-      headers: { Authorization: authHeader },
-    }
-  );
+  const response = await axios.get<{ response: string }>(config.cf_worker.url, {
+    params: {
+      ...(!messages?.length && { prompt }),
+      ...(messages?.length && {
+        messages: encodeURIComponent(JSON.stringify(messages)),
+      }),
+      evil: true,
+    },
+    headers: { Authorization: authHeader },
+  });
 
   await addMessageToHistory(chatId, "evilllama", {
     role: "user",
@@ -354,7 +365,9 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
 
     if (model && !validModels.includes(model)) {
       await msg.reply(
-        `Invalid model. Valid models: ${validModels.join(", ")}\n\nUsage: !ai clear [model|all]`
+        `Invalid model. Valid models: ${validModels.join(
+          ", ",
+        )}\n\nUsage: !ai clear [model|all]`,
       );
       return;
     }
@@ -362,14 +375,20 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     if (!model || model === "all") {
       const deletedCount = await clearConversation(chatId);
       await msg.reply(
-        `✅ Cleared all AI conversation history (${deletedCount} ${deletedCount === 1 ? "conversation" : "conversations"})`
+        `✅ Cleared all AI conversation history (${deletedCount} ${
+          deletedCount === 1 ? "conversation" : "conversations"
+        })`,
       );
     } else {
       const deletedCount = await clearConversation(chatId, model);
       if (deletedCount > 0) {
-        await msg.reply(`✅ Cleared ${model.toUpperCase()} conversation history`);
+        await msg.reply(
+          `✅ Cleared ${model.toUpperCase()} conversation history`,
+        );
       } else {
-        await msg.reply(`No ${model.toUpperCase()} conversation history found.`);
+        await msg.reply(
+          `No ${model.toUpperCase()} conversation history found.`,
+        );
       }
     }
     return;
@@ -381,7 +400,9 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
 
     if (!validModels.includes(model)) {
       await msg.reply(
-        `Invalid model. Valid models: ${validModels.join(", ")}\n\nUsage: !ai history [model]`
+        `Invalid model. Valid models: ${validModels.join(
+          ", ",
+        )}\n\nUsage: !ai history [model]`,
       );
       return;
     }
@@ -389,7 +410,9 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     const history = await getConversationHistory(chatId, model);
 
     if (history.length === 0) {
-      await msg.reply(`No conversation history found for ${model.toUpperCase()}.`);
+      await msg.reply(
+        `No conversation history found for ${model.toUpperCase()}.`,
+      );
       return;
     }
 
@@ -421,7 +444,9 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
 
     if (!validModels.includes(model)) {
       await msg.reply(
-        `Invalid model. Valid models: ${validModels.join(", ")}\n\nUsage: !ai export [model]`
+        `Invalid model. Valid models: ${validModels.join(
+          ", ",
+        )}\n\nUsage: !ai export [model]`,
       );
       return;
     }
@@ -460,19 +485,29 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     let modelsText = `🤖 *Available AI Models*\n\n`;
     modelsText += `Current default: *${defaultModel.toUpperCase()}*\n\n`;
 
-    modelsText += `1. *Gemini* (Gemini 2.0 Flash) ${defaultModel === "gemini" ? "⭐" : ""}\n`;
+    modelsText += `1. *Gemini* (Gemini 2.0 Flash) ${
+      defaultModel === "gemini" ? "⭐" : ""
+    }\n`;
     modelsText += `   Features: Text, Vision, Fast\n\n`;
 
-    modelsText += `2. *GPT* (GPT-4O-mini 120B) ${defaultModel === "gpt" ? "⭐" : ""}\n`;
+    modelsText += `2. *GPT* (GPT-4O-mini 120B) ${
+      defaultModel === "gpt" ? "⭐" : ""
+    }\n`;
     modelsText += `   Features: Text, Vision\n\n`;
 
-    modelsText += `3. *Llama* (Llama 3.3 70B) ${defaultModel === "llama" ? "⭐" : ""}\n`;
+    modelsText += `3. *Llama* (Llama 3.3 70B) ${
+      defaultModel === "llama" ? "⭐" : ""
+    }\n`;
     modelsText += `   Features: Text chat\n\n`;
 
-    modelsText += `4. *DeepSeek* (DeepSeek R1) ${defaultModel === "ds" ? "⭐" : ""}\n`;
+    modelsText += `4. *DeepSeek* (DeepSeek R1) ${
+      defaultModel === "ds" ? "⭐" : ""
+    }\n`;
     modelsText += `   Features: Reasoning, CoT\n\n`;
 
-    modelsText += `5. *EvilLlama* (Uncensored) ${defaultModel === "evilllama" ? "⭐" : ""}\n`;
+    modelsText += `5. *EvilLlama* (Uncensored) ${
+      defaultModel === "evilllama" ? "⭐" : ""
+    }\n`;
     modelsText += `   Features: No filters\n\n`;
 
     modelsText += `*Usage:*\n`;
@@ -490,7 +525,9 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
 
     if (!model || !validModels.includes(model)) {
       await msg.reply(
-        `Invalid model. Valid models: ${validModels.join(", ")}\n\nUsage: !ai use [model]`
+        `Invalid model. Valid models: ${validModels.join(
+          ", ",
+        )}\n\nUsage: !ai use [model]`,
       );
       return;
     }
@@ -516,7 +553,9 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     prompt = args.slice(1).join(" ");
 
     if (!prompt) {
-      await msg.reply(`Please provide a prompt for ${selectedModel.toUpperCase()}`);
+      await msg.reply(
+        `Please provide a prompt for ${selectedModel.toUpperCase()}`,
+      );
       return;
     }
   }
@@ -537,10 +576,24 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
     // Route to appropriate model
     switch (selectedModel) {
       case "gemini":
-        response = await executeGemini(client, msg, prompt, chatId, hasMedia, mediaMsg);
+        response = await executeGemini(
+          client,
+          msg,
+          prompt,
+          chatId,
+          hasMedia,
+          mediaMsg,
+        );
         break;
       case "gpt":
-        response = await executeGPT(client, msg, prompt, chatId, hasMedia, mediaMsg);
+        response = await executeGPT(
+          client,
+          msg,
+          prompt,
+          chatId,
+          hasMedia,
+          mediaMsg,
+        );
         break;
       case "llama":
         response = await executeLlama(client, msg, prompt, chatId);
@@ -552,14 +605,23 @@ const execute = async (client: Client, msg: Message, args: string[]) => {
         response = await executeEvilLlama(client, msg, prompt, chatId);
         break;
       default:
-        response = await executeGemini(client, msg, prompt, chatId, hasMedia, mediaMsg);
+        response = await executeGemini(
+          client,
+          msg,
+          prompt,
+          chatId,
+          hasMedia,
+          mediaMsg,
+        );
     }
 
     // Send response
     await msg.reply(`${selectedModel.toUpperCase()}: ${response}`);
   } catch (error) {
     console.error(`${selectedModel} generation failed:`, error);
-    await msg.reply(`❌ ${selectedModel.toUpperCase()} generation failed. Please try again.`);
+    await msg.reply(
+      `❌ ${selectedModel.toUpperCase()} generation failed. Please try again.`,
+    );
   }
 };
 
