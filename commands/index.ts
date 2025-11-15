@@ -82,6 +82,7 @@ import everyone from "./everyone.js";
 import groupinfo from "./groupinfo.js";
 import userinfo from "./userinfo.js";
 import ai from "./ai.js";
+import imagegen from "./imagegen.js";
 import { Command } from "../types/command.js";
 
 export const commands = new Map<string, Command>();
@@ -170,3 +171,4 @@ commands.set(everyone.command.slice(1), everyone);
 commands.set(groupinfo.command.slice(1), groupinfo);
 commands.set(userinfo.command.slice(1), userinfo);
 commands.set(ai.command.slice(1), ai);
+commands.set(imagegen.command.slice(1), imagegen);
